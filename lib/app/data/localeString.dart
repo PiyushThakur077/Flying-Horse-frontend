@@ -35,10 +35,9 @@ class LocaleString extends Translations {
   Map<String, Map<String, String>> get keys => {
         //ENGLISH LANGUAGE
         'en_US': {
-          'home': 'Home',
-          'recents': 'Recents',
-          'following': 'Following',
-          'messages': 'Messages'
+          'home': 'HOME',
+          'users': 'USERS',
+          'profile': 'PROFILE',
         },
       };
 }

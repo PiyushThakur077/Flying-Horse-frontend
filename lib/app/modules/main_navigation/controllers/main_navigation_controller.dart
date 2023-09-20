@@ -1,12 +1,34 @@
+import 'package:flutter/material.dart';
+import 'package:flying_horse/app/modules/home/controllers/home_controller.dart';
+import 'package:flying_horse/app/modules/home/views/home_view.dart';
+import 'package:flying_horse/app/modules/profile/controllers/profile_controller.dart';
+import 'package:flying_horse/app/modules/profile/views/profile_view.dart';
+import 'package:flying_horse/app/modules/users/controllers/users_controller.dart';
+import 'package:flying_horse/app/modules/users/views/users_view.dart';
 import 'package:get/get.dart';
 
 class MainNavigationController extends GetxController {
-  //TODO: Implement MainNavigationController
-
-  final count = 0.obs;
+  RxInt selectedIndex = 0.obs;
+  List<Widget> bottomNavigationBarItems = [
+    HomeView(),
+    UsersView(),
+    ProfileView()
+  ];
   @override
   void onInit() {
     super.onInit();
+  }
+
+  get getSelectedIndex => selectedIndex.value;
+  setSelectedIndex(int index) {
+    if (index == 0) {
+      Get.find<HomeController>().onInit();
+    } else if (index == 1) {
+      Get.find<UsersController>().onInit();
+    } else if (index == 2) {
+      Get.find<ProfileController>().onInit();
+    }
+    this.selectedIndex.value = index;
   }
 
   @override
@@ -18,6 +40,4 @@ class MainNavigationController extends GetxController {
   void onClose() {
     super.onClose();
   }
-
-  void increment() => count.value++;
 }

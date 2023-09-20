@@ -7,7 +7,7 @@ import 'package:get/get.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   runApp(GetMaterialApp(
-    initialRoute: Routes.LOGIN,
+    initialRoute: Routes.MAIN_NAVIGATION,
     getPages: AppPages.routes,
     title: 'Chirper',
     translations: LocaleString(),
