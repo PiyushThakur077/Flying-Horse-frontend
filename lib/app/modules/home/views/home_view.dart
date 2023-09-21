@@ -1,10 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flying_horse/app/data/colors.dart';
 import 'package:flying_horse/app/utils/text_style.dart';
-
 import 'package:get/get.dart';
-import 'package:get_storage/get_storage.dart';
-
 import '../controllers/home_controller.dart';
 
 class HomeView extends GetView<HomeController> {
@@ -13,7 +10,7 @@ class HomeView extends GetView<HomeController> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          title: const Text('HomeView'),
+          title: const Text('Home'),
           centerTitle: true,
         ),
         body: Obx(
@@ -70,6 +67,7 @@ class HomeView extends GetView<HomeController> {
                       confirmDismiss: (direction) async {
                         if (direction == DismissDirection.endToStart) {
                           controller.selectedIndex.value = index;
+                          controller.startTimer();
                           return false;
                         }
                       },
@@ -185,8 +183,126 @@ class HomeView extends GetView<HomeController> {
                         height: 15,
                       ),
                   itemCount: 4),
+              Container(
+                  height: 125,
+                  margin: EdgeInsets.all(20),
+                  decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(5),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.15),
+                          spreadRadius: 1,
+                          blurRadius: 5,
+                          offset: Offset(0, 0),
+                        ),
+                      ]),
+                  child: Column(children: [
+                    Container(
+                        height: 40,
+                        decoration: BoxDecoration(
+                          color: Color(0xffE2E2E2),
+                          borderRadius: BorderRadius.only(
+                              topLeft: Radius.circular(5),
+                              topRight: Radius.circular(5)),
+                        ),
+                        child: Row(
+                          children: [
+                            SizedBox(
+                              width: 16,
+                            ),
+                            Expanded(
+                                child: Text(
+                              'Status',
+                              style: AppTextStyle.mediumStyle(fontSize: 20),
+                            )),
+                            Text(
+                              controller.selectedIndex.value == 0
+                                  ? 'Available'
+                                  : controller.selectedIndex.value == 1
+                                      ? 'May Be Available'
+                                      : controller.selectedIndex.value == 2
+                                          ? 'Unavailable'
+                                          : controller.selectedIndex.value == 3
+                                              ? 'Do Not Disturb'
+                                              : 'Not Selected',
+                              style: AppTextStyle.regularStyle(
+                                  fontSize: 14,
+                                  color: controller.selectedIndex.value == 0
+                                      ? AppColors.available
+                                      : controller.selectedIndex.value == 1
+                                          ? AppColors.mayBe
+                                          : controller.selectedIndex.value == 2
+                                              ? AppColors.unavailable
+                                              : controller.selectedIndex
+                                                          .value ==
+                                                      3
+                                                  ? AppColors.dnd
+                                                  : Colors.black),
+                            ),
+                            SizedBox(
+                              width: 14,
+                            ),
+                          ],
+                        )),
+                    Obx(() => buildTime())
+                  ])),
+              InkWell(
+                onTap: () {},
+                child: Container(
+                  height: 45,
+                  margin: EdgeInsets.all(20),
+                  decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(5),
+                      color: AppColors.primary),
+                  child: Center(
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          'Stop',
+                          style: AppTextStyle.regularStyle(
+                              fontSize: 18, color: Colors.white),
+                        ),
+                        SizedBox(
+                          width: 8,
+                        ),
+                        Image.asset(
+                          'assets/images/stop.png',
+                          height: 24,
+                        )
+                      ],
+                    ),
+                  ),
+                ),
+              )
             ],
           ),
         ));
+  }
+
+  Widget buildTime() {
+    String twoDigit(int n) => n.toString().padLeft(2, '0');
+    final hours = twoDigit(controller.duration.value.inHours);
+    final minutes = twoDigit(controller.duration.value.inMinutes.remainder(60));
+    final seconds = twoDigit(controller.duration.value.inSeconds.remainder(60));
+    return Expanded(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        mainAxisSize: MainAxisSize.max,
+        children: [
+          Text(
+            '$hours : $minutes : $seconds',
+            style: AppTextStyle.semiBoldStyle(fontSize: 32),
+          ),
+          Text(
+            'HOUR                 MIN                 SEC',
+            style: AppTextStyle.regularStyle(fontSize: 10),
+          ),
+        ],
+      ),
+    );
   }
 }

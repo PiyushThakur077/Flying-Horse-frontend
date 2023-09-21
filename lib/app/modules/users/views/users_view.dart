@@ -12,7 +12,7 @@ class UsersView extends GetView<UsersController> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('UsersView'),
+        title: Text('Users'),
         centerTitle: true,
       ),
       body: ListView(
