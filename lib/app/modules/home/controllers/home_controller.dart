@@ -1,5 +1,11 @@
 import 'dart:async';
 
+import 'package:flutter/cupertino.dart';
+import 'package:flying_horse/app/data/api_provider.dart';
+import 'package:flying_horse/app/data/colors.dart';
+import 'package:flying_horse/app/modules/home/user_detail_response.dart';
+import 'package:flying_horse/app/modules/login/user.dart';
+import 'package:flying_horse/app/widgets/dialogs.dart';
 import 'package:get/get.dart';
 
 class HomeController extends GetxController {
@@ -7,9 +13,12 @@ class HomeController extends GetxController {
   Rx<Duration> duration = Duration().obs;
   Timer? timer;
   RxBool isCountDown = true.obs;
+  RxBool isLoading = false.obs;
+  Rx<User> users = User().obs;
   @override
   void onInit() {
     super.onInit();
+    duration.value = DateTime.now().difference(DateTime(2023, 09, 21));
   }
 
   void reset() {
@@ -22,8 +31,47 @@ class HomeController extends GetxController {
     duration.value = Duration(seconds: seconds);
   }
 
+  getUser(int page) {
+    isLoading.value = true;
+    ApiProvider().getUser().then((resp) {
+      isLoading.value = false;
+      users.value = UserDetailResponse.fromJson(resp).data!;
+    }, onError: (err) {
+      isLoading.value = false;
+    });
+  }
+
+  Future<void> changeStatusApi(int status) async {
+    Get.dialog(
+        Center(
+            child: CupertinoActivityIndicator(
+          color: AppColors.primary,
+        )),
+        barrierDismissible: false);
+
+    var res = await ApiProvider().updateStatus({
+      'status_id': status,
+    });
+
+    Get.back();
+    if (res['success'] ?? false) {
+      UserData userData = LoginResponse.fromJson(res).data!;
+  
+      
+    } else {
+      Widgets.showAppDialog(description: res['message'] ?? '');
+    }
+  }
+
   void startTimer() {
+    stopTimer();
     reset();
+    timer = Timer.periodic(Duration(seconds: 1), (timer) {
+      addTime();
+    });
+  }
+
+  void resumeTimer() {
     timer = Timer.periodic(Duration(seconds: 1), (timer) {
       addTime();
     });

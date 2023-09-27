@@ -1,5 +1,12 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flying_horse/app/data/api_provider.dart';
+import 'package:flying_horse/app/data/colors.dart';
+import 'package:flying_horse/app/modules/login/user.dart';
+import 'package:flying_horse/app/routes/app_pages.dart';
+import 'package:flying_horse/app/widgets/dialogs.dart';
 import 'package:get/get.dart';
+import 'package:get_storage/get_storage.dart';
 
 class LoginController extends GetxController {
   TextEditingController usernameController = TextEditingController();
@@ -26,10 +33,34 @@ class LoginController extends GetxController {
     final FormState form = loginFormKey.currentState!;
     if (form.validate()) {
       //if form valid
-      // loginApiCall(id: Uuid().v4());
+      loginApiCall();
     } else {
       //form is invalid
       print('Form is invalid');
+    }
+  }
+
+  Future<void> loginApiCall() async {
+    Get.dialog(
+        Center(child: CupertinoActivityIndicator(color: AppColors.primary)),
+        barrierDismissible: false);
+
+    var res = await ApiProvider().signIn({
+      'email': usernameController.text,
+      'password': passwordController.text,
+    });
+
+    Get.back();
+    if (res['success'] ?? false) {
+      UserData userData = LoginResponse.fromJson(res).data!;
+      GetStorage().write('token', userData.token);
+      GetStorage().write('userId', userData.user!.id);
+      GetStorage().write('userName', userData.user!.name);
+      Get.offAllNamed(
+        Routes.MAIN_NAVIGATION,
+      );
+    } else {
+      Widgets.showAppDialog(description: res['message'] ?? '');
     }
   }
 

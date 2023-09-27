@@ -126,7 +126,9 @@ class LoginView extends GetView<LoginController> {
                       ),
                       AppButton(
                         padding: EdgeInsets.symmetric(vertical: 20),
-                        onPressed: () {},
+                        onPressed: () {
+                          controller.validateAndContinue();
+                        },
                         title: 'Login',
                       ),
                     ],
