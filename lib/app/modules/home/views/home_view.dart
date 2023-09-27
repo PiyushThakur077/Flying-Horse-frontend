@@ -167,9 +167,8 @@ class HomeView extends GetView<HomeController> {
                                       confirmDismiss: (direction) async {
                                         if (direction ==
                                             DismissDirection.endToStart) {
-                                          controller.selectedIndex.value =
-                                              index;
-                                          controller.startTimer();
+                                          await controller
+                                              .changeStatusApi(index);
                                           return false;
                                         }
                                       },

@@ -13,6 +13,7 @@ class UsersController extends GetxController {
   }
 
   getUsers(int page) {
+    users.clear();
     isLoading.value = true;
     ApiProvider().getUsers().then((resp) {
       isLoading.value = false;

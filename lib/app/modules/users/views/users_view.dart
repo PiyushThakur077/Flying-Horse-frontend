@@ -96,8 +96,25 @@ class UsersView extends GetView<UsersController> {
                                                 color: Colors.black),
                                           ),
                                           TextSpan(
-                                            text:
-                                                '${controller.users[index].statusId}',
+                                            text: controller.users[index]
+                                                        .statusId ==
+                                                    1
+                                                ? 'Available'
+                                                : controller.users[index]
+                                                            .statusId ==
+                                                        2
+                                                    ? 'May Be Available'
+                                                    : controller.users[index]
+                                                                .statusId ==
+                                                            3
+                                                        ? 'Unavailable'
+                                                        : controller
+                                                                    .users[
+                                                                        index]
+                                                                    .statusId ==
+                                                                3
+                                                            ? 'Do Not Disturb'
+                                                            : 'Not defined',
                                             style: AppTextStyle.regularStyle(
                                                 fontSize: 14,
                                                 color: Color(0xffBDBDBD)),

@@ -14,11 +14,11 @@ class HomeController extends GetxController {
   Timer? timer;
   RxBool isCountDown = true.obs;
   RxBool isLoading = false.obs;
-  Rx<User> users = User().obs;
+  Rx<User> user = User().obs;
   @override
   void onInit() {
     super.onInit();
-    duration.value = DateTime.now().difference(DateTime(2023, 09, 21));
+    getUser();
   }
 
   void reset() {
@@ -31,11 +31,17 @@ class HomeController extends GetxController {
     duration.value = Duration(seconds: seconds);
   }
 
-  getUser(int page) {
+  getUser() {
+    stopTimer();
     isLoading.value = true;
     ApiProvider().getUser().then((resp) {
       isLoading.value = false;
-      users.value = UserDetailResponse.fromJson(resp).data!;
+      user.value = UserDetailResponse.fromJson(resp).data!;
+      duration.value =
+          DateTime.now().difference(DateTime.parse(user.value.updatedAt!));
+      selectedIndex.value = (user.value.statusId ?? 10) - 1;
+      resumeTimer();
+      // duration.value = DateTime.now().difference(DateTime(2023, 09, 21));
     }, onError: (err) {
       isLoading.value = false;
     });
@@ -48,16 +54,15 @@ class HomeController extends GetxController {
           color: AppColors.primary,
         )),
         barrierDismissible: false);
-
+    startTimer();
     var res = await ApiProvider().updateStatus({
-      'status_id': status,
+      'status_id': (status + 1),
     });
 
     Get.back();
     if (res['success'] ?? false) {
-      UserData userData = LoginResponse.fromJson(res).data!;
-  
-      
+      // UserData userData = LoginResponse.fromJson(res).data!;
+      selectedIndex.value = status;
     } else {
       Widgets.showAppDialog(description: res['message'] ?? '');
     }
