@@ -1,4 +1,4 @@
-package com.zinreet.flying_horse
+package com.flyingHorseLogistics
 
 import io.flutter.embedding.android.FlutterActivity
 

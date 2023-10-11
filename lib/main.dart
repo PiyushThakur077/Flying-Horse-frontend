@@ -17,7 +17,7 @@ Future<void> main() async {
   runApp(GetMaterialApp(
     initialRoute: initialRoute,
     getPages: AppPages.routes,
-    title: 'Chirper',
+    title: 'Flying horse',
     translations: LocaleString(),
     locale: LocaleString.locale,
     fallbackLocale: LocaleString.fallbackLocale,

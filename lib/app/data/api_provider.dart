@@ -15,25 +15,38 @@ class ApiProvider extends GetConnect {
   }
 
   Future<dynamic> signIn(Map map) async {
-    return await postApi('api/login', map,
-        headers: {}, contentType: 'application/json');
+    return await postApi(
+      'api/login',
+      map,
+      headers: {'accept': 'application/json'},
+      contentType: 'application/json',
+    );
   }
 
   Future<dynamic> getUsers() async {
     return await getApi('api/users',
-        headers: {'Authorization': "Bearer ${GetStorage().read('token')}"},
+        headers: {
+          'accept': 'application/json',
+          'Authorization': "Bearer ${GetStorage().read('token')}"
+        },
         contentType: 'application/json');
   }
 
   Future<dynamic> getUser() async {
     return await getApi('api/user',
-        headers: {'Authorization': "Bearer ${GetStorage().read('token')}"},
+        headers: {
+          'accept': 'application/json',
+          'Authorization': "Bearer ${GetStorage().read('token')}"
+        },
         contentType: 'application/json');
   }
 
   Future<dynamic> updateStatus(Map map) async {
     return await postApi('api/updateStatus', map,
-        headers: {'Authorization': "Bearer ${GetStorage().read('token')}"},
+        headers: {
+          'accept': 'application/json',
+          'Authorization': "Bearer ${GetStorage().read('token')}"
+        },
         contentType: 'application/json');
   }
 
