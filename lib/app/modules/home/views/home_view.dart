@@ -154,58 +154,74 @@ class HomeView extends GetView<HomeController> {
                                             offset: Offset(0, 0),
                                           ),
                                         ]),
-                                    child: Row(
-                                      children: [
-                                        SizedBox(
-                                          width: 16,
-                                        ),
-                                        Expanded(
-                                          child: Text.rich(
-                                            TextSpan(
-                                              children: [
-                                                TextSpan(
-                                                  text: index == 0
-                                                      ? 'Available'
-                                                      : index == 1
-                                                          ? 'May Be Available'
-                                                          : index == 2
-                                                              ? 'Unavailable'
-                                                              : 'Do Not Disturb',
-                                                  style:
-                                                      AppTextStyle.mediumStyle(
-                                                          fontSize: 17,
-                                                          color: Colors.black),
-                                                ),
-                                              ],
+                                    child: Dismissible(
+                                      background: Container(
+                                        height: 64,
+                                        color: index == 0
+                                            ? AppColors.available
+                                            : index == 1
+                                                ? AppColors.mayBe
+                                                : index == 2
+                                                    ? AppColors.unavailable
+                                                    : AppColors.dnd,
+                                      ),
+                                      confirmDismiss: (direction) async {
+                                        if (direction ==
+                                            DismissDirection.endToStart) {
+                                          await controller
+                                              .changeStatusApi(index);
+                                          return false;
+                                        }
+                                      },
+                                      key: Key(index.toString()),
+                                      child: Center(
+                                        child: Row(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.center,
+                                          children: [
+                                            SizedBox(
+                                              width: 16,
                                             ),
-                                          ),
+                                            Expanded(
+                                              child: Text.rich(
+                                                TextSpan(
+                                                  children: [
+                                                    TextSpan(
+                                                      text: index == 0
+                                                          ? 'Available'
+                                                          : index == 1
+                                                              ? 'May Be Available'
+                                                              : index == 2
+                                                                  ? 'Unavailable'
+                                                                  : 'Do Not Disturb',
+                                                      style: AppTextStyle
+                                                          .mediumStyle(
+                                                              fontSize: 17,
+                                                              color:
+                                                                  Colors.black),
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+                                            ),
+                                            Image.asset(
+                                              'assets/images/thumb_slide.png',
+                                              color: index == 0
+                                                  ? AppColors.available
+                                                  : index == 1
+                                                      ? AppColors.mayBe
+                                                      : index == 2
+                                                          ? AppColors
+                                                              .unavailable
+                                                          : AppColors.dnd,
+                                              height: 36,
+                                            ),
+                                            SizedBox(
+                                              width: 9,
+                                            )
+                                          ],
                                         ),
-                                        Dismissible(
-                                          confirmDismiss: (direction) async {
-                                            if (direction ==
-                                                DismissDirection.endToStart) {
-                                              await controller
-                                                  .changeStatusApi(index);
-                                              return false;
-                                            }
-                                          },
-                                          key: Key(index.toString()),
-                                          child: Image.asset(
-                                            'assets/images/thumb_slide.png',
-                                            color: index == 0
-                                                ? AppColors.available
-                                                : index == 1
-                                                    ? AppColors.mayBe
-                                                    : index == 2
-                                                        ? AppColors.unavailable
-                                                        : AppColors.dnd,
-                                            height: 36,
-                                          ),
-                                        ),
-                                        SizedBox(
-                                          width: 9,
-                                        )
-                                      ],
+                                      ),
                                     ),
                                   ),
                             separatorBuilder: (context, index) => SizedBox(

@@ -24,11 +24,18 @@ class LoginView extends GetView<LoginController> {
         body: SafeArea(
           child: Stack(
             children: [
-              Image.asset(
-                'assets/images/login_background.png',
+              Image(
+                image: AssetImage('assets/images/login_background1.png'),
+                // Image.asset(
+                //   'assets/images/login_background.png',
                 height: Get.height,
                 width: Get.width,
                 fit: BoxFit.cover,
+              ),
+              Container(
+                height: Get.height,
+                width: Get.width,
+                color: Colors.black.withOpacity(0.7),
               ),
               Obx(() => Form(
                     key: controller.loginFormKey,
@@ -67,17 +74,17 @@ class LoginView extends GetView<LoginController> {
                           keyboardType: TextInputType.text,
                           textInputAction: TextInputAction.next,
                           style: AppTextStyle.mediumStyle(
-                              fontSize: 14, color: Color(0xffD6D6D6)),
+                              fontSize: 14, color: Color(0xffffffff)),
                           validator: (v) {
                             return controller.validateUserName(v ?? '');
                           },
                           decoration: InputDecoration(
                             filled: true,
-                            fillColor: Colors.white.withOpacity(0.5),
+                            fillColor: Colors.white.withOpacity(0.3),
                             hintText: 'Username',
                             isDense: true,
                             hintStyle: AppTextStyle.regularStyle(
-                                fontSize: 13, color: Color(0xffD6D6D6)),
+                                fontSize: 13, color: Color(0xffffffff)),
                           ),
                           onChanged: (val) {},
                           onFieldSubmitted: (v) {
@@ -106,13 +113,13 @@ class LoginView extends GetView<LoginController> {
                           obscureText: controller.obsecureCreatePassword.value,
                           textAlignVertical: TextAlignVertical.center,
                           style: AppTextStyle.mediumStyle(
-                              fontSize: 14, color: Color(0xffD6D6D6)),
+                              fontSize: 14, color: Color(0xffffffff)),
                           focusNode: controller.passwordFocus,
                           keyboardType: TextInputType.visiblePassword,
                           textInputAction: TextInputAction.done,
                           decoration: InputDecoration(
                               filled: true,
-                              fillColor: Colors.white.withOpacity(0.5),
+                              fillColor: Colors.white.withOpacity(0.3),
                               isDense: true,
                               suffixIcon: IconButton(
                                 icon: Icon(
@@ -130,7 +137,7 @@ class LoginView extends GetView<LoginController> {
                                 },
                               ),
                               hintStyle: AppTextStyle.regularStyle(
-                                  fontSize: 13, color: Color(0xffD6D6D6)),
+                                  fontSize: 13, color: Color(0xffffffff)),
                               hintText: 'Password'),
                         ),
                         AppButton(

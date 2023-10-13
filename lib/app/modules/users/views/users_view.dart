@@ -114,7 +114,7 @@ class UsersView extends GetView<UsersController> {
                                                                     .statusId ==
                                                                 3
                                                             ? 'Do Not Disturb'
-                                                            : 'Not defined',
+                                                            : '',
                                             style: AppTextStyle.regularStyle(
                                                 fontSize: 14,
                                                 color: Color(0xffBDBDBD)),
@@ -126,7 +126,23 @@ class UsersView extends GetView<UsersController> {
                                   Container(
                                     height: 64,
                                     decoration: BoxDecoration(
-                                        color: AppColors.available,
+                                        color: controller
+                                                    .users[index].statusId ==
+                                                0
+                                            ? AppColors.available
+                                            : controller.users[index]
+                                                        .statusId ==
+                                                    1
+                                                ? AppColors.mayBe
+                                                : controller.users[index]
+                                                            .statusId ==
+                                                        2
+                                                    ? AppColors.unavailable
+                                                    : controller.users[index]
+                                                                .statusId ==
+                                                            3
+                                                        ? AppColors.dnd
+                                                        : Colors.grey,
                                         borderRadius: BorderRadius.only(
                                             topRight: Radius.circular(5),
                                             bottomRight: Radius.circular(5))),

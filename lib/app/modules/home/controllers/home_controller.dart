@@ -37,10 +37,11 @@ class HomeController extends GetxController {
     ApiProvider().getUser().then((resp) {
       isLoading.value = false;
       user.value = UserDetailResponse.fromJson(resp).data!;
-      duration.value =
-          DateTime.now().difference(DateTime.parse(user.value.updatedAt!));
+      if (user.value.statusId != null)
+        duration.value =
+            DateTime.now().difference(DateTime.parse(user.value.updatedAt!));
       selectedIndex.value = (user.value.statusId ?? 10) - 1;
-      resumeTimer();
+      if (user.value.statusId != null) resumeTimer();
       // duration.value = DateTime.now().difference(DateTime(2023, 09, 21));
     }, onError: (err) {
       isLoading.value = false;

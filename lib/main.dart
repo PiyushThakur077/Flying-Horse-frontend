@@ -8,6 +8,7 @@ import 'package:get_storage/get_storage.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await GetStorage.init();
+  await Future.delayed(Duration(seconds: 1));
 
   String initialRoute = Routes.LOGIN;
 
