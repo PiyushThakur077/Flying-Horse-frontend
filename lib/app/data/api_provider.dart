@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flying_horse/app/data/constants.dart';
 import 'package:flying_horse/app/modules/login/user.dart';
 import 'package:flying_horse/app/widgets/dialogs.dart';
@@ -23,12 +25,13 @@ class ApiProvider extends GetConnect {
     );
   }
 
-  Future<dynamic> getUsers() async {
+  Future<dynamic> getUsers(String page) async {
     return await getApi('api/users',
         headers: {
           'accept': 'application/json',
           'Authorization': "Bearer ${GetStorage().read('token')}"
         },
+        query: {'page': page},
         contentType: 'application/json');
   }
 
@@ -62,8 +65,8 @@ class ApiProvider extends GetConnect {
       // if (isLoading) {
       Get.back();
       // }
-      Widgets.showAppDialog(
-          isError: true, description: response.body['message']);
+      Widgets.showAppDialog(isError: true, description: ErrorHandler(response));
+
       return Future.error(response.statusText!);
     } else {
       print(response.body);
@@ -91,16 +94,46 @@ class ApiProvider extends GetConnect {
     httpClient.timeout = const Duration(seconds: 35);
     final response = await get(Constants.baseUrl + url!,
         contentType: contentType, headers: headers, query: query);
+    log(response.status.toString());
+    log(response.body.toString());
+
     if (response.status.hasError) {
       if (isLoading) {
         Get.back();
       }
-      Widgets.showAppDialog(
-          isError: true, description: response.body['message']);
+      Widgets.showAppDialog(isError: true, description: ErrorHandler(response));
       return Future.error(response.statusText!);
     } else {
       print(response.body);
       return response.body;
+    }
+  }
+
+  dynamic ErrorHandler(Response response) {
+    print(response.toString());
+    if (response.status.connectionError) {
+      return 'Error occurred pls check internet and retry.';
+    } else {
+      switch (response.statusCode) {
+        case 200:
+        case 201:
+        case 202:
+          var responseJson = response.body;
+          return responseJson;
+        case 400:
+          var responseJson = response.body['message'] is String
+              ? response.body['message']
+              : response.body['message'][0];
+          return responseJson;
+        case 500:
+          return "Server Error pls retry later";
+        case 403:
+          return 'Error occurred pls retry.';
+        case 401:
+          return 'Unauthorised.';
+        default:
+          return 'Error occurred retry';
+      }
     }
   }
 }

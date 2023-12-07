@@ -24,43 +24,49 @@ class Widgets {
             const SizedBox(
               height: 20,
             ),
-            isError
-                ? Text(
-                    'opps'.tr,
-                    style: AppTextStyle.boldStyle(
-                      fontSize: 20,
-                    ),
-                  )
-                : isCongrats
-                    ? Text(
-                        'congratulation'.tr,
-                        style: AppTextStyle.boldStyle(
-                            color: Colors.black,
-                            fontSize: 20,
-                            fontWeight: FontWeight.w700),
-                      )
-                    : title != null
-                        ? Text(
-                            title,
-                            style: AppTextStyle.boldStyle(
-                                color: Colors.black,
-                                fontSize: 20,
-                                fontWeight: FontWeight.w700),
-                          )
-                        : const SizedBox(),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20.0),
+              child: isError
+                  ? Text(
+                      'opps'.tr,
+                      style: AppTextStyle.boldStyle(
+                        fontSize: 20,
+                      ),
+                    )
+                  : isCongrats
+                      ? Text(
+                          'congratulation'.tr,
+                          style: AppTextStyle.boldStyle(
+                              color: Colors.black,
+                              fontSize: 20,
+                              fontWeight: FontWeight.w700),
+                        )
+                      : title != null
+                          ? Text(
+                              title,
+                              style: AppTextStyle.boldStyle(
+                                  color: Colors.black,
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.w700),
+                            )
+                          : const SizedBox(),
+            ),
             SizedBox(
               height: isError || isCongrats || title != null ? 12 : 0,
             ),
-            Text(
-              description,
-              style: AppTextStyle.regularStyle(
-                color: Colors.black,
-                fontSize: 14,
-                fontWeight: FontWeight.w400,
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20.0),
+              child: Text(
+                description,
+                style: AppTextStyle.regularStyle(
+                  color: Colors.black,
+                  fontSize: 14,
+                  fontWeight: FontWeight.w400,
+                ),
+                textAlign: TextAlign.center,
+                overflow: TextOverflow.ellipsis,
+                maxLines: 3,
               ),
-              textAlign: TextAlign.center,
-              overflow: TextOverflow.ellipsis,
-              maxLines: 3,
             ),
             const SizedBox(
               height: 20,

@@ -24,7 +24,7 @@ class MainNavigationController extends GetxController {
     if (index == 0) {
       Get.find<HomeController>().onInit();
     } else if (index == 1) {
-      Get.find<UsersController>().onInit();
+      Get.find<UsersController>().getUsers(1);
     } else if (index == 2) {
       Get.find<ProfileController>().onInit();
     }

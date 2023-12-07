@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flying_horse/app/data/colors.dart';
 import 'package:flying_horse/app/routes/app_pages.dart';
 
 import 'package:get/get.dart';
@@ -10,7 +12,15 @@ class ProfileView extends GetView<ProfileController> {
   const ProfileView({Key? key}) : super(key: key);
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return AnnotatedRegion<SystemUiOverlayStyle>(
+        value: SystemUiOverlayStyle(
+            statusBarIconBrightness: Brightness.dark,
+            statusBarColor: AppColors.primary,
+            systemNavigationBarIconBrightness: Brightness.dark,
+            statusBarBrightness: Brightness.light,
+            systemNavigationBarColor: AppColors.primary,
+            systemNavigationBarDividerColor: AppColors.primary),
+        child: Scaffold(
       appBar: AppBar(
         title: const Text('ProfileView'),
         centerTitle: true,
@@ -27,6 +37,6 @@ class ProfileView extends GetView<ProfileController> {
           ),
         ),
       ),
-    );
+    ));
   }
 }

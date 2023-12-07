@@ -59,7 +59,6 @@ class HomeController extends GetxController {
     var res = await ApiProvider().updateStatus({
       'status_id': (status + 1),
     });
-
     Get.back();
     if (res['success'] ?? false) {
       // UserData userData = LoginResponse.fromJson(res).data!;

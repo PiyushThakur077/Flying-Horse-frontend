@@ -15,11 +15,11 @@ class LoginView extends GetView<LoginController> {
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: SystemUiOverlayStyle(
           statusBarIconBrightness: Brightness.dark,
-          statusBarColor: Colors.white,
+          statusBarColor: AppColors.primary,
           systemNavigationBarIconBrightness: Brightness.dark,
           statusBarBrightness: Brightness.light,
-          systemNavigationBarColor: Colors.white,
-          systemNavigationBarDividerColor: Colors.white),
+          systemNavigationBarColor: AppColors.primary,
+          systemNavigationBarDividerColor: AppColors.primary),
       child: Scaffold(
         body: SafeArea(
           child: Stack(
