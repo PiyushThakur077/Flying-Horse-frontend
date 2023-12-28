@@ -13,31 +13,33 @@ class LoginView extends GetView<LoginController> {
   @override
   Widget build(BuildContext context) {
     return AnnotatedRegion<SystemUiOverlayStyle>(
-      value: SystemUiOverlayStyle(
-          statusBarIconBrightness: Brightness.dark,
-          statusBarColor: AppColors.primary,
-          systemNavigationBarIconBrightness: Brightness.dark,
-          statusBarBrightness: Brightness.light,
-          systemNavigationBarColor: AppColors.primary,
-          systemNavigationBarDividerColor: AppColors.primary),
-      child: Scaffold(
-        body: SafeArea(
-          child: Stack(
-            children: [
-              Image(
-                image: AssetImage('assets/images/login_background1.png'),
-                // Image.asset(
-                //   'assets/images/login_background.png',
-                height: Get.height,
-                width: Get.width,
-                fit: BoxFit.cover,
-              ),
-              Container(
-                height: Get.height,
-                width: Get.width,
-                color: Colors.black.withOpacity(0.7),
-              ),
-              Obx(() => Form(
+        value: SystemUiOverlayStyle(
+            statusBarIconBrightness: Brightness.dark,
+            statusBarColor: AppColors.primary,
+            systemNavigationBarIconBrightness: Brightness.dark,
+            statusBarBrightness: Brightness.light,
+            systemNavigationBarColor: AppColors.primary,
+            systemNavigationBarDividerColor: AppColors.primary),
+        child:
+            Scaffold(body: OrientationBuilder(builder: (context, orientation) {
+          return SafeArea(
+            child: Obx(
+              () => Stack(
+                children: [
+                  Image(
+                    image: AssetImage('assets/images/login_background1.png'),
+                    // Image.asset(
+                    //   'assets/images/login_background.png',
+                    height: Get.height,
+                    width: Get.width,
+                    fit: BoxFit.cover,
+                  ),
+                  Container(
+                    height: Get.height,
+                    width: Get.width,
+                    color: Colors.black.withOpacity(0.7),
+                  ),
+                  Form(
                     key: controller.loginFormKey,
                     child: ListView(
                       padding: EdgeInsets.symmetric(horizontal: 20),
@@ -149,11 +151,11 @@ class LoginView extends GetView<LoginController> {
                         ),
                       ],
                     ),
-                  ))
-            ],
-          ),
-        ),
-      ),
-    );
+                  )
+                ],
+              ),
+            ),
+          );
+        })));
   }
 }
