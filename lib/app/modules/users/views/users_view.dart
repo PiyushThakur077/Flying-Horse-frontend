@@ -24,6 +24,8 @@ class UsersView extends GetView<UsersController> {
             appBar: AppBar(
               title: Text('Users'),
               centerTitle: true,
+              backgroundColor: AppColors.primary,
+              titleTextStyle: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.w600),
             ),
             body: Obx(
               () => controller.isLoading.value

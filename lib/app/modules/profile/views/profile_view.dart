@@ -23,7 +23,9 @@ class ProfileView extends GetView<ProfileController> {
         child: Scaffold(
       appBar: AppBar(
         title: const Text('ProfileView'),
+        titleTextStyle: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.w600),
         centerTitle: true,
+        backgroundColor: AppColors.primary,
       ),
       body: Center(
         child: InkWell(

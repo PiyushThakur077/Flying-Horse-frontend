@@ -7,6 +7,7 @@ import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import '../controllers/home_controller.dart';
 
+
 class HomeView extends GetView<HomeController> {
   const HomeView({Key? key}) : super(key: key);
   @override
@@ -23,6 +24,8 @@ class HomeView extends GetView<HomeController> {
             appBar: AppBar(
               title: const Text('Home'),
               centerTitle: true,
+              backgroundColor: AppColors.primary,
+              titleTextStyle: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.w600),
             ),
             body: SafeArea(
                 child: Obx(

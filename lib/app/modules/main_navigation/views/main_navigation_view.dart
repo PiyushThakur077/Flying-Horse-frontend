@@ -62,6 +62,18 @@ class MainNavigationView extends GetView<MainNavigationController> {
                 ),
                 BottomNavigationBarItem(
                   icon: Image.asset(
+                    'assets/images/tab_fuel.png',
+                    height: 24,
+                  ),
+                  label: 'FUEL'.tr,
+                  activeIcon: Image.asset(
+                    'assets/images/tab_fuel.png',
+                    color: AppColors.primary,
+                    height: 24,
+                  ),
+                ),
+                BottomNavigationBarItem(
+                  icon: Image.asset(
                     'assets/images/tab_profile.png',
                     height: 24,
                   ),
@@ -72,7 +84,9 @@ class MainNavigationView extends GetView<MainNavigationController> {
                     height: 24,
                   ),
                 ),
+                
               ],
+              
               currentIndex: controller.getSelectedIndex,
               onTap: (index) async {
                 controller.setSelectedIndex(index);
