@@ -65,7 +65,7 @@ class MainNavigationView extends GetView<MainNavigationController> {
                     'assets/images/tab_fuel.png',
                     height: 24,
                   ),
-                  label: 'FUEL'.tr,
+                  label: 'REFUEL'.tr,
                   activeIcon: Image.asset(
                     'assets/images/tab_fuel.png',
                     color: AppColors.primary,

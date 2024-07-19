@@ -16,6 +16,7 @@ class UsersController extends GetxController {
   void onInit() {
     super.onInit();
     scrollControllerListner();
+    getUsers(current_page.value);
   }
 
   scrollControllerListner() {
@@ -37,7 +38,7 @@ class UsersController extends GetxController {
     } else {
       Get.dialog(
           Center(
-              child: CupertinoActivityIndicator(
+              child: CupertinoActivityIndicator( 
             color: AppColors.primary,
           )),
           barrierDismissible: false);

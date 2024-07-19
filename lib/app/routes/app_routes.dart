@@ -9,6 +9,7 @@ abstract class Routes {
   static const USERS = _Paths.USERS;
   static const PROFILE = _Paths.PROFILE;
   static const REFUELING = _Paths.REFUELING;
+  static const REFUEL = _Paths.REFUEL;
 }
 
 abstract class _Paths {
@@ -19,4 +20,5 @@ abstract class _Paths {
   static const USERS = '/users';
   static const PROFILE = '/profile';
   static const REFUELING = '/refueling';
+  static const REFUEL = '/refuel';
 }
