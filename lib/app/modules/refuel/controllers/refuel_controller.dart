@@ -8,6 +8,7 @@ class RefuelController extends GetxController {
 
   var currentLocation = LatLng(0, 0).obs;
   var isLoading = true.obs;
+  var selectedFuelType = 0.obs; // Add this line
 
   @override
   void onInit() {
@@ -45,5 +46,9 @@ class RefuelController extends GetxController {
 
   void onMapCreated(GoogleMapController controller) {
     mapController = controller;
+  }
+
+  void setSelectedFuelType(int index) {
+    selectedFuelType.value = index;
   }
 }
