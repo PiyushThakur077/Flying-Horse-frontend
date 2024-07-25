@@ -10,6 +10,8 @@ import '../modules/profile/bindings/profile_binding.dart';
 import '../modules/profile/views/profile_view.dart';
 import '../modules/refuel/bindings/refuel_binding.dart';
 import '../modules/refuel/views/refuel_view.dart';
+import '../modules/refuel_card/bindings/refuel_card_binding.dart';
+import '../modules/refuel_card/views/refuel_card_view.dart';
 import '../modules/refueling/bindings/refueling_binding.dart';
 import '../modules/refueling/views/refueling_view.dart';
 import '../modules/users/bindings/users_binding.dart';
@@ -57,6 +59,11 @@ class AppPages {
       name: _Paths.REFUEL,
       page: () => const RefuelView(),
       binding: RefuelBinding(),
+    ),
+    GetPage(
+      name: _Paths.REFUEL_CARD,
+      page: () => const RefuelCardView(),
+      binding: RefuelCardBinding(),
     ),
   ];
 }

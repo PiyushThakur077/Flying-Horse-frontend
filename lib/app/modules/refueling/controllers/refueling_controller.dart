@@ -1,23 +1,28 @@
+import 'package:flying_horse/app/data/api_provider.dart';
 import 'package:get/get.dart';
 
 class RefuelingController extends GetxController {
-  //TODO: Implement RefuelingController
+  var trips = <Map<String, dynamic>>[].obs; // List of maps to hold trip data
+  var isLoading = true.obs;
+  final apiProvider = ApiProvider();
 
-  final count = 0.obs;
   @override
   void onInit() {
     super.onInit();
+    fetchTrips();
   }
 
-  @override
-  void onReady() {
-    super.onReady();
+  void fetchTrips() async {
+    try {
+      isLoading(true);
+      var response = await apiProvider.getTrip();
+      if (response != null && response is List) {
+        trips.assignAll(response.map((e) => e as Map<String, dynamic>).toList());
+      }
+    } catch (e) {
+      Get.snackbar('Error', 'Failed to fetch trips');
+    } finally {
+      isLoading(false);
+    }
   }
-
-  @override
-  void onClose() {
-    super.onClose();
-  }
-
-  void increment() => count.value++;
 }

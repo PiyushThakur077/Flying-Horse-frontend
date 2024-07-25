@@ -1,3 +1,3 @@
 class Constants {
-  static const String baseUrl = "https://475d-223-178-209-179.ngrok-free.app/";
+  static const String baseUrl = "https://5bbf-14-97-239-178.ngrok-free.app/";
 }

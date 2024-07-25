@@ -37,7 +37,7 @@ class CommonTextInput extends StatelessWidget {
             fontSize: 16,
           ),
         ),
-        const SizedBox(height: 8),
+        const SizedBox(height: 5),
         TextFormField(
           controller: controller,
           keyboardType: keyboardType,
@@ -62,7 +62,7 @@ class CommonTextInput extends StatelessWidget {
             hintStyle: const TextStyle(color: Color(0xFFB8B8B8)),
             suffixIcon: showSegmentedTabs && segments != null
                 ? Padding(
-                    padding: const EdgeInsets.only(right: 10),
+                    padding: const EdgeInsets.only(right: 5),
                     child: SegmentedTab(
                       segments: segments!,
                       onSegmentChanged: onSegmentChanged,
@@ -95,36 +95,46 @@ class _SegmentedTabState extends State<SegmentedTab> {
 
   @override
   Widget build(BuildContext context) {
-    return SegmentedButton<int>(
-      segments: widget.segments.asMap().entries.map((entry) {
-        return ButtonSegment<int>(
-          value: entry.key,
-          label: Text(entry.value),
+    return AnimatedSwitcher(
+      duration: const Duration(milliseconds: 300),
+      transitionBuilder: (Widget child, Animation<double> animation) {
+        return FadeTransition(
+          opacity: animation,
+          child: child,
         );
-      }).toList(),
-      selected: {_selectedIndex},
-      showSelectedIcon: false,
-      onSelectionChanged: (newSelection) {
-        setState(() {
-          _selectedIndex = newSelection.first;
-        });
-        if (widget.onSegmentChanged != null) {
-          widget.onSegmentChanged!(_selectedIndex);
-        }
       },
-      style: ButtonStyle(
-        backgroundColor: MaterialStateProperty.resolveWith<Color>((states) {
-          if (states.contains(MaterialState.selected)) {
-            return AppColors.primary;
+      child: SegmentedButton<int>(
+        key: ValueKey<int>(_selectedIndex),
+        segments: widget.segments.asMap().entries.map((entry) {
+          return ButtonSegment<int>(
+            value: entry.key,
+            label: Text(entry.value),
+          );
+        }).toList(),
+        selected: {_selectedIndex},
+        showSelectedIcon: false,
+        onSelectionChanged: (newSelection) {
+          setState(() {
+            _selectedIndex = newSelection.first;
+          });
+          if (widget.onSegmentChanged != null) {
+            widget.onSegmentChanged!(_selectedIndex);
           }
-          return Colors.white;
-        }),
-        foregroundColor: MaterialStateProperty.resolveWith<Color>((states) {
-          if (states.contains(MaterialState.selected)) {
+        },
+        style: ButtonStyle(
+          backgroundColor: MaterialStateProperty.resolveWith<Color>((states) {
+            if (states.contains(MaterialState.selected)) {
+              return AppColors.primary;
+            }
             return Colors.white;
-          }
-          return Colors.black;
-        }),
+          }),
+          foregroundColor: MaterialStateProperty.resolveWith<Color>((states) {
+            if (states.contains(MaterialState.selected)) {
+              return Colors.white;
+            }
+            return Colors.black;
+          }),
+        ),
       ),
     );
   }

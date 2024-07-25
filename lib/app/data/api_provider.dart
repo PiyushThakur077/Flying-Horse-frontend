@@ -1,5 +1,4 @@
 import 'dart:developer';
-
 import 'package:flying_horse/app/data/constants.dart';
 import 'package:flying_horse/app/modules/login/user.dart';
 import 'package:flying_horse/app/widgets/dialogs.dart';
@@ -53,6 +52,33 @@ class ApiProvider extends GetConnect {
         contentType: 'application/json');
   }
 
+  Future<dynamic> getTrip() async {
+    return await getApi('api/user/trips',
+        headers: {
+          'accept': 'application/json',
+          'Authorization': "Bearer ${GetStorage().read('token')}"
+        },
+        contentType: 'application/json');
+  }
+
+  Future<dynamic> getTripId(int id) async {
+    return await getApi('api/user/trips/$id',
+        headers: {
+          'accept': 'application/json',
+          'Authorization': "Bearer ${GetStorage().read('token')}"
+        },
+        contentType: 'application/json');
+  }
+
+  Future<dynamic> saveFuelDetails(Map map) async {
+    return await postApi('api/user/refuelings', map,
+        headers: {
+          'accept': 'application/json',
+          'Authorization': "Bearer ${GetStorage().read('token')}"
+        },
+        contentType: 'application/json');
+  }
+
   Future<dynamic> postApi(String? url, dynamic body,
       {String? contentType,
       Map<String, String>? headers,
@@ -62,11 +88,8 @@ class ApiProvider extends GetConnect {
     final response = await post(Constants.baseUrl + url!, body,
         contentType: contentType, headers: headers);
     if (response.status.hasError) {
-      // if (isLoading) {
       Get.back();
-      // }
       Widgets.showAppDialog(isError: true, description: ErrorHandler(response));
-
       return Future.error(response.statusText!);
     } else {
       print(response.body);

@@ -7,4 +7,5 @@ class AppColors {
   static const Color available = Color(0xff00970F);
   static const Color mayBe = Color(0xffE58900);
   static const Color unavailable = Color(0xff580082);
+  static const Color black = Colors.black;
 }

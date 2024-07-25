@@ -1,6 +1,10 @@
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
+import 'package:flying_horse/app/data/api_provider.dart';
+import 'package:flying_horse/app/data/colors.dart';
 import 'package:get/get.dart';
+import 'package:get_storage/get_storage.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:location/location.dart';
 
 class RefuelController extends GetxController {
   late GoogleMapController mapController;
@@ -8,47 +12,57 @@ class RefuelController extends GetxController {
 
   var currentLocation = LatLng(0, 0).obs;
   var isLoading = true.obs;
-  var selectedFuelType = 0.obs; // Add this line
+  var selectedFuelType = 'Diesel'.obs;
+
+  var truckNumber = ''.obs;
+  var odometerReadingUnit = 'KM'.obs;
+  var odometerReading = 0.0.obs;
+  var fuelQuantityUnit = 'Liter'.obs;
+  var fuelQuantity = 0.0.obs;
+  var amountPaid = 0.0.obs;
+  var tripNumber = ''.obs;
+  var cardDetail = ''.obs;
 
   @override
   void onInit() {
     super.onInit();
-    _getCurrentLocation();
   }
 
-  void _getCurrentLocation() async {
-    Location location = Location();
+  void setSelectedFuelType(String value) {
+    selectedFuelType.value = value;
+  }
 
-    bool _serviceEnabled;
-    PermissionStatus _permissionGranted;
-    LocationData _locationData;
-
-    _serviceEnabled = await location.serviceEnabled();
-    if (!_serviceEnabled) {
-      _serviceEnabled = await location.requestService();
-      if (!_serviceEnabled) {
-        return;
-      }
+  Future<void> saveFuelDetails() async {
+    isLoading.value = true;
+    final map = {
+      "trip_number": tripNumber.value,
+      "fuel_type": selectedFuelType.value.toLowerCase(),
+      "odometer_reading_unit": odometerReadingUnit.value,
+      "odometer_reading": odometerReading.value,
+      "fuel_quantity_unit": fuelQuantityUnit.value,
+      "fuel_quantity": fuelQuantity.value,
+      "amount_paid": amountPaid.value,
+      "fuel_station_address":
+          "Fairmat Hotel Macdonald, Edmonton AB T5J ON6, Canada",
+    };
+    try {
+      await ApiProvider().saveFuelDetails(map);
+      Get.snackbar("Success", "Fuel details saved successfully");
+      Get.back(); // Navigate back to the previous screen
+    } catch (e) {
+      Get.snackbar("Error", "Failed to save fuel details");
+    } finally {
+      isLoading.value = false;
     }
-
-    _permissionGranted = await location.hasPermission();
-    if (_permissionGranted == PermissionStatus.denied) {
-      _permissionGranted = await location.requestPermission();
-      if (_permissionGranted != PermissionStatus.granted) {
-        return;
-      }
-    }
-
-    _locationData = await location.getLocation();
-    currentLocation.value = LatLng(_locationData.latitude!, _locationData.longitude!);
-    isLoading.value = false;
   }
 
-  void onMapCreated(GoogleMapController controller) {
-    mapController = controller;
+  @override
+  void onReady() {
+    super.onReady();
   }
 
-  void setSelectedFuelType(int index) {
-    selectedFuelType.value = index;
+  @override
+  void onClose() {
+    super.onClose();
   }
 }
