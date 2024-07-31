@@ -79,6 +79,36 @@ class ApiProvider extends GetConnect {
         contentType: 'application/json');
   }
 
+  Future<dynamic> deleteFuelDetails(int id) async {
+    return await deleteApi('api/user/refuelings/destroy/$id',
+        headers: {
+          'accept': 'application/json',
+          'Authorization': "Bearer ${GetStorage().read('token')}"
+        },
+        contentType: 'application/json');
+  }
+
+  Future<dynamic> updateFuelDetails(int id, Map map) async {
+    return await putApi('api/user/refuelings/update/$id', map,
+        headers: {
+          'accept': 'application/json',
+          'Authorization': "Bearer ${GetStorage().read('token')}"
+        },
+        contentType: 'application/json');
+  }
+
+  Future<dynamic> filterTrips(Map<String, dynamic> filterParams) async {
+    return await postApi(
+      'api/user/trips/filter',
+      filterParams,
+      headers: {
+        'accept': 'application/json',
+        'Authorization': "Bearer ${GetStorage().read('token')}"
+      },
+      contentType: 'application/json',
+    );
+  }
+
   Future<dynamic> postApi(String? url, dynamic body,
       {String? contentType,
       Map<String, String>? headers,
@@ -116,6 +146,48 @@ class ApiProvider extends GetConnect {
       bool isLoading = false}) async {
     httpClient.timeout = const Duration(seconds: 35);
     final response = await get(Constants.baseUrl + url!,
+        contentType: contentType, headers: headers, query: query);
+    log(response.status.toString());
+    log(response.body.toString());
+
+    if (response.status.hasError) {
+      if (isLoading) {
+        Get.back();
+      }
+      Widgets.showAppDialog(isError: true, description: ErrorHandler(response));
+      return Future.error(response.statusText!);
+    } else {
+      print(response.body);
+      return response.body;
+    }
+  }
+
+  Future<dynamic> putApi(String? url, dynamic body,
+      {String? contentType,
+      Map<String, String>? headers,
+      Map<String, dynamic>? query}) async {
+    httpClient.timeout = const Duration(seconds: 35);
+    final response = await put(Constants.baseUrl + url!, body,
+        contentType: contentType, headers: headers);
+    log(response.status.toString());
+    log(response.body.toString());
+
+    if (response.status.hasError) {
+      Widgets.showAppDialog(isError: true, description: ErrorHandler(response));
+      return Future.error(response.statusText!);
+    } else {
+      print(response.body);
+      return response.body;
+    }
+  }
+
+  Future<dynamic> deleteApi(String? url,
+      {String? contentType,
+      Map<String, String>? headers,
+      Map<String, dynamic>? query,
+      bool isLoading = false}) async {
+    httpClient.timeout = const Duration(seconds: 35);
+    final response = await delete(Constants.baseUrl + url!,
         contentType: contentType, headers: headers, query: query);
     log(response.status.toString());
     log(response.body.toString());

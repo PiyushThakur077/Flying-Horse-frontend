@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flying_horse/app/data/colors.dart';
+import 'package:flying_horse/app/utils/text_style.dart';
+import 'package:country_state_city_pro/country_state_city_pro.dart';
 
 class CommonTextInput extends StatelessWidget {
   final String labelText;
@@ -10,7 +12,13 @@ class CommonTextInput extends StatelessWidget {
   final Function(String)? onChanged;
   final bool showSegmentedTabs;
   final List<String>? segments;
-  final Function(int)? onSegmentChanged;
+  final String? selectedSegment;
+  final Function(String)? onSegmentSelected;
+  final bool readOnly;
+  final bool isCountryPicker;
+  final TextEditingController? countryController;
+  final TextEditingController? stateController;
+  final TextEditingController? cityController;
 
   const CommonTextInput({
     Key? key,
@@ -22,7 +30,13 @@ class CommonTextInput extends StatelessWidget {
     this.onChanged,
     this.showSegmentedTabs = false,
     this.segments,
-    this.onSegmentChanged,
+    this.selectedSegment,
+    this.onSegmentSelected,
+    this.readOnly = false,
+    this.isCountryPicker = false,
+    this.countryController,
+    this.stateController,
+    this.cityController,
   }) : super(key: key);
 
   @override
@@ -30,47 +44,86 @@ class CommonTextInput extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          labelText,
-          style: const TextStyle(
-            color: Colors.black,
-            fontSize: 16,
+        Padding(
+          padding: EdgeInsets.symmetric(horizontal: 10),
+          child: Text(
+            labelText,
+            style: AppTextStyle.mediumStyle(
+                fontSize: 15, color: Color(0xff000000)),
           ),
         ),
-        const SizedBox(height: 5),
-        TextFormField(
-          controller: controller,
-          keyboardType: keyboardType,
-          obscureText: obscureText,
-          onChanged: onChanged,
-          decoration: InputDecoration(
-            filled: true,
-            fillColor: const Color(0xFFEEEEEE),
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(25.0),
-              borderSide: BorderSide.none,
+        const SizedBox(height: 6),
+        if (isCountryPicker)
+          CountryStateCityPicker(
+            country: countryController!,
+            state: stateController!,
+            city: cityController!,
+            dialogColor: Colors.grey.shade200,
+            textFieldDecoration: InputDecoration(
+              fillColor: const Color(0xFFEEEEEE),
+              filled: true,
+              suffixIcon: const Icon(Icons.arrow_drop_down),
+              border: const OutlineInputBorder(borderSide: BorderSide.none),
+              enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(25.0),
+                borderSide: BorderSide.none,
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(25.0),
+                borderSide: BorderSide.none,
+              ),
+              hintText: hintText,
+              hintStyle: const TextStyle(color: Color(0xFFB8B8B8)),
+              contentPadding:
+                  const EdgeInsets.symmetric(vertical: 15.0, horizontal: 20.0),
             ),
-            enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(25.0),
-              borderSide: BorderSide.none,
+            
+          )
+        else
+          Container(
+            width: double.infinity,
+            height: 50,
+            child: TextFormField(
+              controller: controller,
+              keyboardType: keyboardType,
+              obscureText: obscureText,
+              onChanged: onChanged,
+              readOnly: readOnly,
+              decoration: InputDecoration(
+                filled: true,
+                fillColor: const Color(0xFFEEEEEE),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(25.0),
+                  borderSide: BorderSide.none,
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(25.0),
+                  borderSide: BorderSide.none,
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(25.0),
+                  borderSide: BorderSide.none,
+                ),
+                hintText: hintText,
+                hintStyle: const TextStyle(color: Color(0xFFB8B8B8)),
+                contentPadding: const EdgeInsets.symmetric(
+                    vertical: 15.0, horizontal: 20.0),
+                suffixIcon: showSegmentedTabs && segments != null
+                    ? Padding(
+                        padding: const EdgeInsets.only(right: 8),
+                        child: Container(
+                          height: 30, // Smaller height
+                          child: SegmentedTab(
+                            segments: segments!,
+                            selectedSegment: selectedSegment,
+                            onSegmentSelected: onSegmentSelected,
+                          ),
+                        ),
+                      )
+                    : null,
+              ),
             ),
-            focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(25.0),
-              borderSide: BorderSide.none,
-            ),
-            hintText: hintText,
-            hintStyle: const TextStyle(color: Color(0xFFB8B8B8)),
-            suffixIcon: showSegmentedTabs && segments != null
-                ? Padding(
-                    padding: const EdgeInsets.only(right: 5),
-                    child: SegmentedTab(
-                      segments: segments!,
-                      onSegmentChanged: onSegmentChanged,
-                    ),
-                  )
-                : null,
           ),
-        ),
       ],
     );
   }
@@ -78,12 +131,14 @@ class CommonTextInput extends StatelessWidget {
 
 class SegmentedTab extends StatefulWidget {
   final List<String> segments;
-  final Function(int)? onSegmentChanged;
+  final String? selectedSegment;
+  final Function(String)? onSegmentSelected;
 
   const SegmentedTab({
     Key? key,
     required this.segments,
-    this.onSegmentChanged,
+    this.selectedSegment,
+    this.onSegmentSelected,
   }) : super(key: key);
 
   @override
@@ -91,50 +146,44 @@ class SegmentedTab extends StatefulWidget {
 }
 
 class _SegmentedTabState extends State<SegmentedTab> {
-  int _selectedIndex = 0;
+  late String _selectedSegment;
+
+  @override
+  void initState() {
+    super.initState();
+    _selectedSegment = widget.selectedSegment ?? widget.segments[0];
+  }
 
   @override
   Widget build(BuildContext context) {
-    return AnimatedSwitcher(
-      duration: const Duration(milliseconds: 300),
-      transitionBuilder: (Widget child, Animation<double> animation) {
-        return FadeTransition(
-          opacity: animation,
-          child: child,
-        );
-      },
-      child: SegmentedButton<int>(
-        key: ValueKey<int>(_selectedIndex),
-        segments: widget.segments.asMap().entries.map((entry) {
-          return ButtonSegment<int>(
-            value: entry.key,
-            label: Text(entry.value),
-          );
-        }).toList(),
-        selected: {_selectedIndex},
-        showSelectedIcon: false,
-        onSelectionChanged: (newSelection) {
+    return Container(
+      height: 30, // Smaller height
+      child: ToggleButtons(
+        isSelected: widget.segments
+            .map((segment) => segment == _selectedSegment)
+            .toList(),
+        onPressed: (index) {
           setState(() {
-            _selectedIndex = newSelection.first;
+            _selectedSegment = widget.segments[index];
           });
-          if (widget.onSegmentChanged != null) {
-            widget.onSegmentChanged!(_selectedIndex);
+          if (widget.onSegmentSelected != null) {
+            widget.onSegmentSelected!(_selectedSegment);
           }
         },
-        style: ButtonStyle(
-          backgroundColor: MaterialStateProperty.resolveWith<Color>((states) {
-            if (states.contains(MaterialState.selected)) {
-              return AppColors.primary;
-            }
-            return Colors.white;
-          }),
-          foregroundColor: MaterialStateProperty.resolveWith<Color>((states) {
-            if (states.contains(MaterialState.selected)) {
-              return Colors.white;
-            }
-            return Colors.black;
-          }),
-        ),
+        borderRadius: BorderRadius.circular(15.0), 
+        fillColor: AppColors.primary, 
+        selectedColor: Colors.white, 
+        color: Colors.black, 
+        constraints:
+            BoxConstraints(minHeight: 30, minWidth: 50), 
+        children: widget.segments
+            .map((segment) => Padding(
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 7.0, vertical: 5.0), 
+                  child: Text(segment,
+                      style: TextStyle(fontSize: 14)), 
+                ))
+            .toList(),
       ),
     );
   }

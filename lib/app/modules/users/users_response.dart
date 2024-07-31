@@ -9,10 +9,10 @@ class UsersResponse {
   UsersResponse({this.data, this.success, this.message, this.statusCode});
 
   UsersResponse.fromJson(Map<String, dynamic> json) {
-    if (json['data'] != null) {
+    if (json['data'] != null && json['data']['data'] != null) {
       data = <User>[];
-      json['data'].forEach((v) {
-        data!.add(new User.fromJson(v));
+      json['data']['data'].forEach((v) {
+        data!.add(User.fromJson(v));
       });
     }
     success = json['success'];
@@ -21,7 +21,7 @@ class UsersResponse {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
+    final Map<String, dynamic> data = <String, dynamic>{};
     if (this.data != null) {
       data['data'] = this.data!.map((v) => v.toJson()).toList();
     }
@@ -31,5 +31,3 @@ class UsersResponse {
     return data;
   }
 }
-
-

@@ -10,53 +10,70 @@ class UsersController extends GetxController {
   RxBool isLoading = false.obs;
   RxList<User> users = <User>[].obs;
   ScrollController scrollController = ScrollController();
-  RxInt current_page = 1.obs;
-  RxInt last_page = 1.obs;
+  RxInt currentPage = 1.obs;
+  RxInt lastPage = 1.obs;
+
   @override
   void onInit() {
     super.onInit();
-    scrollControllerListner();
-    getUsers(current_page.value);
+    getUsers(currentPage.value);
+    scrollControllerListener();
   }
 
-  scrollControllerListner() {
+  void scrollControllerListener() {
     scrollController.addListener(() {
-      if (scrollController.position.pixels ==
-          scrollController.position.maxScrollExtent) {
-        if (current_page.value < last_page.value) {
-          current_page.value++;
-          getUsers(current_page.value);
+      if (scrollController.position.pixels == scrollController.position.maxScrollExtent) {
+        if (currentPage.value < lastPage.value && !isLoading.value) {
+          currentPage.value++;
+          getUsers(currentPage.value);
         }
       }
     });
   }
 
-  getUsers(int page) {
+  Future<void> getUsers(int page) async {
     if (page == 1) {
-      users.clear();
+      users.clear();  
       isLoading.value = true;
     } else {
       Get.dialog(
-          Center(
-              child: CupertinoActivityIndicator( 
+        Center(
+          child: CupertinoActivityIndicator(
             color: AppColors.primary,
-          )),
-          barrierDismissible: false);
+          ),
+        ),
+        barrierDismissible: false,
+      );
     }
-    ApiProvider().getUsers(page.toString()).then((resp) {
+
+    try {
+      var resp = await ApiProvider().getUsers(page.toString());
+      print('API response: $resp'); // Debug print
+
+      var usersResponse = UsersResponse.fromJson(resp);
+      print('Parsed users: ${usersResponse.data}'); // Debug print
+
       if (page == 1) {
         isLoading.value = false;
       } else {
         Get.back();
       }
-      users.addAll(UsersResponse.fromJson(resp).data!);
-      if (UsersResponse.fromJson(resp).data!.length == 10) {
-        last_page.value++;
+
+      if (usersResponse.data != null) {
+        users.addAll(usersResponse.data!);
       }
+
+      if (usersResponse.data != null && usersResponse.data!.length == 10) {
+        lastPage.value = currentPage.value;  // Ensure lastPage value is correctly updated
+      }
+
       users.refresh();
-    }, onError: (err) {
+      print('Users list updated: ${users.length}'); // Debug print
+    } catch (err) {
       isLoading.value = false;
-    });
+      if (page != 1) Get.back();
+      print('Error: $err'); // Debug print
+    }
   }
 
   @override
@@ -66,6 +83,7 @@ class UsersController extends GetxController {
 
   @override
   void onClose() {
+    scrollController.dispose();
     super.onClose();
   }
 }

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flying_horse/app/data/colors.dart';
+import 'package:flying_horse/app/utils/text_style.dart';
 import 'package:flying_horse/app/widgets/app_button.dart';
 import 'package:flying_horse/app/widgets/common_text_input.dart';
 import 'package:get/get.dart';
@@ -31,18 +32,37 @@ class RefuelView extends GetView<RefuelController> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
-                  'Fuel Type',
-                  style: TextStyle(
-                    color: Colors.black,
-                    fontSize: 16,
+                CommonTextInput(
+                  labelText: 'Site Name',
+                  hintText: 'ONTARIO 8AHM 202',
+                  controller: controller.siteNameController,
+                ),
+                const SizedBox(height: 10),
+                CommonTextInput(
+                  labelText: 'Select Location',
+                  hintText: 'Select Country',
+                  isCountryPicker: true,
+                  countryController: controller.countryController,
+                  stateController: controller.stateController,
+                  cityController: controller.cityController,
+                  readOnly: true,
+                ),
+                const SizedBox(height: 10),
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 11),
+                  child: Text(
+                    'Fuel Type',
+                    style: AppTextStyle.mediumStyle(
+                      fontSize: 15,
+                      color: Color(0xff000000),
+                    ),
                   ),
                 ),
-                const SizedBox(height: 5),
                 Obx(() => Container(
+                      height: 50,
                       width: double.infinity,
                       child: SegmentedButton<String>(
-                        showSelectedIcon: false, // Hide the tick icon
+                        showSelectedIcon: false,
                         style: ButtonStyle(
                           backgroundColor:
                               MaterialStateProperty.resolveWith<Color?>(
@@ -51,7 +71,6 @@ class RefuelView extends GetView<RefuelController> {
                                 return AppColors.primary;
                               }
                               return Color(0xFFEEEEEE);
-                              return null;
                             },
                           ),
                           foregroundColor:
@@ -64,14 +83,22 @@ class RefuelView extends GetView<RefuelController> {
                             },
                           ),
                         ),
-                        segments: const <ButtonSegment<String>>[
+                        segments: <ButtonSegment<String>>[
                           ButtonSegment<String>(
-                            value: 'Diesel',
-                            label: Text('Diesel'),
+                            value: 'diesel',
+                            label: Text(
+                              'Diesel',
+                              style: AppTextStyle.mediumStyle(fontSize: 16),
+                              textAlign: TextAlign.center,
+                            ),
                           ),
                           ButtonSegment<String>(
-                            value: 'DEF',
-                            label: Text('DEF'),
+                            value: 'def',
+                            label: Text(
+                              'DEF',
+                              style: AppTextStyle.mediumStyle(fontSize: 16),
+                              textAlign: TextAlign.center,
+                            ),
                           ),
                         ],
                         selected: <String>{controller.selectedFuelType.value},
@@ -86,7 +113,10 @@ class RefuelView extends GetView<RefuelController> {
                 CommonTextInput(
                   labelText: 'Truck number',
                   hintText: 'ONTARIO 8AHM 202',
+                  controller:
+                      TextEditingController(text: controller.truckNumber.value),
                   onChanged: (value) => controller.truckNumber.value = value,
+                  readOnly: true,
                 ),
                 const SizedBox(height: 10),
                 CommonTextInput(
@@ -94,21 +124,25 @@ class RefuelView extends GetView<RefuelController> {
                   hintText: 'Enter odometer reading',
                   showSegmentedTabs: true,
                   segments: ['KM', 'Miles'],
+                  selectedSegment: controller.odometerReadingUnit.value,
                   onChanged: (value) => controller.odometerReading.value =
                       double.tryParse(value) ?? 0.0,
-                  onSegmentChanged: (index) => controller
-                      .odometerReadingUnit.value = ['KM', 'Miles'][index],
+                  onSegmentSelected: (value) =>
+                      controller.odometerReadingUnit.value = value,
+                  keyboardType: TextInputType.number,
                 ),
                 const SizedBox(height: 10),
                 CommonTextInput(
                   labelText: 'Fuel Quantity',
                   hintText: 'Enter fuel quantity',
                   showSegmentedTabs: true,
-                  segments: ['Liter', 'Gallon'],
+                  segments: ['liters', 'gallon'],
+                  selectedSegment: controller.fuelQuantityUnit.value,
                   onChanged: (value) => controller.fuelQuantity.value =
                       double.tryParse(value) ?? 0.0,
-                  onSegmentChanged: (index) => controller
-                      .fuelQuantityUnit.value = ['Liter', 'Gallon'][index],
+                  onSegmentSelected: (value) =>
+                      controller.fuelQuantityUnit.value = value,
+                  keyboardType: TextInputType.number,
                 ),
                 const SizedBox(height: 10),
                 CommonTextInput(
@@ -116,18 +150,25 @@ class RefuelView extends GetView<RefuelController> {
                   hintText: 'Enter amount here',
                   onChanged: (value) => controller.amountPaid.value =
                       double.tryParse(value) ?? 0.0,
+                  keyboardType: TextInputType.number,
                 ),
                 const SizedBox(height: 10),
                 CommonTextInput(
                   labelText: 'Trip Number',
                   hintText: 'Enter trip number',
+                  controller:
+                      TextEditingController(text: controller.tripNumber.value),
                   onChanged: (value) => controller.tripNumber.value = value,
+                  readOnly: true,
                 ),
                 const SizedBox(height: 10),
                 CommonTextInput(
                   labelText: 'Card Detail',
                   hintText: 'Enter card detail',
+                  controller:
+                      TextEditingController(text: controller.cardDetail.value),
                   onChanged: (value) => controller.cardDetail.value = value,
+                  readOnly: true,
                 ),
                 const SizedBox(height: 100),
               ],
@@ -137,14 +178,12 @@ class RefuelView extends GetView<RefuelController> {
             bottom: 0,
             left: 0,
             right: 0,
-            child: Obx(
-              () => AppButton(
-                title: 'Submit',
-                onPressed: controller.isLoading.value
-                    ? null
-                    : () => controller.saveFuelDetails(),
-                buttonWidth: double.infinity,
-              ),
+            child: AppButton(
+              title: 'Submit',
+              onPressed: () {
+                controller.saveFuelDetails(context);
+              },
+              buttonWidth: double.infinity,
             ),
           ),
         ],
