@@ -33,7 +33,7 @@ class UsersView extends GetView<UsersController> {
           ),
         ),
         body: Obx(
-          () => controller.isLoading.value
+          () => controller.isLoading.value && controller.users.isEmpty
               ? Center(
                   child: CupertinoActivityIndicator(color: AppColors.primary),
                 )
@@ -51,11 +51,11 @@ class UsersView extends GetView<UsersController> {
                       controller: controller.scrollController,
                       children: [
                         SizedBox(height: 10),
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 18),
-                          child: Row(
-                            children: [
-                              Expanded(
+                        Row(
+                          children: [
+                            Expanded(
+                              child: Padding(
+                                padding: EdgeInsets.symmetric(horizontal: 15),
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
@@ -86,12 +86,12 @@ class UsersView extends GetView<UsersController> {
                                   ],
                                 ),
                               ),
-                              Image.asset(
-                                'assets/images/horse_black.png',
-                                height: 138,
-                              )
-                            ],
-                          ),
+                            ),
+                            Image.asset(
+                              'assets/images/horse_black.png',
+                              height: 138,
+                            )
+                          ],
                         ),
                         SizedBox(height: 20),
                         ListView.separated(
@@ -99,6 +99,17 @@ class UsersView extends GetView<UsersController> {
                           shrinkWrap: true,
                           physics: NeverScrollableScrollPhysics(),
                           itemBuilder: (context, index) {
+                            if (index == controller.users.length) {
+                              // Show loader only if more pages are available
+                              return controller.currentPage.value <
+                                      controller.lastPage.value
+                                  ? Center(
+                                      child: CupertinoActivityIndicator(
+                                        color: AppColors.primary,
+                                      ),
+                                    )
+                                  : SizedBox.shrink();
+                            }
                             final user = controller.users[index];
                             return Container(
                               height: 64,
@@ -172,7 +183,8 @@ class UsersView extends GetView<UsersController> {
                           },
                           separatorBuilder: (context, index) =>
                               SizedBox(height: 15),
-                          itemCount: controller.users.length,
+                          itemCount: controller.users.length +
+                              1, // Added one for the loader
                         ),
                       ],
                     ),

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flying_horse/app/data/api_provider.dart';
+import 'package:flying_horse/app/modules/refueling/controllers/refueling_controller.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -39,6 +40,7 @@ class RefuelController extends GetxController {
     truckNumber.value = storage.read<String>('truckNumber') ?? '';
     tripNumber.value = storage.read<String>('tripNumber') ?? '';
     cardDetail.value = storage.read<String>('cardNumber') ?? '';
+    fuelQuantity.value = storage.read<double>('fuelQuantity') ?? 0.0;
   }
 
   void setSelectedFuelType(String value) {
@@ -60,6 +62,11 @@ class RefuelController extends GetxController {
       return false;
     }
     return true;
+  }
+
+  void notifyRefuelingController() {
+    RefuelingController refuelingController = Get.find<RefuelingController>();
+    refuelingController.refreshTrips();
   }
 
   Future<void> saveFuelDetails(BuildContext context) async {
@@ -91,6 +98,13 @@ class RefuelController extends GetxController {
       if (response is Map<String, dynamic> && response['success'] == true) {
         Get.snackbar("Success", "Fuel details saved successfully");
 
+        // Save fuelQuantity in GetStorage
+        final storage = GetStorage();
+        storage.write('fuelQuantity', fuelQuantity.value);
+
+        // Notify RefuelingController
+        notifyRefuelingController();
+
         // Clear all fields
         truckNumber.value = '';
         odometerReading.value = 0.0;
@@ -104,7 +118,7 @@ class RefuelController extends GetxController {
         siteNameController.clear();
 
         Future.delayed(Duration(seconds: 1), () {
-          Navigator.of(context).pop(true); 
+          Navigator.pop(context, true);
         });
       } else {
         Get.snackbar(
@@ -116,11 +130,6 @@ class RefuelController extends GetxController {
     } finally {
       isLoading.value = false;
     }
-  }
-
-  @override
-  void onReady() {
-    super.onReady();
   }
 
   @override

@@ -55,6 +55,7 @@ class CommonTextInput extends StatelessWidget {
         const SizedBox(height: 6),
         if (isCountryPicker)
           CountryStateCityPicker(
+            
             country: countryController!,
             state: stateController!,
             city: cityController!,
@@ -63,7 +64,7 @@ class CommonTextInput extends StatelessWidget {
               fillColor: const Color(0xFFEEEEEE),
               filled: true,
               suffixIcon: const Icon(Icons.arrow_drop_down),
-              border: const OutlineInputBorder(borderSide: BorderSide.none),
+              border: InputBorder.none,
               enabledBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(25.0),
                 borderSide: BorderSide.none,
@@ -77,7 +78,6 @@ class CommonTextInput extends StatelessWidget {
               contentPadding:
                   const EdgeInsets.symmetric(vertical: 15.0, horizontal: 20.0),
             ),
-            
           )
         else
           Container(
@@ -170,18 +170,16 @@ class _SegmentedTabState extends State<SegmentedTab> {
             widget.onSegmentSelected!(_selectedSegment);
           }
         },
-        borderRadius: BorderRadius.circular(15.0), 
-        fillColor: AppColors.primary, 
-        selectedColor: Colors.white, 
-        color: Colors.black, 
-        constraints:
-            BoxConstraints(minHeight: 30, minWidth: 50), 
+        borderRadius: BorderRadius.circular(15.0),
+        fillColor: AppColors.primary,
+        selectedColor: Colors.white,
+        color: Colors.black,
+        constraints: BoxConstraints(minHeight: 30, minWidth: 50),
         children: widget.segments
             .map((segment) => Padding(
                   padding: const EdgeInsets.symmetric(
-                      horizontal: 7.0, vertical: 5.0), 
-                  child: Text(segment,
-                      style: TextStyle(fontSize: 14)), 
+                      horizontal: 7.0, vertical: 5.0),
+                  child: Text(segment, style: TextStyle(fontSize: 14)),
                 ))
             .toList(),
       ),

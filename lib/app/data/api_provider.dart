@@ -24,14 +24,16 @@ class ApiProvider extends GetConnect {
     );
   }
 
-  Future<dynamic> getUsers(String page) async {
-    return await getApi('api/users',
-        headers: {
-          'accept': 'application/json',
-          'Authorization': "Bearer ${GetStorage().read('token')}"
-        },
-        query: {'page': page},
-        contentType: 'application/json');
+  Future<dynamic> getUsers(int page, {int perPage = 20}) async {
+    return await getApi(
+      'api/users',
+      headers: {
+        'accept': 'application/json',
+        'Authorization': "Bearer ${GetStorage().read('token')}"
+      },
+      query: {'page': page.toString(), 'per_page': perPage.toString()},
+      contentType: 'application/json',
+    );
   }
 
   Future<dynamic> getUser() async {

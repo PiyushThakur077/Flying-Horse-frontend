@@ -398,7 +398,9 @@ class RefuelingView extends GetView<RefuelingController> {
                                                             ),
                                                           ],
                                                         ),
-                                                        SizedBox(height: 10,),
+                                                        SizedBox(
+                                                          height: 10,
+                                                        ),
                                                         Row(
                                                           children: [
                                                             Padding(
@@ -531,9 +533,11 @@ class RefuelingView extends GetView<RefuelingController> {
     );
   }
 
-  
-void showDateRangePicker(
-    BuildContext context, Function(DateTime, DateTime) onDateRangeSelected) {
+
+   void showDateRangePicker(
+    BuildContext context,
+    Function(DateTime, DateTime) onDateRangeSelected,
+    {DateTime? initialStartDate, DateTime? initialEndDate}) {
   showDialog(
     context: context,
     builder: (BuildContext context) {
@@ -579,14 +583,15 @@ void showDateRangePicker(
                             }
                           },
                           selectionMode: DateRangePickerSelectionMode.range,
-                          initialSelectedRange: PickerDateRange(
-                            DateTime.now().subtract(Duration(days: 7)),
-                            DateTime.now(),
-                          ),
+                          initialSelectedRange: initialStartDate != null && initialEndDate != null
+                              ? PickerDateRange(initialStartDate, initialEndDate)
+                              : PickerDateRange(
+                                  DateTime.now().subtract(Duration(days: 7)),
+                                  DateTime.now(),
+                                ),
                           startRangeSelectionColor: AppColors.primary,
                           endRangeSelectionColor: AppColors.primary,
-                          rangeSelectionColor:
-                              AppColors.primary.withOpacity(0.1),
+                          rangeSelectionColor: AppColors.primary.withOpacity(0.1),
                           todayHighlightColor: AppColors.primary,
                           selectionTextStyle: TextStyle(
                             color: Colors.white,
@@ -623,9 +628,7 @@ void showDateRangePicker(
                               );
                             }
                             return Center(
-                              child: Text(
-                                details.date.day.toString(),
-                              ),
+                              child: Text(details.date.day.toString()),
                             );
                           },
                           backgroundColor: Colors.white,
@@ -636,8 +639,15 @@ void showDateRangePicker(
                 ),
                 Divider(height: 1, color: Colors.grey[300]),
                 Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: <Widget>[
+                    TextButton(
+                      child: const Text('Clear Filter'),
+                      onPressed: () {
+                        Get.find<RefuelingController>().clearFilter();
+                        Navigator.of(context).pop();
+                      },
+                    ),
                     TextButton(
                       child: const Text('Close'),
                       onPressed: () {

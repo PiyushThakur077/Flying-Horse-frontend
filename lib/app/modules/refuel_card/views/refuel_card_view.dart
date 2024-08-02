@@ -250,8 +250,6 @@ class RefuelCardView extends GetView<RefuelCardController> {
                     _buildIconButton(Icons.edit_square, onPressed: () {
                       showEditModal(context, refuelings, controller);
                     }),
-                    _buildIconButton(Icons.print, onPressed: () {}),
-                    _buildIconButton(Icons.download, onPressed: () {}),
                     _buildCloseButton(onPressed: () {
                       Get.back();
                     }),
@@ -277,32 +275,31 @@ class RefuelCardView extends GetView<RefuelCardController> {
     String odometerReadingUnit = 'KM';
     String fuelQuantityUnit = 'liters';
 
+    if (selectedRefuel != null) {
+      var address = jsonDecode(selectedRefuel['fuel_station_address']);
+      controller.siteNameController.text = address['site_name'] ?? '';
+      controller.countryController.text = address['country'] ?? '';
+      controller.stateController.text = address['state'] ?? '';
+      controller.cityController.text = address['city'] ?? '';
+
+      odometerController.text =
+          selectedRefuel['odometer_reading']?.toString() ?? '';
+      fuelQuantityController.text =
+          double.parse(selectedRefuel['fuel_quantity']?.toString() ?? '0.0')
+              .toStringAsFixed(2);
+      amountPaidController.text =
+          selectedRefuel['amount_paid']?.toString() ?? '';
+      driverNameController.text = selectedRefuel['user_name'] ?? '';
+
+      odometerReadingUnit = selectedRefuel['odometer_reading_unit'] ?? 'KM';
+      fuelQuantityUnit = selectedRefuel['fuel_quantity_unit'] ?? 'liters';
+    }
+
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return StatefulBuilder(
           builder: (BuildContext context, StateSetter setState) {
-            if (selectedRefuel != null) {
-              var address = jsonDecode(selectedRefuel['fuel_station_address']);
-              controller.siteNameController.text = address['site_name'] ?? '';
-              controller.countryController.text = address['country'] ?? '';
-              controller.stateController.text = address['state'] ?? '';
-              controller.cityController.text = address['city'] ?? '';
-
-              odometerController.text =
-                  selectedRefuel['odometer_reading']?.toString() ?? '';
-              fuelQuantityController.text =
-                  selectedRefuel['fuel_quantity']?.toString() ?? '';
-              amountPaidController.text =
-                  selectedRefuel['amount_paid']?.toString() ?? '';
-              driverNameController.text = selectedRefuel['user_name'] ?? '';
-
-              odometerReadingUnit =
-                  selectedRefuel['odometer_reading_unit'] ?? 'KM';
-              fuelQuantityUnit =
-                  selectedRefuel['fuel_quantity_unit'] ?? 'liters';
-            }
-
             return Dialog(
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(15.0),
@@ -373,8 +370,10 @@ class RefuelCardView extends GetView<RefuelCardController> {
                           odometerController.text =
                               selectedRefuel['odometer_reading']?.toString() ??
                                   '';
-                          fuelQuantityController.text =
-                              selectedRefuel['fuel_quantity']?.toString() ?? '';
+                          fuelQuantityController.text = double.parse(
+                                  selectedRefuel['fuel_quantity']?.toString() ??
+                                      '0.0')
+                              .toStringAsFixed(2);
                           amountPaidController.text =
                               selectedRefuel['amount_paid']?.toString() ?? '';
                           driverNameController.text =
@@ -505,21 +504,37 @@ class RefuelCardView extends GetView<RefuelCardController> {
     );
   }
 
-  Widget _buildIconButton(IconData icon,
-      {required void Function()? onPressed}) {
-    return Container(
-      width: 50,
+Widget _buildIconButton(IconData icon, {required void Function()? onPressed}) {
+  return GestureDetector(
+    onTap: onPressed,
+    child: Container(
+      width: 160,
       height: 50,
       decoration: BoxDecoration(
         color: AppColors.primary,
         borderRadius: BorderRadius.circular(5),
       ),
-      child: IconButton(
-        icon: Icon(icon, color: Colors.white),
-        onPressed: onPressed,
+      child: Center(
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Icon(icon, color: Colors.white),
+            SizedBox(width: 8),  // Adding some spacing between the icon and text
+            Text(
+              'Edit',
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+                color: Colors.white,
+              ),
+            ),
+          ],
+        ),
       ),
-    );
-  }
+    ),
+  );
+}
 
   Widget _buildCloseButton({required void Function()? onPressed}) {
     return GestureDetector(

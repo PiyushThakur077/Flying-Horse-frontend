@@ -182,6 +182,7 @@ class RefuelView extends GetView<RefuelController> {
               title: 'Submit',
               onPressed: () {
                 controller.saveFuelDetails(context);
+                
               },
               buttonWidth: double.infinity,
             ),

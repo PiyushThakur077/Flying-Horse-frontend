@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:flying_horse/app/data/api_provider.dart';
+import 'package:flying_horse/app/modules/refueling/controllers/refueling_controller.dart';
 import 'package:get/get.dart';
 import 'package:flutter/material.dart'; // Import this for TextEditingController
 
@@ -53,6 +54,9 @@ class RefuelCardController extends GetxController {
       tripDetails['refuelings'] = updatedRefuelings;
       tripDetails['total_amount_paid'] = _calculateTotalAmountPaid(updatedRefuelings);
       tripDetails['total_fuel_in_liters'] = _calculateTotalFuelInLiters(updatedRefuelings);
+      
+      // Trigger update in RefuelingController
+      Get.find<RefuelingController>().fetchTrips();
     } catch (e) {
       print('Error deleting fuel detail: $e');
     } finally {
@@ -60,31 +64,34 @@ class RefuelCardController extends GetxController {
     }
   }
 
- Future<void> updateFuelDetail(int id, Map<String, dynamic> updatedData) async {
-  isLoading.value = true;
-  try {
-    updatedData['fuel_station_address'] = jsonEncode({
-      "country": countryController.text,
-      "state": stateController.text,
-      "city": cityController.text,
-      "site_name": siteNameController.text,
-    });
+  Future<void> updateFuelDetail(int id, Map<String, dynamic> updatedData) async {
+    isLoading.value = true;
+    try {
+      updatedData['fuel_station_address'] = jsonEncode({
+        "country": countryController.text,
+        "state": stateController.text,
+        "city": cityController.text,
+        "site_name": siteNameController.text,
+      });
 
-    await apiProvider.updateFuelDetails(id, updatedData);
-    var updatedRefuelings = tripDetails['refuelings'] as List;
-    int index = updatedRefuelings.indexWhere((refuel) => refuel['id'] == id);
-    if (index != -1) {
-      updatedRefuelings[index] = updatedData;
-      tripDetails['refuelings'] = updatedRefuelings;
-      tripDetails['total_amount_paid'] = _calculateTotalAmountPaid(updatedRefuelings);
-      tripDetails['total_fuel_in_liters'] = _calculateTotalFuelInLiters(updatedRefuelings);
+      await apiProvider.updateFuelDetails(id, updatedData);
+      var updatedRefuelings = tripDetails['refuelings'] as List;
+      int index = updatedRefuelings.indexWhere((refuel) => refuel['id'] == id);
+      if (index != -1) {
+        updatedRefuelings[index] = updatedData;
+        tripDetails['refuelings'] = updatedRefuelings;
+        tripDetails['total_amount_paid'] = _calculateTotalAmountPaid(updatedRefuelings);
+        tripDetails['total_fuel_in_liters'] = _calculateTotalFuelInLiters(updatedRefuelings);
+      }
+      
+      // Trigger update in RefuelingController
+      Get.find<RefuelingController>().fetchTrips();
+    } catch (e) {
+      print('Error updating fuel detail: $e');
+    } finally {
+      isLoading.value = false;
     }
-  } catch (e) {
-    print('Error updating fuel detail: $e');
-  } finally {
-    isLoading.value = false;
   }
-}
 
   double _calculateTotalAmountPaid(List refuelings) {
     double totalAmountPaid = 0.0;

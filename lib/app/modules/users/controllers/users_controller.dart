@@ -16,7 +16,7 @@ class UsersController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    getUsers(currentPage.value);
+    getUsers(1);
     scrollControllerListener();
   }
 
@@ -33,7 +33,6 @@ class UsersController extends GetxController {
 
   Future<void> getUsers(int page) async {
     if (page == 1) {
-      users.clear();  
       isLoading.value = true;
     } else {
       Get.dialog(
@@ -47,43 +46,20 @@ class UsersController extends GetxController {
     }
 
     try {
-      var resp = await ApiProvider().getUsers(page.toString());
-      print('API response: $resp'); // Debug print
-
-      var usersResponse = UsersResponse.fromJson(resp);
-      print('Parsed users: ${usersResponse.data}'); // Debug print
-
+      var resp = await ApiProvider().getUsers(page, perPage: 50);
+      UsersResponse usersResponse = UsersResponse.fromJson(resp);
       if (page == 1) {
-        isLoading.value = false;
-      } else {
+        users.clear();
+      }
+      users.addAll(usersResponse.data!);
+      lastPage.value = usersResponse.lastPage ?? 1;
+    } catch (e) {
+      print(e);
+    } finally {
+      isLoading.value = false;
+      if (page > 1) {
         Get.back();
       }
-
-      if (usersResponse.data != null) {
-        users.addAll(usersResponse.data!);
-      }
-
-      if (usersResponse.data != null && usersResponse.data!.length == 10) {
-        lastPage.value = currentPage.value;  // Ensure lastPage value is correctly updated
-      }
-
-      users.refresh();
-      print('Users list updated: ${users.length}'); // Debug print
-    } catch (err) {
-      isLoading.value = false;
-      if (page != 1) Get.back();
-      print('Error: $err'); // Debug print
     }
-  }
-
-  @override
-  void onReady() {
-    super.onReady();
-  }
-
-  @override
-  void onClose() {
-    scrollController.dispose();
-    super.onClose();
   }
 }

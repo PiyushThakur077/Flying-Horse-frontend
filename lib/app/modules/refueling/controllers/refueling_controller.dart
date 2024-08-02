@@ -3,14 +3,23 @@ import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 
 class RefuelingController extends GetxController {
-  var trips = <Map<String, dynamic>>[].obs; // List of maps to hold trip data
+  var trips = <Map<String, dynamic>>[].obs;
   var isLoading = true.obs;
   final apiProvider = ApiProvider();
+  var fuelQuantity = 0.0.obs;
+  DateTime? selectedStartDate;
+  DateTime? selectedEndDate;
 
   @override
   void onInit() {
     super.onInit();
     fetchTrips();
+    fetchFuelQuantity(); // Fetch stored fuel quantity
+  }
+
+  void fetchFuelQuantity() {
+    final storage = GetStorage();
+    fuelQuantity.value = storage.read<double>('fuelQuantity') ?? 0.0;
   }
 
   void fetchTrips() async {
@@ -18,22 +27,21 @@ class RefuelingController extends GetxController {
       isLoading(true);
       var response = await apiProvider.getTrip();
       if (response != null && response is List) {
-        var sortedTrips =
-            response.map((e) => e as Map<String, dynamic>).toList()
-              ..sort((a, b) {
-                if (a['status_name'] == 'inprogress' &&
-                    b['status_name'] != 'inprogress') {
-                  return -1;
-                } else if (a['status_name'] != 'inprogress' &&
-                    b['status_name'] == 'inprogress') {
-                  return 1;
-                } else {
-                  return 0;
-                }
-              });
+        var sortedTrips = response.map((e) => e as Map<String, dynamic>).toList()
+          ..sort((a, b) {
+            if (a['status_name'] == 'inprogress' &&
+                b['status_name'] != 'inprogress') {
+              return -1;
+            } else if (a['status_name'] != 'inprogress' &&
+                b['status_name'] == 'inprogress') {
+              return 1;
+            } else {
+              return 0;
+            }
+          });
         trips.assignAll(sortedTrips);
 
-        // Save the data to Get Storage if status_name is inprogress
+        // Save the data to GetStorage if status_name is inprogress
         for (var trip in sortedTrips) {
           if (trip['status_name'] == 'inprogress') {
             GetStorage().write('cardNumber', trip['card_number']);
@@ -61,14 +69,15 @@ class RefuelingController extends GetxController {
   void filterTrips(DateTime startDate, DateTime endDate) async {
     try {
       isLoading(true);
+      selectedStartDate = startDate;
+      selectedEndDate = endDate;
       var filterParams = {
         'trip_start_date': startDate.toIso8601String(),
         'trip_end_date': endDate.toIso8601String(),
       };
       var response = await apiProvider.filterTrips(filterParams);
       if (response != null && response is List) {
-        var filteredTrips =
-            response.map((e) => e as Map<String, dynamic>).toList();
+        var filteredTrips = response.map((e) => e as Map<String, dynamic>).toList();
         trips.assignAll(filteredTrips);
       }
     } catch (e) {
@@ -76,6 +85,12 @@ class RefuelingController extends GetxController {
     } finally {
       isLoading(false);
     }
+  }
+
+  void clearFilter() {
+    selectedStartDate = null;
+    selectedEndDate = null;
+    fetchTrips(); // Fetch all trips again to clear the filter
   }
 
   void refreshTrips() {
