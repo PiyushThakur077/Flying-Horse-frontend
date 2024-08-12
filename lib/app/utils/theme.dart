@@ -21,6 +21,7 @@ class AppTheme {
           ),
         ),
       ),
+      
       floatingActionButtonTheme: FloatingActionButtonThemeData(
         elevation: 4,
         backgroundColor: Colors.white,
@@ -60,6 +61,8 @@ class AppTheme {
       ),
       colorScheme: ColorScheme.fromSwatch()
           .copyWith(primary: AppColors.primary, secondary: AppColors.primary),
+        useMaterial3: false
     );
+
   }
 }

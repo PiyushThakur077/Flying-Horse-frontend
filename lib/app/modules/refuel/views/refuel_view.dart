@@ -9,6 +9,8 @@ import '../controllers/refuel_controller.dart';
 class RefuelView extends GetView<RefuelController> {
   const RefuelView({Key? key}) : super(key: key);
 
+ 
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -32,12 +34,40 @@ class RefuelView extends GetView<RefuelController> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                CommonTextInput(
-                  labelText: 'Site Name',
-                  hintText: 'ONTARIO 8AHM 202',
-                  controller: controller.siteNameController,
-                ),
-                const SizedBox(height: 10),
+                // Autocomplete<String>(
+                //   optionsBuilder: (TextEditingValue textEditingValue) async {
+                //     if (textEditingValue.text.isEmpty) {
+                //       return const Iterable<String>.empty();
+                //     }
+                //     return await controller
+                //         .fetchSiteSuggestions(textEditingValue.text);
+                //   },
+                //   onSelected: (String selection) {
+                //     controller.siteNameController.text = selection;
+                //   },
+                //   fieldViewBuilder: (BuildContext context,
+                //       TextEditingController textEditingController,
+                //       FocusNode focusNode,
+                //       VoidCallback onFieldSubmitted) {
+                //     return TextField(
+                //       controller:
+                //           controller.siteNameController, 
+                //       focusNode: focusNode,
+                //       decoration: InputDecoration(
+                //         labelText: 'Site Name',
+                //         hintText: 'ONTARIO 8AHM 202',
+                //         border: OutlineInputBorder(),
+                //       ),
+                //       onChanged: (value) {
+                //         textEditingController.text =
+                //             value; 
+                //         controller.siteNameController.text =
+                //             value; 
+                //       },
+                //     );
+                //   },
+                // ),
+               
                 CommonTextInput(
                   labelText: 'Select Location',
                   hintText: 'Select Country',
@@ -47,6 +77,10 @@ class RefuelView extends GetView<RefuelController> {
                   cityController: controller.cityController,
                   readOnly: true,
                 ),
+                const SizedBox(height: 10),
+                 CommonTextInput(labelText:'Site Name' 
+                , hintText: 'ONTARIO 8AHM 202',
+                controller: controller.siteNameController,),
                 const SizedBox(height: 10),
                 Padding(
                   padding: EdgeInsets.symmetric(horizontal: 11),
@@ -154,6 +188,15 @@ class RefuelView extends GetView<RefuelController> {
                 ),
                 const SizedBox(height: 10),
                 CommonTextInput(
+                  labelText: 'Receipt Number',
+                  hintText: 'Enter receipt number here',
+                  onChanged: (value) => controller.receiptNumber.value =
+                      value, // Store string value
+                  keyboardType:
+                      TextInputType.text, // Use text input for receipt number
+                ),
+                const SizedBox(height: 10),
+                CommonTextInput(
                   labelText: 'Trip Number',
                   hintText: 'Enter trip number',
                   controller:
@@ -182,7 +225,6 @@ class RefuelView extends GetView<RefuelController> {
               title: 'Submit',
               onPressed: () {
                 controller.saveFuelDetails(context);
-                
               },
               buttonWidth: double.infinity,
             ),

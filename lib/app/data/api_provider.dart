@@ -111,6 +111,32 @@ class ApiProvider extends GetConnect {
     );
   }
 
+  Future<dynamic> filterPetroleumSites(
+      Map<String, dynamic> filterParams) async {
+    return await postApi(
+      'api/user/petroleum-sites',
+      filterParams,
+      headers: {
+        'accept': 'application/json',
+        'Authorization': "Bearer ${GetStorage().read('token')}"
+      },
+      contentType: 'application/json',
+    );
+  }
+
+  Future<dynamic> getPetroleumSiteSuggestions(
+      Map<String, dynamic> filterParams) async {
+    return await postApi(
+      'api/user/petroleum-sites-suggestion',
+      filterParams,
+      headers: {
+        'accept': 'application/json',
+        'Authorization': "Bearer ${GetStorage().read('token')}"
+      },
+      contentType: 'application/json',
+    );
+  }
+
   Future<dynamic> postApi(String? url, dynamic body,
       {String? contentType,
       Map<String, String>? headers,

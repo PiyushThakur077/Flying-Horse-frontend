@@ -7,11 +7,18 @@ import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import '../controllers/home_controller.dart';
 
-
 class HomeView extends GetView<HomeController> {
   const HomeView({Key? key}) : super(key: key);
   @override
   Widget build(BuildContext context) {
+    String toTitleCase(String? text) {
+      if (text == null || text.isEmpty) return '';
+      return text.split(' ').map((word) {
+        if (word.isEmpty) return '';
+        return word[0].toUpperCase() + word.substring(1).toLowerCase();
+      }).join(' ');
+    }
+
     return AnnotatedRegion<SystemUiOverlayStyle>(
         value: SystemUiOverlayStyle(
             statusBarIconBrightness: Brightness.dark,
@@ -25,7 +32,10 @@ class HomeView extends GetView<HomeController> {
               title: const Text('Home'),
               centerTitle: true,
               backgroundColor: AppColors.primary,
-              titleTextStyle: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.w600),
+              titleTextStyle: TextStyle(
+                  color: Colors.white,
+                  fontSize: 20,
+                  fontWeight: FontWeight.w600),
             ),
             body: SafeArea(
                 child: Obx(
@@ -47,11 +57,14 @@ class HomeView extends GetView<HomeController> {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text('Hi ${GetStorage().read('userName')},',
-                                    style: AppTextStyle.regularStyle(
-                                        fontSize: 20,
-                                        color: Color(0xffBDBDBD),
-                                        height: 1.0)),
+                                Text(
+                                  'Hi ${toTitleCase(GetStorage().read('userName'))},',
+                                  style: AppTextStyle.regularStyle(
+                                    fontSize: 20,
+                                    color: Color(0xffBDBDBD),
+                                    height: 1.0,
+                                  ),
+                                ),
                                 Text(
                                   'Choose Your',
                                   style: AppTextStyle.regularStyle(

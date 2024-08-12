@@ -10,9 +10,21 @@ import 'package:flying_horse/app/widgets/trip_detail_row.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import '../controllers/refuel_card_controller.dart';
+import 'package:intl/intl.dart';
 
 class RefuelCardView extends GetView<RefuelCardController> {
   const RefuelCardView({Key? key}) : super(key: key);
+
+  String convertUtcToLocal(String utcDate) {
+    DateTime utcDateTime = DateTime.parse(utcDate).toUtc();
+
+    DateTime localDateTime = utcDateTime.toLocal();
+
+    String formattedDate =
+        DateFormat('dd MMM yyyy, hh:mm a').format(localDateTime);
+
+    return formattedDate;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -101,11 +113,6 @@ class RefuelCardView extends GetView<RefuelCardController> {
                               rightText: tripDetails['truck_number'] ?? '',
                               spaceHeight: 15.0,
                             ),
-                            TripDetailRow(
-                              leftText: "Fuel Type",
-                              rightText: tripDetails['fuel_type'] ?? 'Diesel',
-                              spaceHeight: 15.0,
-                            ),
                             ...refuelings.asMap().entries.map<Widget>((entry) {
                               int index = entry.key;
                               var refuel = entry.value;
@@ -113,11 +120,15 @@ class RefuelCardView extends GetView<RefuelCardController> {
                               String fuelStationAddressString =
                                   refuel['fuel_station_address'] ?? '';
 
-                              // Decode the inner JSON string to a Map
                               Map<String, dynamic> fuelStationAddress = {};
                               if (fuelStationAddressString.isNotEmpty) {
-                                fuelStationAddress =
-                                    jsonDecode(fuelStationAddressString);
+                                try {
+                                  fuelStationAddress =
+                                      jsonDecode(fuelStationAddressString);
+                                } catch (e) {
+                                  print(
+                                      'Error decoding fuel station address: $e');
+                                }
                               }
 
                               String address = '';
@@ -141,58 +152,32 @@ class RefuelCardView extends GetView<RefuelCardController> {
                                         child: Text(
                                           "${_getFillingStationLabel(index)} Filling Station",
                                           style: AppTextStyle.semiBoldStyle(
-                                              color: Color(0xff676767),
+                                              color: Colors.black,
                                               fontSize: 16),
                                         ),
                                       ),
-                                      IconButton(
-                                        icon: Icon(Icons.delete,
-                                            color: Colors.red),
-                                        onPressed: () {
-                                          showDeleteConfirmationDialog(
-                                              context, refuel['id']);
-                                        },
-                                      ),
+                                      Obx(() => IconButton(
+                                            icon: Icon(Icons.delete,
+                                                color: Colors.red),
+                                            onPressed: controller
+                                                    .isEditable.value
+                                                ? () {
+                                                    showDeleteConfirmationDialog(
+                                                        context, refuel['id']);
+                                                  }
+                                                : null, // Disable the button if not editable
+                                          )),
                                     ],
                                   ),
-                                  TripDetailRow(
-                                    leftText: "Odometer Reading",
-                                    rightText:
-                                        "${refuel['odometer_reading']} ${refuel['odometer_reading_unit']}",
-                                    showDottedLine: false,
-                                    spaceHeight: 10.0,
-                                  ),
-                                  TripDetailRow(
-                                    leftText: "Quantity filled at GS",
-                                    rightText:
-                                        "${refuel['fuel_quantity']} ${refuel['fuel_quantity_unit']}",
-                                    showDottedLine: false,
-                                    spaceHeight: 10.0,
-                                  ),
-                                  TripDetailRow(
-                                    leftText: "Driver Name",
-                                    rightText: refuel['user_name'] ?? '',
-                                    showDottedLine: false,
-                                    spaceHeight: 10.0,
-                                  ),
-                                  TripDetailRow(
-                                    leftText: "Amount Paid",
-                                    rightText: "\$${refuel['amount_paid']}",
-                                    showDottedLine: false,
-                                    spaceHeight: 10.0,
-                                  ),
-                                  const SizedBox(
-                                    height: 5.0,
-                                  ),
-                                  Padding(
-                                    padding: EdgeInsets.symmetric(vertical: 5),
-                                    child: Text(
-                                      "Fuel Pump Location",
-                                      style: AppTextStyle.regularStyle(
-                                          color: Color(0xff676767),
-                                          fontSize: 15),
-                                    ),
-                                  ),
+                                  // Padding(
+                                  //   padding: EdgeInsets.symmetric(vertical: 5),
+                                  //   child: Text(
+                                  //     "Fuel Pump Location",
+                                  //     style: AppTextStyle.regularStyle(
+                                  //         color: Color(0xff676767),
+                                  //         fontSize: 15),
+                                  //   ),
+                                  // ),
                                   Row(
                                     children: [
                                       Icon(
@@ -205,14 +190,71 @@ class RefuelCardView extends GetView<RefuelCardController> {
                                         child: Text(
                                           address,
                                           style: TextStyle(
-                                              color: Colors.black,
+                                              color: Color(0xff333333),
                                               fontWeight: FontWeight.w700,
                                               fontSize: 15),
                                         ),
                                       ),
                                     ],
                                   ),
-                                  const SizedBox(height: 5.0),
+                                  TripDetailRow(
+                                    leftText: "Fuel Type",
+                                    rightText: (refuel['fuel_type'] ?? 'Diesel')
+                                            .toString()
+                                            .substring(0, 1)
+                                            .toUpperCase() +
+                                        (refuel['fuel_type'] ?? 'Diesel')
+                                            .toString()
+                                            .substring(1),
+                                    showDottedLine: false,
+                                    spaceHeight: 10.0,
+                                  ),
+                                  TripDetailRow(
+                                    leftText: "Odometer Reading",
+                                    rightText:
+                                        "${refuel['odometer_reading']} ${refuel['odometer_reading_unit'].toString().substring(0, 1).toUpperCase()}${refuel['odometer_reading_unit'].toString().substring(1)}",
+                                    showDottedLine: false,
+                                    spaceHeight: 10.0,
+                                  ),
+                                  TripDetailRow(
+                                    leftText: "Quantity filled at GS",
+                                    rightText:
+                                        "${refuel['fuel_quantity']} ${refuel['fuel_quantity_unit'].toString().substring(0, 1).toUpperCase()}${refuel['fuel_quantity_unit'].toString().substring(1)}",
+                                    showDottedLine: false,
+                                    spaceHeight: 10.0,
+                                  ),
+                                  TripDetailRow(
+                                    leftText: "Driver Name",
+                                    rightText:
+                                        "${refuel['user_name'].toString().substring(0, 1).toUpperCase()}${refuel['user_name'].toString().substring(1)}",
+                                    showDottedLine: false,
+                                    spaceHeight: 10.0,
+                                  ),
+                                  TripDetailRow(
+                                    leftText: "Amount Paid",
+                                    rightText: refuel['amount_paid'] != null
+                                        ? "\$${refuel['amount_paid']}"
+                                        : "N/A",
+                                    showDottedLine: false,
+                                    spaceHeight: 10.0,
+                                  ),
+                                  TripDetailRow(
+                                    leftText: "Recipet Number",
+                                    rightText: "${refuel['receipt_number']}",
+                                    showDottedLine: false,
+                                    spaceHeight: 10.0,
+                                  ),
+
+                                  TripDetailRow(
+                                    leftText: "Filled at",
+                                    rightText:
+                                        convertUtcToLocal(refuel['created_at']),
+                                    showDottedLine: false,
+                                    spaceHeight: 10.0,
+                                  ),
+                                  const SizedBox(
+                                    height: 5.0,
+                                  ),
                                   const DottedLine(),
                                 ],
                               );
@@ -225,7 +267,7 @@ class RefuelCardView extends GetView<RefuelCardController> {
                             TripDetailRow(
                               leftText: "Total Fuel Filled",
                               rightText:
-                                  '${tripDetails['total_fuel_in_liters'].toString()} liters',
+                                  '${tripDetails['total_fuel_in_liters'].toString()} Liters',
                               spaceHeight: 15.0,
                             ),
                             TripDetailRow(
@@ -234,7 +276,6 @@ class RefuelCardView extends GetView<RefuelCardController> {
                                   '\$${tripDetails['total_amount_paid'].toString()}',
                               spaceHeight: 15.0,
                             ),
-                            const SizedBox(height: 10),
                           ],
                         ),
                       ),
@@ -247,8 +288,18 @@ class RefuelCardView extends GetView<RefuelCardController> {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
-                    _buildIconButton(Icons.edit_square, onPressed: () {
-                      showEditModal(context, refuelings, controller);
+                    Obx(() {
+                      final refuelCardController =
+                          Get.find<RefuelCardController>();
+                      return _buildIconButton(
+                        Icons.edit,
+                        onPressed: refuelCardController.isEditable.value
+                            ? () {
+                                showEditModal(context, refuelings, controller);
+                              }
+                            : null,
+                        enabled: refuelCardController.isEditable.value,
+                      );
                     }),
                     _buildCloseButton(onPressed: () {
                       Get.back();
@@ -271,6 +322,8 @@ class RefuelCardView extends GetView<RefuelCardController> {
     TextEditingController fuelQuantityController = TextEditingController();
     TextEditingController amountPaidController = TextEditingController();
     TextEditingController driverNameController = TextEditingController();
+    TextEditingController receiptNumberController =
+        TextEditingController(); // New controller
 
     String odometerReadingUnit = 'KM';
     String fuelQuantityUnit = 'liters';
@@ -290,6 +343,8 @@ class RefuelCardView extends GetView<RefuelCardController> {
       amountPaidController.text =
           selectedRefuel['amount_paid']?.toString() ?? '';
       driverNameController.text = selectedRefuel['user_name'] ?? '';
+      receiptNumberController.text = selectedRefuel['receipt_number'] ??
+          ''; // Set receipt number if available
 
       odometerReadingUnit = selectedRefuel['odometer_reading_unit'] ?? 'KM';
       fuelQuantityUnit = selectedRefuel['fuel_quantity_unit'] ?? 'liters';
@@ -378,6 +433,8 @@ class RefuelCardView extends GetView<RefuelCardController> {
                               selectedRefuel['amount_paid']?.toString() ?? '';
                           driverNameController.text =
                               selectedRefuel['user_name'] ?? '';
+                          receiptNumberController.text =
+                              selectedRefuel['receipt_number'] ?? '';
 
                           odometerReadingUnit =
                               selectedRefuel['odometer_reading_unit'] ?? 'KM';
@@ -451,6 +508,14 @@ class RefuelCardView extends GetView<RefuelCardController> {
                                 keyboardType: TextInputType.number,
                               ),
                               SizedBox(height: 10),
+                              CommonTextInput(
+                                labelText: 'Receipt Number', // New field
+                                hintText:
+                                    'Enter Receipt Number', // Hint text for receipt number
+                                controller: receiptNumberController,
+                                keyboardType: TextInputType.text,
+                              ),
+                              SizedBox(height: 10),
                             ],
                           ),
                         ),
@@ -477,6 +542,8 @@ class RefuelCardView extends GetView<RefuelCardController> {
                                 'fuel_quantity': fuelQuantityController.text,
                                 'fuel_quantity_unit': fuelQuantityUnit,
                                 'amount_paid': amountPaidController.text,
+                                'receipt_number': receiptNumberController
+                                    .text, // Include receipt number in data
                                 'fuel_station_address': jsonEncode({
                                   "country": controller.countryController.text,
                                   "state": controller.stateController.text,
@@ -504,37 +571,38 @@ class RefuelCardView extends GetView<RefuelCardController> {
     );
   }
 
-Widget _buildIconButton(IconData icon, {required void Function()? onPressed}) {
-  return GestureDetector(
-    onTap: onPressed,
-    child: Container(
-      width: 160,
-      height: 50,
-      decoration: BoxDecoration(
-        color: AppColors.primary,
-        borderRadius: BorderRadius.circular(5),
-      ),
-      child: Center(
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            Icon(icon, color: Colors.white),
-            SizedBox(width: 8),  // Adding some spacing between the icon and text
-            Text(
-              'Edit',
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-                color: Colors.white,
+  Widget _buildIconButton(IconData icon,
+      {required void Function()? onPressed, required bool enabled}) {
+    return GestureDetector(
+      onTap: enabled ? onPressed : null,
+      child: Container(
+        width: 160,
+        height: 50,
+        decoration: BoxDecoration(
+          color: enabled ? AppColors.primary : Colors.grey,
+          borderRadius: BorderRadius.circular(5),
+        ),
+        child: Center(
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Icon(icon, color: Colors.white),
+              SizedBox(width: 8),
+              Text(
+                'Edit',
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
-    ),
-  );
-}
+    );
+  }
 
   Widget _buildCloseButton({required void Function()? onPressed}) {
     return GestureDetector(

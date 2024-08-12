@@ -176,10 +176,10 @@ class RefuelingView extends GetView<RefuelingController> {
 
                                         // Format dates
                                         String formattedStartDate =
-                                            DateFormat('dd MMMM, yyyy')
+                                            DateFormat('dd MMMM ')
                                                 .format(startDate);
                                         String formattedEndDate =
-                                            DateFormat('dd MMMM, yyyy')
+                                            DateFormat('dd MMMM')
                                                 .format(endDate);
 
                                         return InkWell(
@@ -239,11 +239,18 @@ class RefuelingView extends GetView<RefuelingController> {
                                                             ),
                                                             Row(children: [
                                                               Icon(
-                                                                Icons
-                                                                    .adjust_rounded,
+                                                                status ==
+                                                                        'cancelled'
+                                                                    ? Icons
+                                                                        .block
+                                                                    : Icons
+                                                                        .adjust_rounded,
                                                                 size: 18.0,
-                                                                color:
-                                                                    iconColor,
+                                                                color: status ==
+                                                                        'cancelled'
+                                                                    ? Colors
+                                                                        .grey
+                                                                    : iconColor,
                                                               ),
                                                               const SizedBox(
                                                                 width: 5,
@@ -252,14 +259,28 @@ class RefuelingView extends GetView<RefuelingController> {
                                                                 status ==
                                                                         'inprogress'
                                                                     ? 'On Route'
-                                                                    : 'Completed',
-                                                                style: AppTextStyle.regularStyle(
-                                                                    color: Color(status ==
-                                                                            'inprogress'
-                                                                        ? 0xff00970F
-                                                                        : 0xffE50000),
-                                                                    fontSize:
-                                                                        14),
+                                                                    : status ==
+                                                                            'completed'
+                                                                        ? 'Completed'
+                                                                        : 'Cancelled',
+                                                                style: AppTextStyle
+                                                                    .regularStyle(
+                                                                  color: status ==
+                                                                          'inprogress'
+                                                                      ? Color(
+                                                                          0xff00970F)
+                                                                      : status ==
+                                                                              'completed'
+                                                                          ? Color(
+                                                                              0xffE50000)
+                                                                          : const Color
+                                                                              .fromARGB(
+                                                                              255,
+                                                                              93,
+                                                                              91,
+                                                                              91),
+                                                                  fontSize: 14,
+                                                                ),
                                                               ),
                                                             ])
                                                           ],
@@ -288,7 +309,7 @@ class RefuelingView extends GetView<RefuelingController> {
                                                               )
                                                             ]),
                                                             const SizedBox(
-                                                                width: 40.0),
+                                                                width: 6.0),
                                                             Row(
                                                               children: [
                                                                 Text(
@@ -533,135 +554,132 @@ class RefuelingView extends GetView<RefuelingController> {
     );
   }
 
+  void showDateRangePicker(
+      BuildContext context, Function(DateTime, DateTime) onDateRangeSelected,
+      {DateTime? initialStartDate, DateTime? initialEndDate}) {
+    final refuelingController = Get.find<RefuelingController>();
 
-   void showDateRangePicker(
-    BuildContext context,
-    Function(DateTime, DateTime) onDateRangeSelected,
-    {DateTime? initialStartDate, DateTime? initialEndDate}) {
-  showDialog(
-    context: context,
-    builder: (BuildContext context) {
-      return Dialog(
-        backgroundColor: Colors.transparent,
-        child: Padding(
-          padding: EdgeInsets.symmetric(vertical: 5, horizontal: 5),
-          child: Container(
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(10),
-            ),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Container(
-                  padding: const EdgeInsets.all(15),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Select Date Range',
-                        style: TextStyle(
-                          fontWeight: FontWeight.w600,
-                          fontSize: 18,
-                          color: Color(0xff000000),
-                        ),
-                      ),
-                      const SizedBox(height: 20),
-                      SizedBox(
-                        height: 300,
-                        width: 300,
-                        child: SfDateRangePicker(
-                          onSelectionChanged:
-                              (DateRangePickerSelectionChangedArgs args) {
-                            if (args.value is PickerDateRange) {
-                              final DateTime startDate = args.value.startDate;
-                              final DateTime? endDate = args.value.endDate;
-                              if (endDate != null) {
-                                onDateRangeSelected(startDate, endDate);
-                                Navigator.of(context).pop();
-                              }
-                            }
-                          },
-                          selectionMode: DateRangePickerSelectionMode.range,
-                          initialSelectedRange: initialStartDate != null && initialEndDate != null
-                              ? PickerDateRange(initialStartDate, initialEndDate)
-                              : PickerDateRange(
-                                  DateTime.now().subtract(Duration(days: 7)),
-                                  DateTime.now(),
-                                ),
-                          startRangeSelectionColor: AppColors.primary,
-                          endRangeSelectionColor: AppColors.primary,
-                          rangeSelectionColor: AppColors.primary.withOpacity(0.1),
-                          todayHighlightColor: AppColors.primary,
-                          selectionTextStyle: TextStyle(
-                            color: Colors.white,
-                            fontWeight: FontWeight.bold,
-                          ),
-                          headerStyle: DateRangePickerHeaderStyle(
-                            textAlign: TextAlign.center,
-                            textStyle: TextStyle(
-                              color: AppColors.primary,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 16,
+    DateTime? selectedStartDate =
+        refuelingController.selectedStartDate ?? initialStartDate;
+    DateTime? selectedEndDate =
+        refuelingController.selectedEndDate ?? initialEndDate;
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return Dialog(
+          backgroundColor: Colors.transparent,
+          child: Padding(
+            padding: EdgeInsets.symmetric(vertical: 5, horizontal: 5),
+            child: Container(
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(15),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              'Select Date Range',
+                              style: TextStyle(
+                                fontWeight: FontWeight.w600,
+                                fontSize: 18,
+                                color: Color(0xff000000),
+                              ),
                             ),
-                          ),
-                          cellBuilder: (context, details) {
-                            final DateTime today = DateTime.now();
-                            final bool isToday = details.date.year == today.year &&
-                                details.date.month == today.month &&
-                                details.date.day == today.day;
-
-                            if (isToday) {
-                              return Container(
-                                alignment: Alignment.center,
-                                decoration: BoxDecoration(
-                                  shape: BoxShape.circle,
-                                  color: AppColors.primary,
-                                ),
-                                child: Text(
-                                  details.date.day.toString(),
-                                  style: TextStyle(
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                              );
-                            }
-                            return Center(
-                              child: Text(details.date.day.toString()),
-                            );
-                          },
-                          backgroundColor: Colors.white,
+                            IconButton(
+                              icon: Icon(Icons.close),
+                              onPressed: () {
+                                Navigator.of(context).pop();
+                              },
+                            ),
+                          ],
                         ),
+                        const SizedBox(height: 20),
+                        SizedBox(
+                          height: 300,
+                          width: 300,
+                          child: SfDateRangePicker(
+                            onSelectionChanged:
+                                (DateRangePickerSelectionChangedArgs args) {
+                              if (args.value is PickerDateRange) {
+                                selectedStartDate = args.value.startDate;
+                                selectedEndDate = args.value.endDate;
+                              }
+                            },
+                            selectionMode:
+                                DateRangePickerSelectionMode.extendableRange,
+                            initialSelectedRange: selectedStartDate != null &&
+                                    selectedEndDate != null
+                                ? PickerDateRange(
+                                    selectedStartDate, selectedEndDate)
+                                : PickerDateRange(
+                                    DateTime.now(),
+                                    DateTime.now(),
+                                  ),
+                            startRangeSelectionColor: AppColors.primary,
+                            endRangeSelectionColor: AppColors.primary,
+                            rangeSelectionColor:
+                                AppColors.primary.withOpacity(0.1),
+                            todayHighlightColor: AppColors.primary,
+                            selectionTextStyle: TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                            ),
+                            headerStyle: DateRangePickerHeaderStyle(
+                              textAlign: TextAlign.center,
+                              textStyle: TextStyle(
+                                color: AppColors.primary,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 16,
+                              ),
+                            ),
+                            backgroundColor: Colors.white,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Divider(height: 1, color: Colors.grey[300]),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: <Widget>[
+                      TextButton(
+                        child: const Text('Clear Filter'),
+                        onPressed: () {
+                          refuelingController.clearFilter();
+                          Navigator.of(context).pop();
+                        },
+                      ),
+                      TextButton(
+                        child: const Text('Save'),
+                        onPressed: () {
+                          if (selectedStartDate != null &&
+                              selectedEndDate != null) {
+                            onDateRangeSelected(
+                                selectedStartDate!, selectedEndDate!);
+                            refuelingController.filterTrips(
+                                selectedStartDate!, selectedEndDate!);
+                          }
+                          Navigator.of(context).pop();
+                        },
                       ),
                     ],
                   ),
-                ),
-                Divider(height: 1, color: Colors.grey[300]),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: <Widget>[
-                    TextButton(
-                      child: const Text('Clear Filter'),
-                      onPressed: () {
-                        Get.find<RefuelingController>().clearFilter();
-                        Navigator.of(context).pop();
-                      },
-                    ),
-                    TextButton(
-                      child: const Text('Close'),
-                      onPressed: () {
-                        Navigator.of(context).pop();
-                      },
-                    ),
-                  ],
-                ),
-              ],
+                ],
+              ),
             ),
           ),
-        ),
-      );
-    },
-  );
-}
+        );
+      },
+    );
+  }
 }

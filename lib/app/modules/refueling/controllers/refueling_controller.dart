@@ -14,7 +14,8 @@ class RefuelingController extends GetxController {
   void onInit() {
     super.onInit();
     fetchTrips();
-    fetchFuelQuantity(); // Fetch stored fuel quantity
+    fetchFuelQuantity();
+    loadSelectedDateRange(); // Load stored date range
   }
 
   void fetchFuelQuantity() {
@@ -41,13 +42,13 @@ class RefuelingController extends GetxController {
           });
         trips.assignAll(sortedTrips);
 
-        // Save the data to GetStorage if status_name is inprogress
+        // Save the data to GetStorage if status_name is "inprogress"
         for (var trip in sortedTrips) {
           if (trip['status_name'] == 'inprogress') {
             GetStorage().write('cardNumber', trip['card_number']);
             GetStorage().write('tripNumber', trip['trip_number']);
             GetStorage().write('truckNumber', trip['truck_number']);
-            break;
+            break; // Stop after saving the first "inprogress" trip
           }
         }
       }
@@ -71,6 +72,7 @@ class RefuelingController extends GetxController {
       isLoading(true);
       selectedStartDate = startDate;
       selectedEndDate = endDate;
+      saveSelectedDateRange(); // Save selected date range
       var filterParams = {
         'trip_start_date': startDate.toIso8601String(),
         'trip_end_date': endDate.toIso8601String(),
@@ -90,7 +92,23 @@ class RefuelingController extends GetxController {
   void clearFilter() {
     selectedStartDate = null;
     selectedEndDate = null;
+    GetStorage().remove('selectedStartDate');
+    GetStorage().remove('selectedEndDate');
     fetchTrips(); // Fetch all trips again to clear the filter
+  }
+
+  void loadSelectedDateRange() {
+    final storage = GetStorage();
+    selectedStartDate = storage.read<DateTime>('selectedStartDate');
+    selectedEndDate = storage.read<DateTime>('selectedEndDate');
+  }
+
+  void saveSelectedDateRange() {
+    final storage = GetStorage();
+    if (selectedStartDate != null && selectedEndDate != null) {
+      storage.write('selectedStartDate', selectedStartDate);
+      storage.write('selectedEndDate', selectedEndDate);
+    }
   }
 
   void refreshTrips() {

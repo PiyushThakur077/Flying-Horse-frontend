@@ -12,6 +12,14 @@ class UsersView extends GetView<UsersController> {
 
   @override
   Widget build(BuildContext context) {
+    String toTitleCase(String? text) {
+      if (text == null || text.isEmpty) return '';
+      return text.split(' ').map((word) {
+        if (word.isEmpty) return '';
+        return word[0].toUpperCase() + word.substring(1).toLowerCase();
+      }).join(' ');
+    }
+
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: SystemUiOverlayStyle(
         statusBarIconBrightness: Brightness.dark,
@@ -133,7 +141,7 @@ class UsersView extends GetView<UsersController> {
                                       TextSpan(
                                         children: [
                                           TextSpan(
-                                            text: '${user.name}, ',
+                                            text: '${toTitleCase(user.name)}, ',
                                             style: AppTextStyle.boldStyle(
                                               fontSize: 17,
                                               color: Colors.black,
