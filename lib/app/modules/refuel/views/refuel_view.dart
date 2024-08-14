@@ -99,62 +99,62 @@ class RefuelView extends GetView<RefuelController> {
                 SizedBox(
                   height: 10,
                 ),
-            //     Container(
-            //         child: Column(children: [
-            //           Text('Select Location', style: AppTextStyle.semiBoldStyle(fontSize: 15)),
-            //           Obx(() => DropdownButton<String>(
-            //   value: controller.selectedCountry.value.isEmpty
-            //       ? null
-            //       : controller.selectedCountry.value,
-            //   onChanged: (String? newValue) {
-            //     controller.onCountrySelected(newValue);
-            //   },
-            //   items: controller.countryIso2Map.keys
-            //       .map<DropdownMenuItem<String>>((String key) {
-            //     return DropdownMenuItem<String>(
-            //       value: key,
-            //       child: Text(key),
-            //     );
-            //   }).toList(),
-            // )),
-            //     Obx(() => DropdownButton<Province>(
-            //           value: controller.selectedProvince.value.name == null
-            //               ? null
-            //               : controller.selectedProvince.value,
-            //           onChanged: controller.onProvinceSelected,
-            //           items: controller.provinces
-            //               .map<DropdownMenuItem<Province>>((Province value) {
-            //             return DropdownMenuItem<Province>(
-            //               value: value,
-            //               child: Text(value.name ?? ""),
-            //             );
-            //           }).toList(),
-            //         )),
-            //     Obx(() => DropdownButton<Cities>(
-            //           value: controller.selectedCity.value.name == null
-            //               ? null
-            //               : controller.selectedCity.value,
-            //           onChanged: controller.onCitySelected,
-            //           items: (controller.selectedProvince.value.cities ?? [])
-            //               .map<DropdownMenuItem<Cities>>((Cities value) {
-            //             return DropdownMenuItem<Cities>(
-            //               value: value,
-            //               child: Text(value.name ?? ""),
-            //             );
-            //           }).toList(),
-            //         )),
-            //         ],),
-            //     ),
-
-                CommonTextInput(
-                  labelText: 'Select Location',
-                  hintText: 'Select Country',
-                  isCountryPicker: true,
-                  countryController: controller.countryController,
-                  stateController: controller.stateController,
-                  cityController: controller.cityController,
-                  readOnly: true,
+                Container(
+                    child: Column(children: [
+                      Text('Select Location', style: AppTextStyle.semiBoldStyle(fontSize: 15)),
+                      Obx(() => DropdownButton<String>(
+              value: controller.selectedCountry.value.isEmpty
+                  ? null
+                  : controller.selectedCountry.value,
+              onChanged: (String? newValue) {
+                controller.onCountrySelected(newValue);
+              },
+              items: controller.countryIso2Map.keys
+                  .map<DropdownMenuItem<String>>((String key) {
+                return DropdownMenuItem<String>(
+                  value: key,
+                  child: Text(key),
+                );
+              }).toList(),
+            )),
+                Obx(() => DropdownButton<Province>(
+                      value: controller.selectedProvince.value.name == null
+                          ? null
+                          : controller.selectedProvince.value,
+                      onChanged: controller.onProvinceSelected,
+                      items: controller.provinces
+                          .map<DropdownMenuItem<Province>>((Province value) {
+                        return DropdownMenuItem<Province>(
+                          value: value,
+                          child: Text(value.name ?? ""),
+                        );
+                      }).toList(),
+                    )),
+                Obx(() => DropdownButton<Cities>(
+                      value: controller.selectedCity.value.name == null
+                          ? null
+                          : controller.selectedCity.value,
+                      onChanged: controller.onCitySelected,
+                      items: (controller.selectedProvince.value.cities ?? [])
+                          .map<DropdownMenuItem<Cities>>((Cities value) {
+                        return DropdownMenuItem<Cities>(
+                          value: value,
+                          child: Text(value.name ?? ""),
+                        );
+                      }).toList(),
+                    )),
+                    ],),
                 ),
+
+                // CommonTextInput(
+                //   labelText: 'Select Location',
+                //   hintText: 'Select Country',
+                //   isCountryPicker: true,
+                //   countryController: controller.countryController,
+                //   stateController: controller.stateController,
+                //   cityController: controller.cityController,
+                //   readOnly: true,
+                // ),
                 const SizedBox(height: 10),
                 CommonTextInput(
                   labelText: 'Site Name',
