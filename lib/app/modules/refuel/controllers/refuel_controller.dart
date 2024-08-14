@@ -1,6 +1,8 @@
+import 'package:csc_picker/model/select_status_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flying_horse/app/data/api_provider.dart';
 import 'package:flying_horse/app/data/colors.dart';
+import 'package:flying_horse/app/modules/refuel/models/country.dart';
 import 'package:flying_horse/app/modules/refueling/controllers/refueling_controller.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
@@ -29,6 +31,10 @@ class RefuelController extends GetxController {
   var siteCode = ''.obs;
   var yourPrice = 0.0.obs;
   var effectiveDate = ''.obs;
+  var provinces = <Province>[].obs;
+  var selectedProvince = Province().obs;
+  var selectedCity = Cities().obs;
+   var selectedCountry = ''.obs;
 
   TextEditingController countryController = TextEditingController();
   TextEditingController stateController = TextEditingController();
@@ -147,6 +153,7 @@ class RefuelController extends GetxController {
     super.onInit();
     _prefillDetailsFromStorage();
     setupListeners();
+    fetchProvinces(selectedCountry.value);
   }
 
   void _prefillDetailsFromStorage() {
@@ -206,14 +213,17 @@ class RefuelController extends GetxController {
     return suggestions;
   }
 
-
   Future<void> fetchProvinces(String iso2CountryCode) async {
+    if (iso2CountryCode.isEmpty) return;
+
     try {
-      final response =
-          await ApiProvider().getProvincesByCountry(iso2CountryCode);
+      final response = await ApiProvider().getProvincesByCountry(iso2CountryCode);
       if (response is List<dynamic>) {
-        final provinces = response.map((item) => item.toString()).toList();
-        print("Fetched Provinces: $provinces");
+        final fetchedProvinces = response.map((item) => Province.fromJson(item)).toList();
+        provinces.value = fetchedProvinces;
+        if (fetchedProvinces.isNotEmpty) {
+          selectedProvince.value = fetchedProvinces.first;
+        }
       } else {
         Get.snackbar("Error", "Failed to fetch provinces.");
       }
@@ -223,6 +233,21 @@ class RefuelController extends GetxController {
     }
   }
 
+void onCountrySelected(String? country) {
+    if (country != null) {
+      selectedProvince.value = Province();
+      selectedCity.value = Cities();
+      selectedCountry.value = country; 
+      fetchProvinces(countryIso2Map[country]!); 
+    }
+  }
+
+  void onProvinceSelected(Province? value) {
+    if (value != null) {
+      selectedProvince.value = value;
+      selectedCity.value = Cities();
+    }
+  }
 
   Future<void> _fetchSiteDetails() async {
     final country = countryController.text;
@@ -476,7 +501,7 @@ class RefuelController extends GetxController {
         "site_name": siteNameController.text,
       }),
       "your_price": yourPrice.value,
-      "timezone": DateTime.now().timeZoneName, // Hidden field for timezone
+      "timezone": DateTime.now().timeZoneName,
       "local_time": localTime,
       "effective_date": effectiveDate.value
     };
@@ -547,4 +572,10 @@ class RefuelController extends GetxController {
     siteNameController.dispose();
     super.onClose();
   }
+
+  void onCitySelected(Cities? value) {
+    selectedCity.value = value!;
+  }
 }
+
+

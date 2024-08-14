@@ -1,55 +1,56 @@
-class City {
-  final String name;
-  final String code;
-
-  City({required this.name, required this.code});
-
-  factory City.fromJson(Map<String, dynamic> json) {
-    return City(
-      name: json['site_names'].first,
-      code: json['site_codes'].first,
-    );
-  }
-}
-
 class Province {
-  final String name;
-  final String iso2;
-  final List<City> cities;
+  int? id;
+  String? name;
+  String? iso2;
+  String? countryCode;
+  List<Cities>? cities;
 
-  Province({required this.name, required this.iso2, required this.cities});
+  Province({this.id, this.name, this.iso2, this.countryCode, this.cities});
 
-  factory Province.fromJson(Map<String, dynamic> json) {
-    var cityList = <City>[];
-    json['cities'].forEach((key, value) {
-      cityList.add(City.fromJson(value));
-    });
+  Province.fromJson(Map<String, dynamic> json) {
+    id = json['id'];
+    name = json['name'];
+    iso2 = json['iso2'];
+    countryCode = json['country_code'];
+    if (json['cities'] != null) {
+      cities = <Cities>[];
+      json['cities'].forEach((v) {
+        cities!.add(new Cities.fromJson(v));
+      });
+    }
+  }
 
-    return Province(
-      name: json['name'],
-      iso2: json['iso2'],
-      cities: cityList,
-    );
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = new Map<String, dynamic>();
+    data['id'] = this.id;
+    data['name'] = this.name;
+    data['iso2'] = this.iso2;
+    data['country_code'] = this.countryCode;
+    if (this.cities != null) {
+      data['cities'] = this.cities!.map((v) => v.toJson()).toList();
+    }
+    return data;
   }
 }
 
-class Country {
-  final String name;
-  final String iso2;
-  final List<Province> provinces;
+class Cities {
+  String? name;
+  List<String>? siteNames;
+  List<String>? siteCodes;
 
-  Country({required this.name, required this.iso2, required this.provinces});
+  Cities({this.name, this.siteNames, this.siteCodes});
 
-  factory Country.fromJson(Map<String, dynamic> json) {
-    var provinceList = <Province>[];
-    json['provinces'].forEach((item) {
-      provinceList.add(Province.fromJson(item));
-    });
+  Cities.fromJson(Map<String, dynamic> json) {
+    name = json['name'];
+    siteNames = json['site_names'].cast<String>();
+    siteCodes = json['site_codes'].cast<String>();
+  }
 
-    return Country(
-      name: json['name'],
-      iso2: json['iso2'],
-      provinces: provinceList,
-    );
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = new Map<String, dynamic>();
+    data['name'] = this.name;
+    data['site_names'] = this.siteNames;
+    data['site_codes'] = this.siteCodes;
+    return data;
   }
 }

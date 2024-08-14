@@ -16,12 +16,10 @@ class RefuelCardView extends GetView<RefuelCardController> {
   const RefuelCardView({Key? key}) : super(key: key);
 
   String convertUtcToLocal(String utcDate) {
-    DateTime utcDateTime = DateTime.parse(utcDate).toUtc();
-
-    DateTime localDateTime = utcDateTime.toLocal();
-
-    String formattedDate = DateFormat('dd MMM yyyy').format(localDateTime);
-
+    DateTime utcDateTime = DateTime.parse(utcDate).toUtc(); // Parse as UTC
+    DateTime localDateTime = utcDateTime.toLocal(); // Convert to local time
+    String formattedDate = DateFormat('dd MMM yyyy, hh:mm a')
+        .format(localDateTime); // Format to desired output
     return formattedDate;
   }
 
@@ -203,8 +201,10 @@ class RefuelCardView extends GetView<RefuelCardController> {
                                   ),
                                   TripDetailRow(
                                     leftText: "Date",
-                                    rightText:
-                                        convertUtcToLocal(refuel['created_at']),
+                                    rightText: refuel['created_at'] != null
+                                        ? convertUtcToLocal(
+                                            refuel['created_at'])
+                                        : 'N/A',
                                     showDottedLine: false,
                                     spaceHeight: 10.0,
                                   ),
@@ -317,333 +317,336 @@ class RefuelCardView extends GetView<RefuelCardController> {
     );
   }
 
- void showEditModal(
-    BuildContext context, List refuelings, RefuelCardController controller) {
-  String? selectedStation = refuelings.isNotEmpty ? '0' : null;
-  var selectedRefuel = refuelings.isNotEmpty ? refuelings[0] : null;
-  TextEditingController odometerController = TextEditingController();
-  TextEditingController fuelQuantityController = TextEditingController();
-  TextEditingController amountPaidController = TextEditingController();
-  TextEditingController driverNameController = TextEditingController();
-  TextEditingController receiptNumberController = TextEditingController();
+  void showEditModal(
+      BuildContext context, List refuelings, RefuelCardController controller) {
+    String? selectedStation = refuelings.isNotEmpty ? '0' : null;
+    var selectedRefuel = refuelings.isNotEmpty ? refuelings[0] : null;
+    TextEditingController odometerController = TextEditingController();
+    TextEditingController fuelQuantityController = TextEditingController();
+    TextEditingController amountPaidController = TextEditingController();
+    TextEditingController driverNameController = TextEditingController();
+    TextEditingController receiptNumberController = TextEditingController();
 
-  String odometerReadingUnit = 'KM';
-  String fuelQuantityUnit = 'liters';
+    String odometerReadingUnit = 'KM';
+    String fuelQuantityUnit = 'liters';
 
-  if (selectedRefuel != null) {
-    var address = jsonDecode(selectedRefuel['fuel_station_address']);
-    controller.siteNameController.text = address['site_name'] ?? '';
-    controller.countryController.text = address['country'] ?? '';
-    controller.stateController.text = address['state'] ?? '';
-    controller.cityController.text = address['city'] ?? '';
+    if (selectedRefuel != null) {
+      var address = jsonDecode(selectedRefuel['fuel_station_address']);
+      controller.siteNameController.text = address['site_name'] ?? '';
+      controller.countryController.text = address['country'] ?? '';
+      controller.stateController.text = address['state'] ?? '';
+      controller.cityController.text = address['city'] ?? '';
 
-    odometerController.text =
-        selectedRefuel['odometer_reading']?.toString() ?? '';
-    fuelQuantityController.text =
-        double.parse(selectedRefuel['fuel_quantity']?.toString() ?? '0.0')
-            .toStringAsFixed(2);
-    amountPaidController.text =
-        selectedRefuel['amount_paid']?.toString() ?? '';
-    driverNameController.text = selectedRefuel['user_name'] ?? '';
-    receiptNumberController.text = selectedRefuel['receipt_number'] ?? '';
+      odometerController.text =
+          selectedRefuel['odometer_reading']?.toString() ?? '';
+      fuelQuantityController.text =
+          double.parse(selectedRefuel['fuel_quantity']?.toString() ?? '0.0')
+              .toStringAsFixed(2);
+      amountPaidController.text =
+          selectedRefuel['amount_paid']?.toString() ?? '';
+      driverNameController.text = selectedRefuel['user_name'] ?? '';
+      receiptNumberController.text = selectedRefuel['receipt_number'] ?? '';
 
-    odometerReadingUnit = selectedRefuel['odometer_reading_unit'] ?? 'KM';
-    fuelQuantityUnit = selectedRefuel['fuel_quantity_unit'] ?? 'liters';
-    
-    // Set the initial value for selectedFuelType
-    controller.selectedFuelType.value = selectedRefuel['fuel_type'] ?? 'diesel';
-  }
+      odometerReadingUnit = selectedRefuel['odometer_reading_unit'] ?? 'KM';
+      fuelQuantityUnit = selectedRefuel['fuel_quantity_unit'] ?? 'liters';
 
-  showDialog(
-    context: context,
-    builder: (BuildContext context) {
-      return StatefulBuilder(
-        builder: (BuildContext context, StateSetter setState) {
-          return Dialog(
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(15.0),
-            ),
-            backgroundColor: Colors.white,
-            child: Padding(
-              padding:
-                  const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Container(
-                    width: 80.0,
-                    height: 80.0,
-                    decoration: BoxDecoration(
-                      color: AppColors.primary.withOpacity(0.1),
-                      shape: BoxShape.circle,
-                    ),
-                    child: Center(
-                      child: Icon(
-                        Icons.edit,
-                        color: AppColors.primary,
-                        size: 35.0,
-                      ),
-                    ),
-                  ),
-                  SizedBox(height: 10),
-                  Text(
-                    'Edit Trip Details',
-                    style:
-                        TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                  ),
-                  SizedBox(height: 16),
-                  DropdownButton<String>(
-                    dropdownColor: Colors.grey[200],
-                    hint: Text(
-                      selectedStation != null
-                          ? "Selected: ${_getFillingStationLabel(int.parse(selectedStation!))}"
-                          : "Select Filling Station",
-                    ),
-                    value: selectedStation,
-                    isExpanded: true,
-                    items: refuelings.asMap().entries.map((entry) {
-                      int index = entry.key;
-                      var refuel = entry.value;
-                      return DropdownMenuItem<String>(
-                        value: index.toString(),
-                        child: Text(
-                          "${_getFillingStationLabel(index)} Filling Station",
-                        ),
-                      );
-                    }).toList(),
-                    onChanged: (value) {
-                      setState(() {
-                        selectedStation = value;
-                        selectedRefuel = refuelings[int.parse(value!)];
-                        var address = jsonDecode(
-                            selectedRefuel['fuel_station_address']);
-                        controller.siteNameController.text =
-                            address['site_name'] ?? '';
-                        controller.countryController.text =
-                            address['country'] ?? '';
-                        controller.stateController.text =
-                            address['state'] ?? '';
-                        controller.cityController.text =
-                            address['city'] ?? '';
+      // Set the initial value for selectedFuelType
+      controller.selectedFuelType.value =
+          selectedRefuel['fuel_type'] ?? 'diesel';
+    }
 
-                        odometerController.text =
-                            selectedRefuel['odometer_reading']?.toString() ??
-                                '';
-                        fuelQuantityController.text = double.parse(
-                                selectedRefuel['fuel_quantity']?.toString() ??
-                                    '0.0')
-                            .toStringAsFixed(2);
-                        amountPaidController.text =
-                            selectedRefuel['amount_paid']?.toString() ?? '';
-                        driverNameController.text =
-                            selectedRefuel['user_name'] ?? '';
-                        receiptNumberController.text =
-                            selectedRefuel['receipt_number']?.toString() ??
-                                '';
-
-                        odometerReadingUnit =
-                            selectedRefuel['odometer_reading_unit'] ?? 'KM';
-                        fuelQuantityUnit =
-                            selectedRefuel['fuel_quantity_unit'] ?? 'liters';
-
-                        // Update the selected fuel type
-                        controller.selectedFuelType.value = selectedRefuel['fuel_type'] ?? 'diesel';
-                      });
-                    },
-                  ),
-                  if (selectedRefuel != null) ...[
-                    Expanded(
-                      child: SingleChildScrollView(
-                        child: Column(
-                          children: [
-                            // Fuel Type Selector
-                            Obx(() => Container(
-                                  height: 50,
-                                  width: double.infinity,
-                                  child: SegmentedButton<String>(
-                                    showSelectedIcon: false,
-                                    style: ButtonStyle(
-                                      backgroundColor:
-                                          MaterialStateProperty.resolveWith<
-                                              Color?>(
-                                        (Set<MaterialState> states) {
-                                          if (states.contains(
-                                              MaterialState.selected)) {
-                                            return AppColors.primary;
-                                          }
-                                          return Color(0xFFEEEEEE);
-                                        },
-                                      ),
-                                      foregroundColor:
-                                          MaterialStateProperty.resolveWith<
-                                              Color?>(
-                                        (Set<MaterialState> states) {
-                                          if (states.contains(
-                                              MaterialState.selected)) {
-                                            return Colors.white;
-                                          }
-                                          return AppColors.black;
-                                        },
-                                      ),
-                                    ),
-                                    segments: <ButtonSegment<String>>[
-                                      ButtonSegment<String>(
-                                        value: 'diesel',
-                                        label: Text(
-                                          'Diesel',
-                                          style: AppTextStyle.mediumStyle(
-                                              fontSize: 16),
-                                          textAlign: TextAlign.center,
-                                        ),
-                                      ),
-                                      ButtonSegment<String>(
-                                        value: 'def',
-                                        label: Text(
-                                          'DEF',
-                                          style: AppTextStyle.mediumStyle(
-                                              fontSize: 16),
-                                          textAlign: TextAlign.center,
-                                        ),
-                                      ),
-                                    ],
-                                    selected: <String>{
-                                      controller.selectedFuelType.value
-                                    },
-                                    onSelectionChanged:
-                                        (Set<String> newSelection) {
-                                      if (newSelection.isNotEmpty) {
-                                        controller.setSelectedFuelType(
-                                            newSelection.first);
-                                      }
-                                    },
-                                  ),
-                                )),
-                            const SizedBox(height: 10),
-                            CommonTextInput(
-                              labelText: 'Site Name',
-                              hintText: 'ONTARIO 8AHM 202',
-                              controller: controller.siteNameController,
-                              readOnly: true,
-                            ),
-                            const SizedBox(height: 10),
-                            CommonTextInput(
-                              labelText: 'Country',
-                              hintText: 'Select Country',
-                              controller: controller.countryController,
-                              readOnly: true,
-                            ),
-                            const SizedBox(height: 10),
-                            CommonTextInput(
-                              labelText: 'State',
-                              hintText: 'Select State',
-                              controller: controller.stateController,
-                              readOnly: true,
-                            ),
-                            const SizedBox(height: 10),
-                            CommonTextInput(
-                              labelText: 'City',
-                              hintText: 'Select City',
-                              controller: controller.cityController,
-                              readOnly: true,
-                            ),
-                            const SizedBox(height: 10),
-                            CommonTextInput(
-                              labelText: 'Driver Name',
-                              hintText: 'Enter Driver Name',
-                              controller: driverNameController,
-                              readOnly: true,
-                            ),
-                            SizedBox(height: 10),
-                            CommonTextInput(
-                              labelText: 'Odometer Reading',
-                              hintText: 'Enter Odometer Reading',
-                              controller: odometerController,
-                              showSegmentedTabs: true,
-                              segments: ['KM', 'Miles'],
-                              selectedSegment: odometerReadingUnit,
-                              onSegmentSelected: (value) {
-                                setState(() {
-                                  odometerReadingUnit = value;
-                                });
-                              },
-                              keyboardType: TextInputType.number,
-                            ),
-                            SizedBox(height: 10),
-                            CommonTextInput(
-                              labelText: 'Fuel Quantity',
-                              hintText: 'Enter Fuel Quantity',
-                              controller: fuelQuantityController,
-                              showSegmentedTabs: true,
-                              segments: ['liters', 'gallon'],
-                              selectedSegment: fuelQuantityUnit,
-                              onSegmentSelected: (value) {
-                                setState(() {
-                                  fuelQuantityUnit = value;
-                                });
-                              },
-                              keyboardType: TextInputType.number,
-                            ),
-                            SizedBox(height: 10),
-                            CommonTextInput(
-                              labelText: 'Receipt Number',
-                              hintText: 'Enter Receipt Number',
-                              controller: receiptNumberController,
-                              keyboardType: TextInputType.text,
-                            ),
-                            SizedBox(height: 10),
-                            CommonTextInput(
-                              labelText: 'Amount Paid',
-                              hintText: 'Enter Amount Paid',
-                              controller: amountPaidController,
-                              keyboardType: TextInputType.number,
-                            ),
-                            SizedBox(height: 20),
-                            TextButton(
-                              child: Text('Save'),
-                              onPressed: () async {
-                                // Construct the updatedData map
-                                Map<String, dynamic> updatedData = {
-                                  "id": selectedRefuel['id'],
-                                  "fuel_type":
-                                      controller.selectedFuelType.value,
-                                  "fuel_quantity": fuelQuantityController.text,
-                                  "fuel_quantity_unit": fuelQuantityUnit,
-                                  "amount_paid": amountPaidController.text,
-                                  "receipt_number":
-                                      receiptNumberController.text,
-                                  "odometer_reading":
-                                      odometerController.text,
-                                  "odometer_reading_unit": odometerReadingUnit,
-                                  "user_name": driverNameController.text,
-                                };
-
-                                // Call the update method on the controller
-                                await controller.updateFuelDetail(
-                                  selectedRefuel['id'],
-                                  updatedData,
-                                );
-
-                                // Close the modal after saving
-                                Get.back();
-                              },
-                            
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ],
-                ],
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return StatefulBuilder(
+          builder: (BuildContext context, StateSetter setState) {
+            return Dialog(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(15.0),
               ),
-            ),
-          );
-        },
-      );
-    },
-  );
-}
+              backgroundColor: Colors.white,
+              child: Padding(
+                padding:
+                    const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Container(
+                      width: 80.0,
+                      height: 80.0,
+                      decoration: BoxDecoration(
+                        color: AppColors.primary.withOpacity(0.1),
+                        shape: BoxShape.circle,
+                      ),
+                      child: Center(
+                        child: Icon(
+                          Icons.edit,
+                          color: AppColors.primary,
+                          size: 35.0,
+                        ),
+                      ),
+                    ),
+                    SizedBox(height: 10),
+                    Text(
+                      'Edit Trip Details',
+                      style:
+                          TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                    ),
+                    SizedBox(height: 16),
+                    DropdownButton<String>(
+                      dropdownColor: Colors.grey[200],
+                      hint: Text(
+                        selectedStation != null
+                            ? "Selected: ${_getFillingStationLabel(int.parse(selectedStation!))}"
+                            : "Select Filling Station",
+                      ),
+                      value: selectedStation,
+                      isExpanded: true,
+                      items: refuelings.asMap().entries.map((entry) {
+                        int index = entry.key;
+                        var refuel = entry.value;
+                        return DropdownMenuItem<String>(
+                          value: index.toString(),
+                          child: Text(
+                            "${_getFillingStationLabel(index)} Filling Station",
+                          ),
+                        );
+                      }).toList(),
+                      onChanged: (value) {
+                        setState(() {
+                          selectedStation = value;
+                          selectedRefuel = refuelings[int.parse(value!)];
+                          var address = jsonDecode(
+                              selectedRefuel['fuel_station_address']);
+                          controller.siteNameController.text =
+                              address['site_name'] ?? '';
+                          controller.countryController.text =
+                              address['country'] ?? '';
+                          controller.stateController.text =
+                              address['state'] ?? '';
+                          controller.cityController.text =
+                              address['city'] ?? '';
 
+                          odometerController.text =
+                              selectedRefuel['odometer_reading']?.toString() ??
+                                  '';
+                          fuelQuantityController.text = double.parse(
+                                  selectedRefuel['fuel_quantity']?.toString() ??
+                                      '0.0')
+                              .toStringAsFixed(2);
+                          amountPaidController.text =
+                              selectedRefuel['amount_paid']?.toString() ?? '';
+                          driverNameController.text =
+                              selectedRefuel['user_name'] ?? '';
+                          receiptNumberController.text =
+                              selectedRefuel['receipt_number']?.toString() ??
+                                  '';
 
+                          odometerReadingUnit =
+                              selectedRefuel['odometer_reading_unit'] ?? 'KM';
+                          fuelQuantityUnit =
+                              selectedRefuel['fuel_quantity_unit'] ?? 'liters';
+
+                          // Update the selected fuel type
+                          controller.selectedFuelType.value =
+                              selectedRefuel['fuel_type'] ?? 'diesel';
+                        });
+                      },
+                    ),
+                    if (selectedRefuel != null) ...[
+                      Expanded(
+                        child: SingleChildScrollView(
+                          child: Column(
+                            children: [
+                              // Fuel Type Selector
+                              Obx(() => Container(
+                                    height: 50,
+                                    width: double.infinity,
+                                    child: SegmentedButton<String>(
+                                      showSelectedIcon: false,
+                                      style: ButtonStyle(
+                                        backgroundColor: MaterialStateProperty
+                                            .resolveWith<Color?>(
+                                          (Set<MaterialState> states) {
+                                            if (states.contains(
+                                                MaterialState.selected)) {
+                                              return AppColors.primary;
+                                            }
+                                            return Color(0xFFEEEEEE);
+                                          },
+                                        ),
+                                        foregroundColor: MaterialStateProperty
+                                            .resolveWith<Color?>(
+                                          (Set<MaterialState> states) {
+                                            if (states.contains(
+                                                MaterialState.selected)) {
+                                              return Colors.white;
+                                            }
+                                            return AppColors.black;
+                                          },
+                                        ),
+                                      ),
+                                      segments: <ButtonSegment<String>>[
+                                        ButtonSegment<String>(
+                                          value: 'diesel',
+                                          label: Text(
+                                            'Diesel',
+                                            style: AppTextStyle.mediumStyle(
+                                                fontSize: 16),
+                                            textAlign: TextAlign.center,
+                                          ),
+                                        ),
+                                        ButtonSegment<String>(
+                                          value: 'def',
+                                          label: Text(
+                                            'DEF',
+                                            style: AppTextStyle.mediumStyle(
+                                                fontSize: 16),
+                                            textAlign: TextAlign.center,
+                                          ),
+                                        ),
+                                      ],
+                                      selected: <String>{
+                                        controller.selectedFuelType.value
+                                      },
+                                      onSelectionChanged:
+                                          (Set<String> newSelection) {
+                                        if (newSelection.isNotEmpty) {
+                                          controller.setSelectedFuelType(
+                                              newSelection.first);
+                                        }
+                                      },
+                                    ),
+                                  )),
+                              const SizedBox(height: 10),
+                              CommonTextInput(
+                                labelText: 'Site Name',
+                                hintText: 'ONTARIO 8AHM 202',
+                                controller: controller.siteNameController,
+                                readOnly: true,
+                              ),
+                              const SizedBox(height: 10),
+                              CommonTextInput(
+                                labelText: 'Country',
+                                hintText: 'Select Country',
+                                controller: controller.countryController,
+                                readOnly: true,
+                              ),
+                              const SizedBox(height: 10),
+                              CommonTextInput(
+                                labelText: 'State',
+                                hintText: 'Select State',
+                                controller: controller.stateController,
+                                readOnly: true,
+                              ),
+                              const SizedBox(height: 10),
+                              CommonTextInput(
+                                labelText: 'City',
+                                hintText: 'Select City',
+                                controller: controller.cityController,
+                                readOnly: true,
+                              ),
+                              const SizedBox(height: 10),
+                              CommonTextInput(
+                                labelText: 'Driver Name',
+                                hintText: 'Enter Driver Name',
+                                controller: driverNameController,
+                                readOnly: true,
+                              ),
+                              SizedBox(height: 10),
+                              CommonTextInput(
+                                labelText: 'Odometer Reading',
+                                hintText: 'Enter Odometer Reading',
+                                controller: odometerController,
+                                showSegmentedTabs: true,
+                                segments: ['KM', 'Miles'],
+                                selectedSegment: odometerReadingUnit,
+                                onSegmentSelected: (value) {
+                                  setState(() {
+                                    odometerReadingUnit = value;
+                                  });
+                                },
+                                keyboardType: TextInputType.number,
+                              ),
+                              SizedBox(height: 10),
+                              CommonTextInput(
+                                labelText: 'Fuel Quantity',
+                                hintText: 'Enter Fuel Quantity',
+                                controller: fuelQuantityController,
+                                showSegmentedTabs: true,
+                                segments: ['liters', 'gallon'],
+                                selectedSegment: fuelQuantityUnit,
+                                onSegmentSelected: (value) {
+                                  setState(() {
+                                    fuelQuantityUnit = value;
+                                  });
+                                },
+                                keyboardType: TextInputType.number,
+                              ),
+                              SizedBox(height: 10),
+                              CommonTextInput(
+                                labelText: 'Receipt Number',
+                                hintText: 'Enter Receipt Number',
+                                controller: receiptNumberController,
+                                keyboardType: TextInputType.text,
+                              ),
+                              SizedBox(height: 10),
+                              CommonTextInput(
+                                labelText: 'Amount Paid',
+                                hintText: 'Enter Amount Paid',
+                                controller: amountPaidController,
+                                keyboardType: TextInputType.number,
+                              ),
+                              SizedBox(height: 20),
+                              TextButton(
+                                child: Text('Save'),
+                                
+                                onPressed: () async {
+                                  String createdAt =
+                                      DateFormat("yyyy-MM-ddTHH:mm:ss'Z'")
+                                          .format(DateTime.now().toUtc());
+                                  // Construct the updatedData map
+                                  Map<String, dynamic> updatedData = {
+                                    "id": selectedRefuel['id'],
+                                    "fuel_type":
+                                        controller.selectedFuelType.value,
+                                    "fuel_quantity":
+                                        fuelQuantityController.text,
+                                    "fuel_quantity_unit": fuelQuantityUnit,
+                                    "amount_paid": amountPaidController.text,
+                                    "receipt_number":
+                                        receiptNumberController.text,
+                                    "odometer_reading": odometerController.text,
+                                    "odometer_reading_unit":
+                                        odometerReadingUnit,
+                                    "user_name": driverNameController.text,
+                                    "created_at": createdAt,
+                                  };
+
+                                  // Call the update method on the controller
+                                  await controller.updateFuelDetail(
+                                    selectedRefuel['id'],
+                                    updatedData,
+                                  );
+
+                                  // Close the modal after saving
+                                  Get.back();
+                                },
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
+                  ],
+                ),
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
 
   Widget _buildIconButton(IconData icon,
       {required void Function()? onPressed, required bool enabled}) {
