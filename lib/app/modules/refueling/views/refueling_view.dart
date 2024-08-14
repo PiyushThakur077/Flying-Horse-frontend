@@ -96,53 +96,54 @@ class RefuelingView extends GetView<RefuelingController> {
                                       )
                                     ],
                                   ),
-                                    Padding(
-                                padding: const EdgeInsets.symmetric(
-                                    vertical: 20.0, horizontal: 14),
-                                child: Container(
-                                  decoration: BoxDecoration(
-                                    color: Colors.white,
-                                    boxShadow: [
-                                      BoxShadow(
-                                        color: Colors.grey.withOpacity(0.5),
-                                        spreadRadius: 2,
-                                        blurRadius: 5,
-                                        offset: const Offset(0, 3),
+                                  Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                        vertical: 20.0, horizontal: 14),
+                                    child: Container(
+                                      decoration: BoxDecoration(
+                                        color: Colors.white,
+                                        boxShadow: [
+                                          BoxShadow(
+                                            color: Colors.grey.withOpacity(0.5),
+                                            spreadRadius: 2,
+                                            blurRadius: 5,
+                                            offset: const Offset(0, 3),
+                                          ),
+                                        ],
+                                        borderRadius: BorderRadius.circular(10),
                                       ),
-                                    ],
-                                    borderRadius: BorderRadius.circular(10),
-                                  ),
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 20.0, vertical: 10.0),
-                                  child: Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      Text(
-                                        'Your Trip Details',
-                                        style: AppTextStyle.semiBoldStyle(
-                                            fontSize: 18, color: Colors.black),
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 20.0, vertical: 10.0),
+                                      child: Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          Text(
+                                            'Your Trip Details',
+                                            style: AppTextStyle.semiBoldStyle(
+                                                fontSize: 18,
+                                                color: Colors.black),
+                                          ),
+                                          // Row(
+                                          //   children: [
+                                          //     InkWell(
+                                          //       onTap: () => showDateRangePicker(
+                                          //           context, (startDate, endDate) {
+                                          //         controller.filterTrips(
+                                          //             startDate, endDate);
+                                          //       }),
+                                          //       child: const Icon(
+                                          //         Icons.tune_rounded,
+                                          //         size: 24.0,
+                                          //         color: Colors.black,
+                                          //       ),
+                                          //     ),
+                                          //   ],
+                                          // ),
+                                        ],
                                       ),
-                                      // Row(
-                                      //   children: [
-                                      //     InkWell(
-                                      //       onTap: () => showDateRangePicker(
-                                      //           context, (startDate, endDate) {
-                                      //         controller.filterTrips(
-                                      //             startDate, endDate);
-                                      //       }),
-                                      //       child: const Icon(
-                                      //         Icons.tune_rounded,
-                                      //         size: 24.0,
-                                      //         color: Colors.black,
-                                      //       ),
-                                      //     ),
-                                      //   ],
-                                      // ),
-                                    ],
+                                    ),
                                   ),
-                                ),
-                              ),
                                   controller.trips.isEmpty
                                       ? Padding(
                                           padding: const EdgeInsets.symmetric(
@@ -363,9 +364,7 @@ class RefuelingView extends GetView<RefuelingController> {
                                                                   return Row(
                                                                     children: [
                                                                       Text(
-                                                                        trip['users']
-                                                                            [
-                                                                            index],
+                                                                        '${trip['users'][index][0].toUpperCase()}${trip['users'][index].substring(1)}',
                                                                         style: AppTextStyle
                                                                             .mediumStyle(
                                                                           fontSize:

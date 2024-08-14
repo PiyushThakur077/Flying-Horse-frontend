@@ -35,6 +35,8 @@ class RefuelController extends GetxController {
   var selectedProvince = Province().obs;
   var selectedCity = Cities().obs;
    var selectedCountry = ''.obs;
+   var siteName  = ''.obs;
+   
 
   TextEditingController countryController = TextEditingController();
   TextEditingController stateController = TextEditingController();
@@ -416,153 +418,158 @@ void onCountrySelected(String? country) {
     );
   }
 
-  void setSelectedFuelType(String value) {
-    selectedFuelType.value = value;
+ void setSelectedFuelType(String value) {
+  selectedFuelType.value = value;
+}
+
+String? validateTruckNumber(String text) {
+  return text.isNotEmpty ? null : "Please enter a valid truck number";
+}
+
+String? validateOdometerReading(double value) {
+  return value > 0 ? null : "Please enter a valid odometer reading";
+}
+
+String? validateFuelQuantity(double value) {
+  return value > 0 ? null : "Please enter a valid fuel quantity";
+}
+
+String? validateAmountPaid(double value) {
+  return value > 0 ? null : "Please enter a valid amount paid";
+}
+
+String? validateTripNumber(String text) {
+  return text.isNotEmpty ? null : "Please enter a valid trip number";
+}
+
+String? validateCardDetail(String text) {
+  return text.isNotEmpty ? null : "Please enter a valid card detail";
+}
+
+String? validateSiteName(String text) {
+  return text.isNotEmpty ? null : "Please enter a valid site name";
+}
+
+String? validateReceiptNumber(String text) {
+  return text.isNotEmpty ? null : "Please enter a valid receipt number";
+}
+
+bool validateFields() {
+  if (validateTruckNumber(truckNumber.value) != null ||
+      validateOdometerReading(odometerReading.value) != null ||
+      validateFuelQuantity(fuelQuantity.value) != null ||
+      validateTripNumber(tripNumber.value) != null ||
+      validateCardDetail(cardDetail.value) != null ||
+      validateSiteName(siteNameController.text) != null ||
+      validateReceiptNumber(receiptNumber.value) != null ||
+      countryController.text.isEmpty ||
+      stateController.text.isEmpty ||
+      cityController.text.isEmpty) {
+    Get.snackbar(
+      backgroundColor: Colors.red.shade500,
+      colorText: Colors.white,
+      "Error",
+      "All fields are required except Amount Paid",
+      icon: const Icon(
+        Icons.error,
+        color: Colors.white,
+      ),
+    );
+
+    return false;
+  }
+  return true;
+}
+
+void notifyRefuelingController() {
+  RefuelingController refuelingController = Get.find<RefuelingController>();
+  refuelingController.refreshTrips();
+}
+
+Future<void> saveFuelDetails(BuildContext context) async {
+  if (!validateFields()) return;
+
+  isLoading.value = true;
+
+  final localTime = DateFormat('yyyy-MM-dd HH:mm:ss').format(DateTime.now());
+
+  final map = {
+    "trip_number": tripNumber.value,
+    "fuel_type": selectedFuelType.value.toLowerCase(),
+    "odometer_reading_unit": odometerReadingUnit.value,
+    "odometer_reading": odometerReading.value,
+    "fuel_quantity_unit": fuelQuantityUnit.value,
+    "fuel_quantity": fuelQuantity.value,
+    "receipt_number": receiptNumber.value,
+    "fuel_station_address": jsonEncode({
+      "country": countryController.text,
+      "state": stateController.text,
+      "city": cityController.text,
+      "site_name": siteNameController.text,
+    }),
+    "your_price": yourPrice.value,
+    "timezone": DateTime.now().timeZoneName,
+    "local_time": localTime,
+    "effective_date": effectiveDate.value
+  };
+
+  // Include amount_paid only if it has a valid value
+  if (amountPaid.value > 0) {
+    map["amount_paid"] = amountPaid.value;
   }
 
-  String? validateTruckNumber(String text) {
-    return text.isNotEmpty ? null : "Please enter a valid truck number";
-  }
+  // Print the submitted data
+  print("Submitted Data: $map");
 
-  String? validateOdometerReading(double value) {
-    return value > 0 ? null : "Please enter a valid odometer reading";
-  }
+  try {
+    var response = await ApiProvider().saveFuelDetails(map);
 
-  String? validateFuelQuantity(double value) {
-    return value > 0 ? null : "Please enter a valid fuel quantity";
-  }
+    if (response is String) {
+      response = jsonDecode(response);
+    }
 
-  String? validateAmountPaid(double value) {
-    return value > 0 ? null : "Please enter a valid amount paid";
-  }
-
-  String? validateTripNumber(String text) {
-    return text.isNotEmpty ? null : "Please enter a valid trip number";
-  }
-
-  String? validateCardDetail(String text) {
-    return text.isNotEmpty ? null : "Please enter a valid card detail";
-  }
-
-  String? validateSiteName(String text) {
-    return text.isNotEmpty ? null : "Please enter a valid site name";
-  }
-
-  bool validateFields() {
-    if (validateTruckNumber(truckNumber.value) != null ||
-        validateOdometerReading(odometerReading.value) != null ||
-        validateFuelQuantity(fuelQuantity.value) != null ||
-        validateTripNumber(tripNumber.value) != null ||
-        validateCardDetail(cardDetail.value) != null ||
-        validateSiteName(siteNameController.text) != null ||
-        countryController.text.isEmpty ||
-        stateController.text.isEmpty ||
-        cityController.text.isEmpty) {
+    if (response is Map<String, dynamic> && response['success'] == true) {
       Get.snackbar(
-        backgroundColor: Colors.red.shade500,
-        colorText: Colors.white,
-        "Error",
-        "All fields are required except Amount Paid",
-        icon: const Icon(
-          Icons.error,
-          color: Colors.white,
-        ),
-      );
+          backgroundColor: Colors.green.shade500,
+          colorText: Colors.white,
+          "Success",
+          "Fuel details saved successfully");
 
-      return false;
+      // Save fuelQuantity in GetStorage
+      final storage = GetStorage();
+      storage.write('fuelQuantity', fuelQuantity.value);
+
+      // Notify RefuelingController
+      notifyRefuelingController();
+
+      // Clear all fields
+      truckNumber.value = '';
+      odometerReading.value = 0.0;
+      fuelQuantity.value = 0.0;
+      amountPaid.value = 0.0;
+      tripNumber.value = '';
+      cardDetail.value = '';
+      receiptNumber.value = '';
+      countryController.clear();
+      stateController.clear();
+      cityController.clear();
+      siteNameController.clear();
+      yourPrice.value = 0.0;
+
+      Future.delayed(Duration(seconds: 1), () {
+        Navigator.pop(context, true);
+      });
+    } else {
+      Get.snackbar(
+          "Error", response['message'] ?? "Failed to save fuel details");
     }
-    return true;
+  } catch (e) {
+    print("Failed to save fuel details: $e");
+    Get.snackbar("Error", "Failed to save fuel details: $e");
+  } finally {
+    isLoading.value = false;
   }
-
-  void notifyRefuelingController() {
-    RefuelingController refuelingController = Get.find<RefuelingController>();
-    refuelingController.refreshTrips();
-  }
-
-  Future<void> saveFuelDetails(BuildContext context) async {
-    if (!validateFields()) return;
-
-    isLoading.value = true;
-
-    final localTime = DateFormat('yyyy-MM-dd HH:mm:ss').format(DateTime.now());
-
-    final map = {
-      "trip_number": tripNumber.value,
-      "fuel_type": selectedFuelType.value.toLowerCase(),
-      "odometer_reading_unit": odometerReadingUnit.value,
-      "odometer_reading": odometerReading.value,
-      "fuel_quantity_unit": fuelQuantityUnit.value,
-      "fuel_quantity": fuelQuantity.value,
-      "receipt_number": receiptNumber.value,
-      "fuel_station_address": jsonEncode({
-        "country": countryController.text,
-        "state": stateController.text,
-        "city": cityController.text,
-        "site_name": siteNameController.text,
-      }),
-      "your_price": yourPrice.value,
-      "timezone": DateTime.now().timeZoneName,
-      "local_time": localTime,
-      "effective_date": effectiveDate.value
-    };
-
-    // Include amount_paid only if it has a valid value
-    if (amountPaid.value > 0) {
-      map["amount_paid"] = amountPaid.value;
-    }
-
-    // Print the submitted data
-    print("Submitted Data: $map");
-
-    try {
-      var response = await ApiProvider().saveFuelDetails(map);
-
-      if (response is String) {
-        response = jsonDecode(response);
-      }
-
-      if (response is Map<String, dynamic> && response['success'] == true) {
-        Get.snackbar(
-            backgroundColor: Colors.green.shade500,
-            colorText: Colors.white,
-            "Success",
-            "Fuel details saved successfully");
-
-        // Save fuelQuantity in GetStorage
-        final storage = GetStorage();
-        storage.write('fuelQuantity', fuelQuantity.value);
-
-        // Notify RefuelingController
-        notifyRefuelingController();
-
-        // Clear all fields
-        truckNumber.value = '';
-        odometerReading.value = 0.0;
-        fuelQuantity.value = 0.0;
-        amountPaid.value = 0.0;
-        tripNumber.value = '';
-        cardDetail.value = '';
-        receiptNumber.value = '';
-        countryController.clear();
-        stateController.clear();
-        cityController.clear();
-        siteNameController.clear();
-        yourPrice.value = 0.0;
-
-        Future.delayed(Duration(seconds: 1), () {
-          Navigator.pop(context, true);
-        });
-      } else {
-        Get.snackbar(
-            "Error", response['message'] ?? "Failed to save fuel details");
-      }
-    } catch (e) {
-      print("Failed to save fuel details: $e");
-      Get.snackbar("Error", "Failed to save fuel details: $e");
-    } finally {
-      isLoading.value = false;
-    }
-  }
+}
 
   @override
   void onClose() {
