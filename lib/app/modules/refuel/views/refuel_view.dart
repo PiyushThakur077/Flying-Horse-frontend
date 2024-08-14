@@ -3,13 +3,12 @@ import 'package:flying_horse/app/data/colors.dart';
 import 'package:flying_horse/app/utils/text_style.dart';
 import 'package:flying_horse/app/widgets/app_button.dart';
 import 'package:flying_horse/app/widgets/common_text_input.dart';
+import 'package:flying_horse/app/widgets/trip_detail_row.dart';
 import 'package:get/get.dart';
 import '../controllers/refuel_controller.dart';
 
 class RefuelView extends GetView<RefuelController> {
   const RefuelView({Key? key}) : super(key: key);
-
- 
 
   @override
   Widget build(BuildContext context) {
@@ -18,7 +17,7 @@ class RefuelView extends GetView<RefuelController> {
         iconTheme: const IconThemeData(
           color: Colors.white,
         ),
-        title: const Text('Refuel'),
+        title: const Text('Fuel'),
         centerTitle: true,
         backgroundColor: AppColors.primary,
         titleTextStyle: const TextStyle(
@@ -50,24 +49,55 @@ class RefuelView extends GetView<RefuelController> {
                 //       FocusNode focusNode,
                 //       VoidCallback onFieldSubmitted) {
                 //     return TextField(
-                //       controller:
-                //           controller.siteNameController, 
+                //       controller: controller.siteNameController,
                 //       focusNode: focusNode,
                 //       decoration: InputDecoration(
+                //         filled: true,
+                //         fillColor: const Color(0xFFEEEEEE),
+                //         border: OutlineInputBorder(
+                //   borderRadius: BorderRadius.circular(25.0),
+                //   borderSide: BorderSide.none,
+                // ),
+                // enabledBorder: OutlineInputBorder(
+                //   borderRadius: BorderRadius.circular(25.0),
+                //   borderSide: BorderSide.none,
+                // ),
+                // focusedBorder: OutlineInputBorder(
+                //   borderRadius: BorderRadius.circular(25.0),
+                //   borderSide: BorderSide.none,
+                // ),
                 //         labelText: 'Site Name',
                 //         hintText: 'ONTARIO 8AHM 202',
-                //         border: OutlineInputBorder(),
+
                 //       ),
                 //       onChanged: (value) {
-                //         textEditingController.text =
-                //             value; 
-                //         controller.siteNameController.text =
-                //             value; 
+                //         textEditingController.text = value;
+                //         controller.siteNameController.text = value;
                 //       },
                 //     );
                 //   },
                 // ),
-               
+                TripDetailRow(
+                  leftText: "Truck number",
+                  rightText: controller.truckNumber.value,
+                  showDottedLine: false,
+                  spaceHeight: 10.0,
+                ),
+                TripDetailRow(
+                  leftText: "Trip Number",
+                  rightText: controller.tripNumber.value,
+                  showDottedLine: false,
+                  spaceHeight: 10.0,
+                ),
+                TripDetailRow(
+                  leftText: "Card Detail",
+                  rightText: controller.cardDetail.value,
+                  showDottedLine: true,
+                  spaceHeight: 10.0,
+                ),
+                SizedBox(
+                  height: 10,
+                ),
                 CommonTextInput(
                   labelText: 'Select Location',
                   hintText: 'Select Country',
@@ -78,9 +108,12 @@ class RefuelView extends GetView<RefuelController> {
                   readOnly: true,
                 ),
                 const SizedBox(height: 10),
-                 CommonTextInput(labelText:'Site Name' 
-                , hintText: 'ONTARIO 8AHM 202',
-                controller: controller.siteNameController,),
+                CommonTextInput(
+                  labelText: 'Site Name',
+                  hintText: '',
+                  controller: controller.siteNameController,
+                  readOnly: true,
+                ),
                 const SizedBox(height: 10),
                 Padding(
                   padding: EdgeInsets.symmetric(horizontal: 11),
@@ -145,15 +178,6 @@ class RefuelView extends GetView<RefuelController> {
                     )),
                 const SizedBox(height: 5),
                 CommonTextInput(
-                  labelText: 'Truck number',
-                  hintText: 'ONTARIO 8AHM 202',
-                  controller:
-                      TextEditingController(text: controller.truckNumber.value),
-                  onChanged: (value) => controller.truckNumber.value = value,
-                  readOnly: true,
-                ),
-                const SizedBox(height: 10),
-                CommonTextInput(
                   labelText: 'Odometer Reading',
                   hintText: 'Enter odometer reading',
                   showSegmentedTabs: true,
@@ -179,39 +203,20 @@ class RefuelView extends GetView<RefuelController> {
                   keyboardType: TextInputType.number,
                 ),
                 const SizedBox(height: 10),
+
+                CommonTextInput(
+                  labelText: 'Receipt Number',
+                  hintText: 'Enter receipt number here',
+                  onChanged: (value) => controller.receiptNumber.value = value,
+                  keyboardType: TextInputType.text,
+                ),
+                const SizedBox(height: 10),
                 CommonTextInput(
                   labelText: 'Amount Paid',
                   hintText: 'Enter amount here',
                   onChanged: (value) => controller.amountPaid.value =
                       double.tryParse(value) ?? 0.0,
                   keyboardType: TextInputType.number,
-                ),
-                const SizedBox(height: 10),
-                CommonTextInput(
-                  labelText: 'Receipt Number',
-                  hintText: 'Enter receipt number here',
-                  onChanged: (value) => controller.receiptNumber.value =
-                      value, // Store string value
-                  keyboardType:
-                      TextInputType.text, // Use text input for receipt number
-                ),
-                const SizedBox(height: 10),
-                CommonTextInput(
-                  labelText: 'Trip Number',
-                  hintText: 'Enter trip number',
-                  controller:
-                      TextEditingController(text: controller.tripNumber.value),
-                  onChanged: (value) => controller.tripNumber.value = value,
-                  readOnly: true,
-                ),
-                const SizedBox(height: 10),
-                CommonTextInput(
-                  labelText: 'Card Detail',
-                  hintText: 'Enter card detail',
-                  controller:
-                      TextEditingController(text: controller.cardDetail.value),
-                  onChanged: (value) => controller.cardDetail.value = value,
-                  readOnly: true,
                 ),
                 const SizedBox(height: 100),
               ],

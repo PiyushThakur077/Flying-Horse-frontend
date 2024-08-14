@@ -23,7 +23,7 @@ class RefuelingController extends GetxController {
     fuelQuantity.value = storage.read<double>('fuelQuantity') ?? 0.0;
   }
 
-  void fetchTrips() async {
+ Future <void> fetchTrips() async {
     try {
       isLoading(true);
       var response = await apiProvider.getTrip();
@@ -42,13 +42,13 @@ class RefuelingController extends GetxController {
           });
         trips.assignAll(sortedTrips);
 
-        // Save the data to GetStorage if status_name is "inprogress"
+       
         for (var trip in sortedTrips) {
           if (trip['status_name'] == 'inprogress') {
             GetStorage().write('cardNumber', trip['card_number']);
             GetStorage().write('tripNumber', trip['trip_number']);
             GetStorage().write('truckNumber', trip['truck_number']);
-            break; // Stop after saving the first "inprogress" trip
+            break;
           }
         }
       }
@@ -111,7 +111,7 @@ class RefuelingController extends GetxController {
     }
   }
 
-  void refreshTrips() {
-    fetchTrips();
+   Future<void> refreshTrips() async {
+    await fetchTrips(); // Ensure fetchTrips() is awaited
   }
 }

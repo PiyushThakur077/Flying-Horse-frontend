@@ -11,6 +11,9 @@ class RefuelCardController extends GetxController {
   var isEditable = true.obs;  
   var apiProvider = ApiProvider();
 
+  // Add this line
+  var selectedFuelType = 'diesel'.obs; // Default value can be 'diesel' or any other fuel type
+
   TextEditingController siteNameController = TextEditingController();
   TextEditingController countryController = TextEditingController();
   TextEditingController stateController = TextEditingController();
@@ -30,6 +33,10 @@ class RefuelCardController extends GetxController {
     stateController.dispose();
     cityController.dispose();
     super.onClose();
+  }
+
+ void setSelectedFuelType(String value) {
+    selectedFuelType.value = value;
   }
 
   void fetchTripDetails(int id) async {
@@ -91,6 +98,7 @@ class RefuelCardController extends GetxController {
       tripDetails['total_amount_paid'] = _calculateTotalAmountPaid(updatedRefuelings);
       tripDetails['total_fuel_in_liters'] = _calculateTotalFuelInLiters(updatedRefuelings);
     }
+    
     
     // Refresh the trips
     Get.find<RefuelingController>().fetchTrips();

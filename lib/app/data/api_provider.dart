@@ -137,6 +137,17 @@ class ApiProvider extends GetConnect {
     );
   }
 
+  Future<dynamic> getProvincesByCountry(String iso2CountryCode) async {
+    return await getApi(
+      'api/user/provinces/$iso2CountryCode',
+      headers: {
+        'accept': 'application/json',
+        'Authorization': "Bearer ${GetStorage().read('token')}"
+      },
+      contentType: 'application/json',
+    );
+  }
+
   Future<dynamic> postApi(String? url, dynamic body,
       {String? contentType,
       Map<String, String>? headers,

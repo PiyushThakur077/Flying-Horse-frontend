@@ -40,22 +40,25 @@ class UsersView extends GetView<UsersController> {
             fontWeight: FontWeight.w600,
           ),
         ),
-        body: Obx(
-          () => controller.isLoading.value && controller.users.isEmpty
-              ? Center(
-                  child: CupertinoActivityIndicator(color: AppColors.primary),
-                )
-              : controller.users.isEmpty
-                  ? Center(
-                      child: Text(
-                        'No users found',
-                        style: AppTextStyle.regularStyle(
-                          fontSize: 20,
-                          color: Colors.black,
-                        ),
+        body: Obx(() => controller.isLoading.value && controller.users.isEmpty
+            ? Center(
+                child: CupertinoActivityIndicator(color: AppColors.primary),
+              )
+            : controller.users.isEmpty
+                ? Center(
+                    child: Text(
+                      'No users found',
+                      style: AppTextStyle.regularStyle(
+                        fontSize: 20,
+                        color: Colors.black,
                       ),
-                    )
-                  : ListView(
+                    ),
+                  )
+                : RefreshIndicator(
+                    onRefresh: () async {
+                      await controller.getUsers(50);
+                    },
+                    child: ListView(
                       controller: controller.scrollController,
                       children: [
                         SizedBox(height: 10),
@@ -196,7 +199,7 @@ class UsersView extends GetView<UsersController> {
                         ),
                       ],
                     ),
-        ),
+                  )),
       ),
     );
   }

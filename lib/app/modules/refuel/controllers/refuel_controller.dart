@@ -28,6 +28,7 @@ class RefuelController extends GetxController {
   var receiptNumber = ''.obs;
   var siteCode = ''.obs;
   var yourPrice = 0.0.obs;
+  var effectiveDate = ''.obs;
 
   TextEditingController countryController = TextEditingController();
   TextEditingController stateController = TextEditingController();
@@ -183,7 +184,7 @@ class RefuelController extends GetxController {
 
         if (response is List<dynamic>) {
           if (response.isEmpty) {
-            Get.snackbar("Info", "No site suggestions found.");
+            // Get.snackbar("Info", "No site suggestions found.");
           } else {
             // Extract the 'site_name' from each map in the list
             suggestions = response.map<String>((item) {
@@ -194,7 +195,7 @@ class RefuelController extends GetxController {
             }).toList();
           }
         } else {
-          // Get.snackbar("Error", "Failed to fetch site suggestions.");
+          Get.snackbar("Error", "Failed to fetch site suggestions.");
         }
       } catch (e) {
         print("Failed to fetch site suggestions: $e");
@@ -204,6 +205,24 @@ class RefuelController extends GetxController {
 
     return suggestions;
   }
+
+
+  Future<void> fetchProvinces(String iso2CountryCode) async {
+    try {
+      final response =
+          await ApiProvider().getProvincesByCountry(iso2CountryCode);
+      if (response is List<dynamic>) {
+        final provinces = response.map((item) => item.toString()).toList();
+        print("Fetched Provinces: $provinces");
+      } else {
+        Get.snackbar("Error", "Failed to fetch provinces.");
+      }
+    } catch (e) {
+      print("Error fetching provinces: $e");
+      Get.snackbar("Error", "Failed to fetch provinces: $e");
+    }
+  }
+
 
   Future<void> _fetchSiteDetails() async {
     final country = countryController.text;
@@ -288,10 +307,12 @@ class RefuelController extends GetxController {
     final siteCodeValue = siteDetails['site_code'] ?? '';
     final siteYourPrice =
         double.tryParse(siteDetails['your_price'].toString()) ?? 0.0;
+    final siteEffectiveDate = siteDetails['effective_date'] ?? '';
 
     siteNameController.text = '$siteCodeValue, $siteName'; // Set combined value
     siteCode.value = siteCodeValue;
     yourPrice.value = siteYourPrice;
+    effectiveDate.value = siteEffectiveDate;
 
     final storage = GetStorage();
     storage.write('siteName', siteName);
@@ -457,6 +478,7 @@ class RefuelController extends GetxController {
       "your_price": yourPrice.value,
       "timezone": DateTime.now().timeZoneName, // Hidden field for timezone
       "local_time": localTime,
+      "effective_date": effectiveDate.value
     };
 
     // Include amount_paid only if it has a valid value
@@ -500,7 +522,7 @@ class RefuelController extends GetxController {
         stateController.clear();
         cityController.clear();
         siteNameController.clear();
-        yourPrice.value = 0.0; // Clear your_price
+        yourPrice.value = 0.0;
 
         Future.delayed(Duration(seconds: 1), () {
           Navigator.pop(context, true);
