@@ -20,8 +20,10 @@ class CommonTextInput extends StatefulWidget {
   final TextEditingController? countryController;
   final TextEditingController? stateController;
   final TextEditingController? cityController;
-  final Function(String countryCode, String stateCode, String city)?
-      onAddressSelected;
+  final Function(String countryCode, String stateCode, String city)? onAddressSelected;
+  final bool required; 
+  final bool isValid;
+  final FormFieldValidator<String>? validator; // New validator parameter
 
   CommonTextInput({
     Key? key,
@@ -42,6 +44,9 @@ class CommonTextInput extends StatefulWidget {
     this.stateController,
     this.cityController,
     this.onAddressSelected,
+    this.required = false, 
+    this.isValid = true,
+    this.validator, // Initialize the validator
   }) : super(key: key);
 
   @override
@@ -49,113 +54,30 @@ class CommonTextInput extends StatefulWidget {
 }
 
 class _CommonTextInputState extends State<CommonTextInput> {
-  // Map of country names to their ISO2 codes
-  final Map<String, String> countryIsoMap = {
-    'Canada': 'CA',
-    'United States': 'US',
-    'Mexico': 'MX',
-  };
+  late TextEditingController _controller;
+  bool _showErrorBorder = false;
 
-  final Map<String, String> stateIsoMap = {
-    // Canada
-    'Alberta': 'AB',
-    'British Columbia': 'BC',
-    'Manitoba': 'MB',
-    'New Brunswick': 'NB',
-    'Newfoundland and Labrador': 'NL',
-    'Northwest Territories': 'NT',
-    'Nova Scotia': 'NS',
-    'Nunavut': 'NU',
-    'Ontario': 'ON',
-    'Prince Edward Island': 'PE',
-    'Quebec': 'QC',
-    'Saskatchewan': 'SK',
-    'Yukon': 'YT',
-    // United States
-    'Alabama': 'AL',
-    'Alaska': 'AK',
-    'Arizona': 'AZ',
-    'Arkansas': 'AR',
-    'California': 'CA',
-    'Colorado': 'CO',
-    'Connecticut': 'CT',
-    'Delaware': 'DE',
-    'Florida': 'FL',
-    'Georgia': 'GA',
-    'Hawaii': 'HI',
-    'Idaho': 'ID',
-    'Illinois': 'IL',
-    'Indiana': 'IN',
-    'Iowa': 'IA',
-    'Kansas': 'KS',
-    'Kentucky': 'KY',
-    'Louisiana': 'LA',
-    'Maine': 'ME',
-    'Maryland': 'MD',
-    'Massachusetts': 'MA',
-    'Michigan': 'MI',
-    'Minnesota': 'MN',
-    'Mississippi': 'MS',
-    'Missouri': 'MO',
-    'Montana': 'MT',
-    'Nebraska': 'NE',
-    'Nevada': 'NV',
-    'New Hampshire': 'NH',
-    'New Jersey': 'NJ',
-    'New Mexico': 'NM',
-    'New York': 'NY',
-    'North Carolina': 'NC',
-    'North Dakota': 'ND',
-    'Ohio': 'OH',
-    'Oklahoma': 'OK',
-    'Oregon': 'OR',
-    'Pennsylvania': 'PA',
-    'Rhode Island': 'RI',
-    'South Carolina': 'SC',
-    'South Dakota': 'SD',
-    'Tennessee': 'TN',
-    'Texas': 'TX',
-    'Utah': 'UT',
-    'Vermont': 'VT',
-    'Virginia': 'VA',
-    'Washington': 'WA',
-    'West Virginia': 'WV',
-    'Wisconsin': 'WI',
-    'Wyoming': 'WY',
-    // Mexico
-    'Aguascalientes': 'AG',
-    'Baja California': 'BC',
-    'Baja California Sur': 'BS',
-    'Campeche': 'CM',
-    'Chiapas': 'CS',
-    'Chihuahua': 'CH',
-    'Coahuila': 'CO',
-    'Colima': 'CL',
-    'Durango': 'DG',
-    'Guanajuato': 'GT',
-    'Guerrero': 'GR',
-    'Hidalgo': 'HG',
-    'Jalisco': 'JA',
-    'Mexico City': 'DF',
-    'Mexico State': 'EM',
-    'Michoacán': 'MI',
-    'Morelos': 'MO',
-    'Nayarit': 'NA',
-    'Nuevo León': 'NL',
-    'Oaxaca': 'OA',
-    'Puebla': 'PU',
-    'Querétaro': 'QT',
-    'Quintana Roo': 'QR',
-    'San Luis Potosí': 'SL',
-    'Sinaloa': 'SI',
-    'Sonora': 'SO',
-    'Tabasco': 'TB',
-    'Tamaulipas': 'TM',
-    'Tlaxcala': 'TL',
-    'Veracruz': 'VE',
-    'Yucatán': 'YU',
-    'Zacatecas': 'ZA',
-  };
+  @override
+  void initState() {
+    super.initState();
+    _controller = widget.controller ?? TextEditingController();
+    _controller.addListener(_validateField);
+  }
+
+  @override
+  void dispose() {
+    _controller.removeListener(_validateField);
+    if (widget.controller == null) {
+      _controller.dispose();
+    }
+    super.dispose();
+  }
+
+  void _validateField() {
+    setState(() {
+      _showErrorBorder = widget.required && _controller.text.isEmpty;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -164,10 +86,12 @@ class _CommonTextInputState extends State<CommonTextInput> {
       children: [
         Padding(
           padding: EdgeInsets.symmetric(horizontal: 10),
-          child: Text(
-            widget.labelText,
-            style: AppTextStyle.mediumStyle(
-                fontSize: 15, color: Color(0xff000000)),
+          child: RichText(
+            text: TextSpan(
+              text: widget.labelText,
+              style: AppTextStyle.mediumStyle(fontSize: 15, color: Color(0xff000000)),
+              children: widget.required ? [TextSpan(text: ' *', style: TextStyle(color: Colors.red))] : [],
+            ),
           ),
         ),
         const SizedBox(height: 6),
@@ -176,10 +100,13 @@ class _CommonTextInputState extends State<CommonTextInput> {
             flagState: CountryFlag.DISABLE,
             onCountryChanged: (country) {
               widget.countryController?.text = country;
+              _validateField();  // Validate on change
             },
             onStateChanged: (state) {
               widget.stateController?.text = state ?? '';
-              String iso2StateCode = stateIsoMap[state] ?? '';
+              _validateField();  // Validate on change
+              // Handle state selection logic
+              String iso2StateCode = ''; // Assuming stateIsoMap logic
               if (widget.countryController?.text != null) {
                 String countryCode = widget.countryController!.text;
                 widget.onAddressSelected?.call(
@@ -191,11 +118,12 @@ class _CommonTextInputState extends State<CommonTextInput> {
             },
             onCityChanged: (city) {
               widget.cityController?.text = city ?? '';
+              _validateField();  // Validate on change
+              // Handle city selection logic
               if (widget.countryController?.text != null &&
                   widget.stateController?.text != null) {
                 String countryCode = widget.countryController!.text;
-                String stateCode =
-                    stateIsoMap[widget.stateController!.text] ?? 'Unknown';
+                String stateCode = ''; // Assuming stateIsoMap logic
                 widget.onAddressSelected?.call(
                   countryCode,
                   stateCode,
@@ -209,7 +137,7 @@ class _CommonTextInputState extends State<CommonTextInput> {
             dropdownDecoration: BoxDecoration(
               borderRadius: BorderRadius.all(Radius.circular(25.0)),
               color: const Color(0xFFEEEEEE),
-              border: Border.all(color: Colors.grey.shade300),
+              border: Border.all(color: _showErrorBorder ? Colors.red : Colors.grey.shade300),
             ),
             disabledDropdownDecoration: BoxDecoration(
               borderRadius: BorderRadius.all(Radius.circular(25.0)),
@@ -228,12 +156,17 @@ class _CommonTextInputState extends State<CommonTextInput> {
         else
           Container(
             width: double.infinity,
-            height: 50,
+            height: 60,
             child: TextFormField(
-              controller: widget.controller,
+              controller: _controller,
               keyboardType: widget.keyboardType,
               obscureText: widget.obscureText,
-              onChanged: widget.onChanged,
+              validator: widget.validator, 
+              onChanged: (value) {
+                if (widget.onChanged != null) widget.onChanged!(value);
+                _validateField();
+              },
+              
               onTap: widget.onTap,
               readOnly: widget.readOnly,
               decoration: InputDecoration(
@@ -241,16 +174,17 @@ class _CommonTextInputState extends State<CommonTextInput> {
                 fillColor: const Color(0xFFEEEEEE),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(25.0),
-                  borderSide: BorderSide.none,
+                  borderSide: _showErrorBorder ? BorderSide(color: Colors.red) : BorderSide.none,
                 ),
                 enabledBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(25.0),
-                  borderSide: BorderSide.none,
+                  borderSide: _showErrorBorder ? BorderSide(color: Colors.red) : BorderSide.none,
                 ),
                 focusedBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(25.0),
-                  borderSide: BorderSide.none,
+                  borderSide: _showErrorBorder ? BorderSide(color: Colors.red) : BorderSide.none,
                 ),
+                
                 hintText: widget.hintText,
                 hintStyle: const TextStyle(color: Color(0xFFB8B8B8)),
                 contentPadding: const EdgeInsets.symmetric(

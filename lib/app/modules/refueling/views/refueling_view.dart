@@ -74,13 +74,13 @@ class RefuelingView extends GetView<RefuelingController> {
                                                           color: const Color(
                                                               0xffBDBDBD),
                                                           height: 1.0)),
-                                              Text('Refueling',
+                                              Text('Fuel',
                                                   style: AppTextStyle
                                                       .semiBoldStyle(
                                                           fontSize: 32,
                                                           color: Colors.black,
                                                           height: 1.0)),
-                                              Text('Location',
+                                              Text('Locations',
                                                   style: AppTextStyle
                                                       .semiBoldStyle(
                                                           fontSize: 32,

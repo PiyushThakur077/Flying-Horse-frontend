@@ -35,22 +35,59 @@ class Province {
 
 class Cities {
   String? name;
-  List<String>? siteNames;
-  List<String>? siteCodes;
+  List<Sites>? sites;
 
-  Cities({this.name, this.siteNames, this.siteCodes});
+  Cities({this.name, this.sites});
 
   Cities.fromJson(Map<String, dynamic> json) {
     name = json['name'];
-    siteNames = json['site_names'].cast<String>();
-    siteCodes = json['site_codes'].cast<String>();
+    if (json['sites'] != null) {
+      sites = <Sites>[];
+      json['sites'].forEach((v) {
+        sites!.add(new Sites.fromJson(v));
+      });
+    }
   }
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
     data['name'] = this.name;
-    data['site_names'] = this.siteNames;
-    data['site_codes'] = this.siteCodes;
+    if (this.sites != null) {
+      data['sites'] = this.sites!.map((v) => v.toJson()).toList();
+    }
+    return data;
+  }
+}
+
+class Sites {
+  String? siteName;
+  String? siteCode;
+  String? yourPrice;
+  String? effectiveDate;
+  String? createdAt;
+
+  Sites(
+      {this.siteName,
+      this.siteCode,
+      this.yourPrice,
+      this.effectiveDate,
+      this.createdAt});
+
+  Sites.fromJson(Map<String, dynamic> json) {
+    siteName = json['site_name'];
+    siteCode = json['site_code'];
+    yourPrice = json['your_price'];
+    effectiveDate = json['effective_date'];
+    createdAt = json['created_at'];
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = new Map<String, dynamic>();
+    data['site_name'] = this.siteName;
+    data['site_code'] = this.siteCode;
+    data['your_price'] = this.yourPrice;
+    data['effective_date'] = this.effectiveDate;
+    data['created_at'] = this.createdAt;
     return data;
   }
 }
