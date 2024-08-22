@@ -432,7 +432,7 @@ class RefuelView extends GetView<RefuelController> {
                         double.tryParse(value) ?? 0.0,
                     onSegmentSelected: (value) =>
                         controller.odometerReadingUnit.value = value,
-                    keyboardType: TextInputType.number,
+                     keyboardType: const TextInputType.numberWithOptions(decimal: true),
                     required: true,
                     validator: (value) {
                       final parsedValue = double.tryParse(value ?? '');
@@ -460,7 +460,7 @@ class RefuelView extends GetView<RefuelController> {
                       controller.fuelQuantityUnit.value = value.toLowerCase();
                     },
                     required: true,
-                    keyboardType: TextInputType.number,
+                     keyboardType: const TextInputType.numberWithOptions(decimal: true),
                     validator: (value) {
                       final parsedValue = double.tryParse(value ?? '');
 
@@ -477,7 +477,7 @@ class RefuelView extends GetView<RefuelController> {
                     hintText: 'Enter receipt number here',
                     onChanged: (value) =>
                         controller.receiptNumber.value = value,
-                    keyboardType: TextInputType.text,
+                    keyboardType: const TextInputType.numberWithOptions(decimal: true),
                     required: true,
                     validator: (value) =>
                         controller.validateReceiptNumber(value ?? ''),
@@ -491,7 +491,7 @@ class RefuelView extends GetView<RefuelController> {
                               hintText: 'Enter price per liter',
                               onChanged: (value) => controller.pricePerLitre
                                   .value = double.tryParse(value) ?? 0.0,
-                              keyboardType: TextInputType.number,
+                              keyboardType: const TextInputType.numberWithOptions(decimal: true),
                               required: true,
                               validator: (value) {
                                 double parsedValue =
@@ -509,7 +509,7 @@ class RefuelView extends GetView<RefuelController> {
                               hintText: 'Enter amount here',
                               onChanged: (value) => controller.amountPaid
                                   .value = double.tryParse(value) ?? 0.0,
-                              keyboardType: TextInputType.number,
+                              keyboardType: const TextInputType.numberWithOptions(decimal: true),
                             ),
                             const SizedBox(height: 10),
                           ],

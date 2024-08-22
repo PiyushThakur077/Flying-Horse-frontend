@@ -537,7 +537,6 @@ class RefuelCardView extends GetView<RefuelCardController> {
                                 controller: controller.siteNameController,
                                 readOnly: true,
                                 height: 60,
-
                               ),
                               Padding(
                                 padding: EdgeInsets.symmetric(horizontal: 11),
@@ -692,9 +691,9 @@ class RefuelCardView extends GetView<RefuelCardController> {
                                           labelText: 'Price per Liter',
                                           hintText: 'Enter price per liter',
                                           controller: pricePerLitreController,
-                                          keyboardType: TextInputType.number,
-                                height: 60,
-
+                                          keyboardType: const TextInputType
+                                              .numberWithOptions(decimal: true),
+                                          height: 60,
                                         ),
                                         const SizedBox(height: 10),
                                       ],
@@ -707,7 +706,6 @@ class RefuelCardView extends GetView<RefuelCardController> {
                                 controller: driverNameController,
                                 readOnly: true,
                                 height: 60,
-
                               ),
                               SizedBox(height: 10),
                               CommonTextInput(
@@ -722,9 +720,10 @@ class RefuelCardView extends GetView<RefuelCardController> {
                                     odometerReadingUnit = value;
                                   });
                                 },
-                                keyboardType: TextInputType.number,
+                                keyboardType:
+                                    const TextInputType.numberWithOptions(
+                                        decimal: true),
                                 height: 60,
-
                               ),
                               SizedBox(height: 10),
                               CommonTextInput(
@@ -739,9 +738,10 @@ class RefuelCardView extends GetView<RefuelCardController> {
                                     fuelQuantityUnit = value;
                                   });
                                 },
-                                keyboardType: TextInputType.number,
+                                keyboardType:
+                                    const TextInputType.numberWithOptions(
+                                        decimal: true),
                                 height: 60,
-
                               ),
                               SizedBox(height: 10),
                               CommonTextInput(
@@ -760,8 +760,9 @@ class RefuelCardView extends GetView<RefuelCardController> {
                                           labelText: 'Amount Paid',
                                           hintText: 'Enter Amount Paid',
                                           controller: amountPaidController,
-                                          keyboardType: TextInputType.number,
-                                height: 60,
+                                          keyboardType: const TextInputType
+                                              .numberWithOptions(decimal: true),
+                                          height: 60,
                                         ),
                                         SizedBox(height: 10),
                                       ],
@@ -892,15 +893,17 @@ class RefuelCardView extends GetView<RefuelCardController> {
   }
 
   String _getFillingStationLabel(int index) {
-    switch (index) {
-      case 0:
-        return "First";
-      case 1:
-        return "Second";
-      case 2:
-        return "Third";
-      default:
-        return "${index + 1}th";
+    int number = index + 1;
+    if (number % 100 >= 11 && number % 100 <= 13) {
+      return "${number}th";
+    } else if (number % 10 == 1) {
+      return "${number}st";
+    } else if (number % 10 == 2) {
+      return "${number}nd";
+    } else if (number % 10 == 3) {
+      return "${number}rd";
+    } else {
+      return "${number}th";
     }
   }
 
