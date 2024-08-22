@@ -20,8 +20,9 @@ class CommonTextInput extends StatefulWidget {
   final TextEditingController? countryController;
   final TextEditingController? stateController;
   final TextEditingController? cityController;
-  final Function(String countryCode, String stateCode, String city)? onAddressSelected;
-  final bool required; 
+  final Function(String countryCode, String stateCode, String city)?
+      onAddressSelected;
+  final bool required;
   final bool isValid;
   final FormFieldValidator<String>? validator; // New validator parameter
 
@@ -44,7 +45,7 @@ class CommonTextInput extends StatefulWidget {
     this.stateController,
     this.cityController,
     this.onAddressSelected,
-    this.required = false, 
+    this.required = false,
     this.isValid = true,
     this.validator, // Initialize the validator
   }) : super(key: key);
@@ -89,8 +90,11 @@ class _CommonTextInputState extends State<CommonTextInput> {
           child: RichText(
             text: TextSpan(
               text: widget.labelText,
-              style: AppTextStyle.mediumStyle(fontSize: 15, color: Color(0xff000000)),
-              children: widget.required ? [TextSpan(text: ' *', style: TextStyle(color: Colors.red))] : [],
+              style: AppTextStyle.mediumStyle(
+                  fontSize: 15, color: Color(0xff000000)),
+              children: widget.required
+                  ? [TextSpan(text: ' *', style: TextStyle(color: Colors.red))]
+                  : [],
             ),
           ),
         ),
@@ -100,11 +104,11 @@ class _CommonTextInputState extends State<CommonTextInput> {
             flagState: CountryFlag.DISABLE,
             onCountryChanged: (country) {
               widget.countryController?.text = country;
-              _validateField();  // Validate on change
+              _validateField(); // Validate on change
             },
             onStateChanged: (state) {
               widget.stateController?.text = state ?? '';
-              _validateField();  // Validate on change
+              _validateField(); // Validate on change
               // Handle state selection logic
               String iso2StateCode = ''; // Assuming stateIsoMap logic
               if (widget.countryController?.text != null) {
@@ -118,7 +122,7 @@ class _CommonTextInputState extends State<CommonTextInput> {
             },
             onCityChanged: (city) {
               widget.cityController?.text = city ?? '';
-              _validateField();  // Validate on change
+              _validateField(); // Validate on change
               // Handle city selection logic
               if (widget.countryController?.text != null &&
                   widget.stateController?.text != null) {
@@ -137,7 +141,8 @@ class _CommonTextInputState extends State<CommonTextInput> {
             dropdownDecoration: BoxDecoration(
               borderRadius: BorderRadius.all(Radius.circular(25.0)),
               color: const Color(0xFFEEEEEE),
-              border: Border.all(color: _showErrorBorder ? Colors.red : Colors.grey.shade300),
+              border: Border.all(
+                  color: _showErrorBorder ? Colors.red : Colors.grey.shade300),
             ),
             disabledDropdownDecoration: BoxDecoration(
               borderRadius: BorderRadius.all(Radius.circular(25.0)),
@@ -156,39 +161,58 @@ class _CommonTextInputState extends State<CommonTextInput> {
         else
           Container(
             width: double.infinity,
-            height: 60,
+            height: 75,
             child: TextFormField(
               controller: _controller,
               keyboardType: widget.keyboardType,
               obscureText: widget.obscureText,
-              validator: widget.validator, 
+              validator: widget.validator,
               onChanged: (value) {
                 if (widget.onChanged != null) widget.onChanged!(value);
                 _validateField();
               },
-              
               onTap: widget.onTap,
               readOnly: widget.readOnly,
+              style: TextStyle(
+                color: widget.readOnly ? Colors.grey : Colors.black,
+              ),
               decoration: InputDecoration(
                 filled: true,
                 fillColor: const Color(0xFFEEEEEE),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(25.0),
-                  borderSide: _showErrorBorder ? BorderSide(color: Colors.red) : BorderSide.none,
+                  borderSide: BorderSide.none,
                 ),
                 enabledBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(25.0),
-                  borderSide: _showErrorBorder ? BorderSide(color: Colors.red) : BorderSide.none,
+                  borderSide: BorderSide(
+                    color: _showErrorBorder ? Colors.red : Colors.grey.shade300,
+                  ),
                 ),
                 focusedBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(25.0),
-                  borderSide: _showErrorBorder ? BorderSide(color: Colors.red) : BorderSide.none,
+                  borderSide: BorderSide(
+                    color: _showErrorBorder ? Colors.red : Colors.grey.shade300,
+                  ),
                 ),
-                
+                errorBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(25.0),
+                  borderSide: BorderSide(
+                    color: Colors.red, // Red border for error state
+                  ),
+                ),
+                focusedErrorBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(25.0),
+                  borderSide: BorderSide(
+                    color: Colors.red, // Red border for focused error state
+                  ),
+                ),
                 hintText: widget.hintText,
                 hintStyle: const TextStyle(color: Color(0xFFB8B8B8)),
                 contentPadding: const EdgeInsets.symmetric(
-                    vertical: 15.0, horizontal: 20.0),
+                  vertical: 15.0,
+                  horizontal: 20.0,
+                ),
                 suffixIcon: widget.showSegmentedTabs && widget.segments != null
                     ? Padding(
                         padding: const EdgeInsets.only(right: 8),

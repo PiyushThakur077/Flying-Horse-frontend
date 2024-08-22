@@ -103,35 +103,40 @@ class RefuelController extends GetxController {
     }
   }
 
-  void onCitySelected(Cities? value) async {
-    if (value != null) {
-      selectedCity.value = value;
-      print('Selected City: ${value.name}');
+ void onCitySelected(Cities? value) async {
+  if (value != null) {
+    selectedCity.value = value;
+    print('Selected City: ${value.name}');
 
-      if (value.sites != null && value.sites!.isNotEmpty) {
-        if (value.sites!.length > 1) {
-          // If there are multiple sites, show the dialog to select one
-          final selectedSite =
-              await showSiteSelectionDialog(Get.context!, value.sites!);
-          if (selectedSite != null) {
-            siteNameController.text =
-                '${selectedSite.siteCode}, ${selectedSite.siteName}';
-            print(
-                'Selected Site: ${selectedSite.siteName}, Site Code: ${selectedSite.siteCode}');
-          }
-        } else {
-          // If there is only one site, select it automatically
-          var firstSite = value.sites!.first;
-          siteNameController.text =
-              '${firstSite.siteCode}, ${firstSite.siteName}';
-          print(
-              'Site Name: ${firstSite.siteName}, Site Code: ${firstSite.siteCode}');
-        }
+    if (value.sites != null && value.sites!.isNotEmpty) {
+      Sites? selectedSite;
+
+      if (value.sites!.length > 1) {
+        // If there are multiple sites, show the dialog to select one
+        selectedSite = await showSiteSelectionDialog(Get.context!, value.sites!);
       } else {
-        print('No sites available for the selected city');
+        // If there is only one site, select it automatically
+        selectedSite = value.sites!.first;
       }
+
+      if (selectedSite != null) {
+        siteNameController.text = '${selectedSite.siteCode}, ${selectedSite.siteName}';
+        print('Selected Site: ${selectedSite.siteName}, Site Code: ${selectedSite.siteCode}');
+
+        // Convert your_price to a double and save it
+        yourPrice.value = double.tryParse(selectedSite.yourPrice ?? '0.0') ?? 0.0;
+        effectiveDate.value = selectedSite.effectiveDate ?? '';
+
+        print('Your Price: ${yourPrice.value}');
+        print('Effective Date: ${effectiveDate.value}');
+      }
+    } else {
+      print('No sites available for the selected city');
     }
   }
+}
+
+
 
   Future<Sites?> showSiteSelectionDialog(
       BuildContext context, List<Sites> sites) async {
@@ -240,8 +245,8 @@ String? validateReceiptNumber(String text) {
   return text.isNotEmpty ? null : "Please enter a valid receipt number";
 }
 
-String? validatePricePerLiter(String text) {
-  return text.isNotEmpty ? null : "Please enter a valid price per liter";
+String? validatePricePerLiter(double value) {
+  return value > 0 ? null : "Please enter a valid price per liter";
 }
 
   bool validateFields() {

@@ -121,7 +121,7 @@ class RefuelView extends GetView<RefuelController> {
                         ),
                         Obx(() => Container(
                               width: double.infinity,
-                              height: 60, // Set width to 100%
+                              height: 65,
                               child: DropdownButtonFormField<String>(
                                 value: controller.selectedCountry.value.isEmpty
                                     ? null
@@ -129,37 +129,50 @@ class RefuelView extends GetView<RefuelController> {
                                 decoration: InputDecoration(
                                   filled: true,
                                   fillColor: const Color(0xFFEEEEEE),
-                                  hintText: 'Select Country',
                                   border: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(25.0),
+                                    borderRadius: BorderRadius.circular(30.0),
                                     borderSide: BorderSide.none,
                                   ),
                                   enabledBorder: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(25.0),
+                                    borderRadius: BorderRadius.circular(30.0),
                                     borderSide: BorderSide.none,
                                   ),
                                   focusedBorder: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(25.0),
+                                    borderRadius: BorderRadius.circular(30.0),
                                     borderSide: BorderSide.none,
                                   ),
                                 ),
                                 onChanged: (String? newValue) {
                                   controller.onCountrySelected(newValue);
                                 },
-                                items: controller.countryIso2Map.keys
-                                    .map<DropdownMenuItem<String>>(
-                                        (String key) {
-                                  return DropdownMenuItem<String>(
-                                    value: key,
-                                    child: Text(key),
-                                  );
-                                }).toList(),
+                                items: [
+                                  DropdownMenuItem<String>(
+                                    value: null,
+                                    child: Center(
+                                      child: Text(
+                                        'Select Country',
+                                        style: TextStyle(
+                                          color: Colors
+                                              .grey, // Optional: make the hint text lighter
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                  ...controller.countryIso2Map.keys
+                                      .map<DropdownMenuItem<String>>(
+                                          (String key) {
+                                    return DropdownMenuItem<String>(
+                                      value: key,
+                                      child: Text(key),
+                                    );
+                                  }).toList(),
+                                ],
                               ),
                             )),
                         SizedBox(height: 10),
                         Obx(() => Container(
                               width: double.infinity,
-                              height: 60, // Set width to 100%
+                              height: 65,
                               child: DropdownButtonFormField<Province>(
                                 value: controller.selectedProvince.value.name ==
                                         null
@@ -168,68 +181,92 @@ class RefuelView extends GetView<RefuelController> {
                                 decoration: InputDecoration(
                                   filled: true,
                                   fillColor: const Color(0xFFEEEEEE),
-                                  hintText: 'Select State',
                                   border: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(25.0),
+                                    borderRadius: BorderRadius.circular(30.0),
                                     borderSide: BorderSide.none,
                                   ),
                                   enabledBorder: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(25.0),
+                                    borderRadius: BorderRadius.circular(30.0),
                                     borderSide: BorderSide.none,
                                   ),
                                   focusedBorder: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(25.0),
+                                    borderRadius: BorderRadius.circular(30.0),
                                     borderSide: BorderSide.none,
                                   ),
                                 ),
                                 onChanged: controller.onProvinceSelected,
-                                items: controller.provinces
-                                    .map<DropdownMenuItem<Province>>(
-                                        (Province value) {
-                                  return DropdownMenuItem<Province>(
-                                    value: value,
-                                    child: Text(value.name ?? ""),
-                                  );
-                                }).toList(),
+                                items: [
+                                  DropdownMenuItem<Province>(
+                                    value: null,
+                                    child: Center(
+                                      child: Text(
+                                        'Select State',
+                                        style: TextStyle(
+                                          color: Colors
+                                              .grey, // Optional: make the hint text lighter
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                  ...controller.provinces
+                                      .map<DropdownMenuItem<Province>>(
+                                          (Province value) {
+                                    return DropdownMenuItem<Province>(
+                                      value: value,
+                                      child: Text(value.name ?? ""),
+                                    );
+                                  }).toList(),
+                                ],
                               ),
                             )),
                         SizedBox(height: 10),
                         Obx(() => Container(
                               width: double.infinity,
-                              height: 60,
+                              height: 65,
                               child: DropdownButtonFormField<Cities>(
                                 value:
                                     controller.selectedCity.value.name == null
                                         ? null
                                         : controller.selectedCity.value,
                                 decoration: InputDecoration(
-                                  hintText: 'Select City',
                                   filled: true,
                                   fillColor: const Color(0xFFEEEEEE),
                                   border: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(25.0),
+                                    borderRadius: BorderRadius.circular(30.0),
                                     borderSide: BorderSide.none,
                                   ),
                                   enabledBorder: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(25.0),
+                                    borderRadius: BorderRadius.circular(30.0),
                                     borderSide: BorderSide.none,
                                   ),
                                   focusedBorder: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(25.0),
+                                    borderRadius: BorderRadius.circular(30.0),
                                     borderSide: BorderSide.none,
                                   ),
                                 ),
                                 onChanged: controller.onCitySelected,
-                                items:
-                                    (controller.selectedProvince.value.cities ??
-                                            [])
-                                        .map<DropdownMenuItem<Cities>>(
-                                            (Cities value) {
-                                  return DropdownMenuItem<Cities>(
-                                    value: value,
-                                    child: Text(capitalize(value.name)),
-                                  );
-                                }).toList(),
+                                items: [
+                                  DropdownMenuItem<Cities>(
+                                    value: null,
+                                    child: Center(
+                                      child: Text(
+                                        'Select City',
+                                        style: TextStyle(
+                                          color: Colors
+                                              .grey, // Optional: make the hint text lighter
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                  ...?controller.selectedProvince.value.cities
+                                      ?.map<DropdownMenuItem<Cities>>(
+                                          (Cities value) {
+                                    return DropdownMenuItem<Cities>(
+                                      value: value,
+                                      child: Text(capitalize(value.name)),
+                                    );
+                                  }).toList(),
+                                ],
                               ),
                             )),
                       ],
@@ -263,7 +300,7 @@ class RefuelView extends GetView<RefuelController> {
                     ),
                   ),
                   Obx(() => Container(
-                        height: 50,
+                        height: 50, // Updated height
                         width: double.infinity,
                         child: SegmentedButton<String>(
                           showSelectedIcon: false,
@@ -327,62 +364,63 @@ class RefuelView extends GetView<RefuelController> {
                       ),
                     ),
                   ),
-                  Obx(() => Container(
-                        height: 50,
-                        width: double.infinity,
-                        child: SegmentedButton<String>(
-                          showSelectedIcon: false,
-                          style: ButtonStyle(
-                            backgroundColor:
-                                MaterialStateProperty.resolveWith<Color?>(
-                              (Set<MaterialState> states) {
-                                if (states.contains(MaterialState.selected)) {
-                                  return AppColors.primary;
-                                }
-                                return Color(0xFFEEEEEE);
-                              },
-                            ),
-                            foregroundColor:
-                                MaterialStateProperty.resolveWith<Color?>(
-                              (Set<MaterialState> states) {
-                                if (states.contains(MaterialState.selected)) {
-                                  return Colors.white;
-                                }
-                                return AppColors.black;
-                              },
+                  Obx(
+                    () => Container(
+                      height: 50,
+                      width: double.infinity,
+                      child: SegmentedButton<String>(
+                        showSelectedIcon: false,
+                        style: ButtonStyle(
+                          backgroundColor:
+                              MaterialStateProperty.resolveWith<Color?>(
+                            (Set<MaterialState> states) {
+                              if (states.contains(MaterialState.selected)) {
+                                return AppColors.primary;
+                              }
+                              return Color(0xFFEEEEEE);
+                            },
+                          ),
+                          foregroundColor:
+                              MaterialStateProperty.resolveWith<Color?>(
+                            (Set<MaterialState> states) {
+                              if (states.contains(MaterialState.selected)) {
+                                return Colors.white;
+                              }
+                              return AppColors.black;
+                            },
+                          ),
+                        ),
+                        segments: <ButtonSegment<String>>[
+                          ButtonSegment<String>(
+                            value: 'diesel',
+                            label: Text(
+                              'Diesel',
+                              style: AppTextStyle.mediumStyle(fontSize: 16),
+                              textAlign: TextAlign.center,
                             ),
                           ),
-                          segments: <ButtonSegment<String>>[
-                            ButtonSegment<String>(
-                              value: 'diesel',
-                              label: Text(
-                                'Diesel',
-                                style: AppTextStyle.mediumStyle(fontSize: 16),
-                                textAlign: TextAlign.center,
-                              ),
+                          ButtonSegment<String>(
+                            value: 'def',
+                            label: Text(
+                              'DEF',
+                              style: AppTextStyle.mediumStyle(fontSize: 16),
+                              textAlign: TextAlign.center,
                             ),
-                            ButtonSegment<String>(
-                              value: 'def',
-                              label: Text(
-                                'DEF',
-                                style: AppTextStyle.mediumStyle(fontSize: 16),
-                                textAlign: TextAlign.center,
-                              ),
-                            ),
-                          ],
-                          selected: <String>{controller.selectedFuelType.value},
-                          onSelectionChanged: (Set<String> newSelection) {
-                            if (newSelection.isNotEmpty) {
-                              controller
-                                  .setSelectedFuelType(newSelection.first);
-                              if (newSelection.first == 'def') {
-                                controller.amountPaid.value =
-                                    0.0; // Reset amount paid when DEF is selected
-                              }
+                          ),
+                        ],
+                        selected: <String>{controller.selectedFuelType.value},
+                        onSelectionChanged: (Set<String> newSelection) {
+                          if (newSelection.isNotEmpty) {
+                            controller.setSelectedFuelType(newSelection.first);
+                            if (newSelection.first == 'def') {
+                              controller.amountPaid.value =
+                                  0.0; // Reset amount paid when DEF is selected
                             }
-                          },
-                        ),
-                      )),
+                          }
+                        },
+                      ),
+                    ),
+                  ),
                   const SizedBox(height: 5),
                   CommonTextInput(
                     labelText: 'Odometer Reading',
@@ -426,7 +464,6 @@ class RefuelView extends GetView<RefuelController> {
                     validator: (value) {
                       final parsedValue = double.tryParse(value ?? '');
 
-                      
                       if (parsedValue == null) {
                         return "Please enter a valid fuel quantity";
                       }
@@ -435,7 +472,6 @@ class RefuelView extends GetView<RefuelController> {
                     },
                   ),
                   const SizedBox(height: 10),
-
                   CommonTextInput(
                     labelText: 'Receipt Number',
                     hintText: 'Enter receipt number here',
@@ -453,13 +489,17 @@ class RefuelView extends GetView<RefuelController> {
                             CommonTextInput(
                               labelText: 'Price per Liter',
                               hintText: 'Enter price per liter',
-                              onChanged: (value) =>
-                                  controller.pricePerLitre.value,
+                              onChanged: (value) => controller.pricePerLitre
+                                  .value = double.tryParse(value) ?? 0.0,
                               keyboardType: TextInputType.number,
                               required: true,
-                              
+                              validator: (value) {
+                                double parsedValue =
+                                    double.tryParse(value ?? '') ?? 0.0;
+                                return controller
+                                    .validatePricePerLiter(parsedValue);
+                              },
                             ),
-                            const SizedBox(height: 10),
                           ],
                         )
                       : Column(
@@ -489,9 +529,7 @@ class RefuelView extends GetView<RefuelController> {
                 if (controller.formKey.currentState!.validate()) {
                   // If the form is valid, save the details
                   controller.saveFuelDetails(context);
-                } else {
-                  // If not valid, show validation errors
-                }
+                } else {}
               },
               buttonWidth: double.infinity,
             ),
