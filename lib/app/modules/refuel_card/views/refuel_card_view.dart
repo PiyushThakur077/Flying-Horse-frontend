@@ -513,6 +513,7 @@ class RefuelCardView extends GetView<RefuelCardController> {
                                 hintText: 'Select Country',
                                 controller: controller.countryController,
                                 readOnly: true,
+                                height: 60,
                               ),
                               const SizedBox(height: 10),
                               CommonTextInput(
@@ -520,6 +521,7 @@ class RefuelCardView extends GetView<RefuelCardController> {
                                 hintText: 'Select State',
                                 controller: controller.stateController,
                                 readOnly: true,
+                                height: 60,
                               ),
                               const SizedBox(height: 10),
                               CommonTextInput(
@@ -527,12 +529,15 @@ class RefuelCardView extends GetView<RefuelCardController> {
                                 hintText: 'Select City',
                                 controller: controller.cityController,
                                 readOnly: true,
+                                height: 60,
                               ),
                               CommonTextInput(
                                 labelText: 'Site Name',
                                 hintText: '',
                                 controller: controller.siteNameController,
                                 readOnly: true,
+                                height: 60,
+
                               ),
                               Padding(
                                 padding: EdgeInsets.symmetric(horizontal: 11),
@@ -688,6 +693,8 @@ class RefuelCardView extends GetView<RefuelCardController> {
                                           hintText: 'Enter price per liter',
                                           controller: pricePerLitreController,
                                           keyboardType: TextInputType.number,
+                                height: 60,
+
                                         ),
                                         const SizedBox(height: 10),
                                       ],
@@ -699,6 +706,8 @@ class RefuelCardView extends GetView<RefuelCardController> {
                                 hintText: 'Enter Driver Name',
                                 controller: driverNameController,
                                 readOnly: true,
+                                height: 60,
+
                               ),
                               SizedBox(height: 10),
                               CommonTextInput(
@@ -714,6 +723,8 @@ class RefuelCardView extends GetView<RefuelCardController> {
                                   });
                                 },
                                 keyboardType: TextInputType.number,
+                                height: 60,
+
                               ),
                               SizedBox(height: 10),
                               CommonTextInput(
@@ -729,6 +740,8 @@ class RefuelCardView extends GetView<RefuelCardController> {
                                   });
                                 },
                                 keyboardType: TextInputType.number,
+                                height: 60,
+
                               ),
                               SizedBox(height: 10),
                               CommonTextInput(
@@ -736,6 +749,7 @@ class RefuelCardView extends GetView<RefuelCardController> {
                                 hintText: 'Enter Receipt Number',
                                 controller: receiptNumberController,
                                 keyboardType: TextInputType.text,
+                                height: 60,
                               ),
                               SizedBox(height: 10),
                               Obx(() => controller.selectedFuelType.value !=
@@ -747,6 +761,7 @@ class RefuelCardView extends GetView<RefuelCardController> {
                                           hintText: 'Enter Amount Paid',
                                           controller: amountPaidController,
                                           keyboardType: TextInputType.number,
+                                height: 60,
                                         ),
                                         SizedBox(height: 10),
                                       ],
@@ -801,7 +816,6 @@ class RefuelCardView extends GetView<RefuelCardController> {
                                     selectedRefuel['id'],
                                     updatedData,
                                   );
-
                                   Get.back();
                                 },
                               ),

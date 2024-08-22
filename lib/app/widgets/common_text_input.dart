@@ -24,7 +24,8 @@ class CommonTextInput extends StatefulWidget {
       onAddressSelected;
   final bool required;
   final bool isValid;
-  final FormFieldValidator<String>? validator; // New validator parameter
+  final FormFieldValidator<String>? validator;
+  final double? height;
 
   CommonTextInput({
     Key? key,
@@ -47,7 +48,8 @@ class CommonTextInput extends StatefulWidget {
     this.onAddressSelected,
     this.required = false,
     this.isValid = true,
-    this.validator, // Initialize the validator
+    this.validator,
+    this.height,
   }) : super(key: key);
 
   @override
@@ -161,7 +163,7 @@ class _CommonTextInputState extends State<CommonTextInput> {
         else
           Container(
             width: double.infinity,
-            height: 75,
+            height: widget.height ?? 75,
             child: TextFormField(
               controller: _controller,
               keyboardType: widget.keyboardType,
