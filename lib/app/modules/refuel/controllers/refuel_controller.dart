@@ -103,107 +103,133 @@ class RefuelController extends GetxController {
     }
   }
 
- void onCitySelected(Cities? value) async {
-  if (value != null) {
-    selectedCity.value = value;
-    print('Selected City: ${value.name}');
+  void onCitySelected(Cities? value) async {
+    if (value != null) {
+      selectedCity.value = value;
+      print('Selected City: ${value.name}');
 
-    if (value.sites != null && value.sites!.isNotEmpty) {
-      Sites? selectedSite;
+      if (value.sites != null && value.sites!.isNotEmpty) {
+        Sites? selectedSite;
 
-      if (value.sites!.length > 1) {
-        // If there are multiple sites, show the dialog to select one
-        selectedSite = await showSiteSelectionDialog(Get.context!, value.sites!);
+        if (value.sites!.length > 1) {
+          // If there are multiple sites, show the dialog to select one
+          selectedSite =
+              await showSiteSelectionDialog(Get.context!, value.sites!);
+        } else {
+          // If there is only one site, select it automatically
+          selectedSite = value.sites!.first;
+        }
+
+        if (selectedSite != null) {
+          siteNameController.text =
+              '${selectedSite.siteCode}, ${selectedSite.siteName}';
+          print(
+              'Selected Site: ${selectedSite.siteName}, Site Code: ${selectedSite.siteCode}');
+
+          // Convert your_price to a double and save it
+          yourPrice.value =
+              double.tryParse(selectedSite.yourPrice ?? '0.0') ?? 0.0;
+          effectiveDate.value = selectedSite.effectiveDate ?? '';
+
+          print('Your Price: ${yourPrice.value}');
+          print('Effective Date: ${effectiveDate.value}');
+        }
       } else {
-        // If there is only one site, select it automatically
-        selectedSite = value.sites!.first;
+        print('No sites available for the selected city');
       }
-
-      if (selectedSite != null) {
-        siteNameController.text = '${selectedSite.siteCode}, ${selectedSite.siteName}';
-        print('Selected Site: ${selectedSite.siteName}, Site Code: ${selectedSite.siteCode}');
-
-        // Convert your_price to a double and save it
-        yourPrice.value = double.tryParse(selectedSite.yourPrice ?? '0.0') ?? 0.0;
-        effectiveDate.value = selectedSite.effectiveDate ?? '';
-
-        print('Your Price: ${yourPrice.value}');
-        print('Effective Date: ${effectiveDate.value}');
-      }
-    } else {
-      print('No sites available for the selected city');
     }
   }
-}
-
-
 
   Future<Sites?> showSiteSelectionDialog(
-      BuildContext context, List<Sites> sites) async {
-    return showDialog<Sites>(
-      context: context,
-      builder: (BuildContext context) {
-        List<Sites> filteredSites = sites;
+    BuildContext context, List<Sites> sites) async {
+  return showDialog<Sites>(
+    context: context,
+    builder: (BuildContext context) {
+      List<Sites> filteredSites = sites;
 
-        return StatefulBuilder(
-          builder: (BuildContext context, StateSetter setState) {
-            return AlertDialog(
-              title: const Text('Select a Site'),
-              content: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  TextField(
-                    decoration: const InputDecoration(
+      return StatefulBuilder(
+        builder: (BuildContext context, StateSetter setState) {
+          return AlertDialog(
+            title: const Text('Select a Site'),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  width: double.infinity,
+                  height: 75,
+                  child: TextFormField(
+                    decoration: InputDecoration(
                       labelText: 'Search',
                       hintText: 'Enter site name or code',
+                      filled: true,
+                      fillColor: const Color(0xFFEEEEEE),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(25.0),
+                        borderSide: BorderSide.none,
+                      ),
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(25.0),
+                        borderSide: BorderSide(
+                          color: Colors.grey.shade300,
+                        ),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(25.0),
+                        borderSide: BorderSide(
+                          color: Colors.grey.shade300,
+                        ),
+                      ),
+                      contentPadding: const EdgeInsets.symmetric(
+                        vertical: 15.0,
+                        horizontal: 20.0,
+                      ),
                     ),
                     onChanged: (value) {
                       setState(() {
                         filteredSites = sites
                             .where((site) =>
-                                (site.siteName
-                                        ?.toLowerCase()
-                                        .contains(value.toLowerCase()) ??
+                                (site.siteName?.toLowerCase().contains(
+                                        value.toLowerCase()) ??
                                     false) ||
-                                (site.siteCode
-                                        ?.toLowerCase()
-                                        .contains(value.toLowerCase()) ??
+                                (site.siteCode?.toLowerCase().contains(
+                                        value.toLowerCase()) ??
                                     false))
                             .toList();
                       });
                     },
                   ),
-                  Expanded(
-                    child: SingleChildScrollView(
-                      child: ListBody(
-                        children: filteredSites.map((site) {
-                          return ListTile(
-                            title: Text('${site.siteCode}, ${site.siteName}'),
-                            onTap: () {
-                              Navigator.pop(
-                                  context, site); // Return the selected site
-                            },
-                          );
-                        }).toList(),
-                      ),
+                ),
+                Expanded(
+                  child: SingleChildScrollView(
+                    child: ListBody(
+                      children: filteredSites.map((site) {
+                        return ListTile(
+                          title: Text('${site.siteCode}, ${site.siteName}'),
+                          onTap: () {
+                            Navigator.pop(
+                                context, site); // Return the selected site
+                          },
+                        );
+                      }).toList(),
                     ),
                   ),
-                ],
-              ),
-              actions: <Widget>[
-                TextButton(
-                  child: const Text('Cancel'),
-                  onPressed: () {
-                    Navigator.pop(context); // Dismiss without returning a site
-                  },
                 ),
               ],
-            );
-          },
-        );
-      },
-    );
-  }
+            ),
+            actions: <Widget>[
+              TextButton(
+                child: const Text('Cancel'),
+                onPressed: () {
+                  Navigator.pop(context); // Dismiss without returning a site
+                },
+              ),
+            ],
+          );
+        },
+      );
+    },
+  );
+}
 
   void setSelectedFuelType(String value) {
     selectedFuelType.value = value;
@@ -214,40 +240,40 @@ class RefuelController extends GetxController {
   }
 
   String? validateTruckNumber(String text) {
-  return text.isNotEmpty ? null : "Please enter a valid truck number";
-}
+    return text.isNotEmpty ? null : "Please enter a valid truck number";
+  }
 
-String? validateOdometerReading(double value) {
-  return value > 0 ? null : "Please enter a valid odometer reading";
-}
+  String? validateOdometerReading(double value) {
+    return value > 0 ? null : "Please enter a valid odometer reading";
+  }
 
-String? validateFuelQuantity(double value) {
-  return value > 0 ? null : "Please enter a valid fuel quantity";
-}
+  String? validateFuelQuantity(double value) {
+    return value > 0 ? null : "Please enter a valid fuel quantity";
+  }
 
-String? validateAmountPaid(double value) {
-  return value > 0 ? null : "Please enter a valid amount paid";
-}
+  String? validateAmountPaid(double value) {
+    return value > 0 ? null : "Please enter a valid amount paid";
+  }
 
-String? validateTripNumber(String text) {
-  return text.isNotEmpty ? null : "Please enter a valid trip number";
-}
+  String? validateTripNumber(String text) {
+    return text.isNotEmpty ? null : "Please enter a valid trip number";
+  }
 
-String? validateCardDetail(String text) {
-  return text.isNotEmpty ? null : "Please enter a valid card detail";
-}
+  String? validateCardDetail(String text) {
+    return text.isNotEmpty ? null : "Please enter a valid card detail";
+  }
 
-String? validateSiteName(String text) {
-  return text.isNotEmpty ? null : "Please enter a valid site name";
-}
+  String? validateSiteName(String text) {
+    return text.isNotEmpty ? null : "Please enter a valid site name";
+  }
 
-String? validateReceiptNumber(String text) {
-  return text.isNotEmpty ? null : "Please enter a valid receipt number";
-}
+  String? validateReceiptNumber(String text) {
+    return text.isNotEmpty ? null : "Please enter a valid receipt number";
+  }
 
-String? validatePricePerLiter(double value) {
-  return value > 0 ? null : "Please enter a valid price per liter";
-}
+  String? validatePricePerLiter(double value) {
+    return value > 0 ? null : "Please enter a valid price per liter";
+  }
 
   bool validateFields() {
     if (validateTruckNumber(truckNumber.value) != null ||

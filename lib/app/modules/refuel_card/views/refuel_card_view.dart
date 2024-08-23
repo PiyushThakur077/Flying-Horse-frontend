@@ -289,10 +289,16 @@ class RefuelCardView extends GetView<RefuelCardController> {
                                     spaceHeight: 10.0,
                                   ),
                                   TripDetailRow(
-                                    leftText: "Amount Paid",
-                                    rightText: refuel['amount_paid'] != null
-                                        ? "\$${refuel['amount_paid']}"
-                                        : "N/A",
+                                    leftText: refuel['fuel_type'] == "def"
+                                        ? "Price Per Litre"
+                                        : "Amount Paid",
+                                    rightText: refuel['fuel_type'] == "def"
+                                        ? (refuel['price_per_liter'] != null
+                                            ? "\$${refuel['price_per_liter']}"
+                                            : "N/A")
+                                        : (refuel['amount_paid'] != null
+                                            ? "\$${refuel['amount_paid']}"
+                                            : "N/A"),
                                     showDottedLine: false,
                                     spaceHeight: 10.0,
                                   ),
@@ -509,6 +515,14 @@ class RefuelCardView extends GetView<RefuelCardController> {
                           child: Column(
                             children: [
                               CommonTextInput(
+                                labelText: 'Driver Name',
+                                hintText: 'Enter Driver Name',
+                                controller: driverNameController,
+                                readOnly: true,
+                                height: 60,
+                              ),
+                              SizedBox(height: 10),
+                              CommonTextInput(
                                 labelText: 'Country',
                                 hintText: 'Select Country',
                                 controller: controller.countryController,
@@ -683,7 +697,9 @@ class RefuelCardView extends GetView<RefuelCardController> {
                                       },
                                     ),
                                   )),
-                              Obx(() => controller.selectedFuelType.value ==
+
+                              const SizedBox(height: 10),
+                               Obx(() => controller.selectedFuelType.value ==
                                       'def'
                                   ? Column(
                                       children: [
@@ -699,15 +715,9 @@ class RefuelCardView extends GetView<RefuelCardController> {
                                       ],
                                     )
                                   : SizedBox.shrink()),
-                              const SizedBox(height: 10),
-                              CommonTextInput(
-                                labelText: 'Driver Name',
-                                hintText: 'Enter Driver Name',
-                                controller: driverNameController,
-                                readOnly: true,
-                                height: 60,
-                              ),
                               SizedBox(height: 10),
+                                  
+                              
                               CommonTextInput(
                                 labelText: 'Odometer Reading',
                                 hintText: 'Enter Odometer Reading',
@@ -752,6 +762,7 @@ class RefuelCardView extends GetView<RefuelCardController> {
                                 height: 60,
                               ),
                               SizedBox(height: 10),
+                             
                               Obx(() => controller.selectedFuelType.value !=
                                       'def'
                                   ? Column(
