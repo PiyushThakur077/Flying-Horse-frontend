@@ -31,6 +31,12 @@ class RefuelCardView extends GetView<RefuelCardController> {
     return text[0].toUpperCase() + text.substring(1).toLowerCase();
   }
 
+  String formatDateTime(String dateTime) {
+    DateTime parsedDateTime = DateTime.parse(dateTime);
+    DateFormat dateFormat = DateFormat('MMMM dd, yyyy hh:mm a');
+    return dateFormat.format(parsedDateTime);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -225,10 +231,8 @@ class RefuelCardView extends GetView<RefuelCardController> {
                                   ),
                                   TripDetailRow(
                                     leftText: "Date",
-                                    rightText: refuel['created_at'] != null
-                                        ? convertUtcToLocal(
-                                            refuel['created_at'])
-                                        : 'N/A',
+                                    rightText:
+                                        formatDateTime(refuel['created_at']),
                                     showDottedLine: false,
                                     spaceHeight: 10.0,
                                   ),
@@ -380,7 +384,6 @@ class RefuelCardView extends GetView<RefuelCardController> {
     String odometerReadingUnit = 'KM';
     String fuelQuantityUnit = 'liters';
 
-    // Initialize the controllers with the selectedRefuel values if not null
     if (selectedRefuel != null) {
       var address = jsonDecode(selectedRefuel['fuel_station_address']);
       controller.siteNameController.text = address['site_name'] ?? '';
@@ -697,9 +700,8 @@ class RefuelCardView extends GetView<RefuelCardController> {
                                       },
                                     ),
                                   )),
-
                               const SizedBox(height: 10),
-                               Obx(() => controller.selectedFuelType.value ==
+                              Obx(() => controller.selectedFuelType.value ==
                                       'def'
                                   ? Column(
                                       children: [
@@ -716,43 +718,57 @@ class RefuelCardView extends GetView<RefuelCardController> {
                                     )
                                   : SizedBox.shrink()),
                               SizedBox(height: 10),
-                                  
-                              
-                              CommonTextInput(
-                                labelText: 'Odometer Reading',
-                                hintText: 'Enter Odometer Reading',
-                                controller: odometerController,
-                                showSegmentedTabs: true,
-                                segments: ['KM', 'Miles'],
-                                selectedSegment: odometerReadingUnit,
-                                onSegmentSelected: (value) {
-                                  setState(() {
-                                    odometerReadingUnit = value;
-                                  });
+                              StatefulBuilder(
+                                builder: (BuildContext context,
+                                    StateSetter setOdometerState) {
+                                  return CommonTextInput(
+                                    labelText: 'Odometer Reading',
+                                    hintText: 'Enter Odometer Reading',
+                                    controller: odometerController,
+                                    showSegmentedTabs: true,
+                                    segments: ['KM', 'Miles'],
+                                    selectedSegment:
+                                        odometerReadingUnit, // This should reflect the current unit
+                                    onSegmentSelected: (value) {
+                                      setOdometerState(() {
+                                        odometerReadingUnit =
+                                            value; // Update the state with the selected unit
+                                      });
+                                    },
+                                    keyboardType:
+                                        const TextInputType.numberWithOptions(
+                                            decimal: true),
+                                    height: 60,
+                                  );
                                 },
-                                keyboardType:
-                                    const TextInputType.numberWithOptions(
-                                        decimal: true),
-                                height: 60,
                               ),
                               SizedBox(height: 10),
-                              CommonTextInput(
-                                labelText: 'Fuel Quantity',
-                                hintText: 'Enter Fuel Quantity',
-                                controller: fuelQuantityController,
-                                showSegmentedTabs: true,
-                                segments: ['liters', 'gallon'],
-                                selectedSegment: fuelQuantityUnit,
-                                onSegmentSelected: (value) {
-                                  setState(() {
-                                    fuelQuantityUnit = value;
-                                  });
+
+                              StatefulBuilder(
+                                builder: (BuildContext context,
+                                    StateSetter setFuelState) {
+                                  return CommonTextInput(
+                                    labelText: 'Fuel Quantity',
+                                    hintText: 'Enter Fuel Quantity',
+                                    controller: fuelQuantityController,
+                                    showSegmentedTabs: true,
+                                    segments: ['liters', 'gallon'],
+                                    selectedSegment: fuelQuantityUnit,
+                                    onSegmentSelected: (value) {
+                                      setFuelState(() {
+                                        fuelQuantityUnit = value;
+                                        print(
+                                            "Fuel Quantity Unit Selected: $fuelQuantityUnit"); // Print here
+                                      });
+                                    },
+                                    keyboardType:
+                                        const TextInputType.numberWithOptions(
+                                            decimal: true),
+                                    height: 60,
+                                  );
                                 },
-                                keyboardType:
-                                    const TextInputType.numberWithOptions(
-                                        decimal: true),
-                                height: 60,
                               ),
+
                               SizedBox(height: 10),
                               CommonTextInput(
                                 labelText: 'Receipt Number',
@@ -762,7 +778,6 @@ class RefuelCardView extends GetView<RefuelCardController> {
                                 height: 60,
                               ),
                               SizedBox(height: 10),
-                             
                               Obx(() => controller.selectedFuelType.value !=
                                       'def'
                                   ? Column(
