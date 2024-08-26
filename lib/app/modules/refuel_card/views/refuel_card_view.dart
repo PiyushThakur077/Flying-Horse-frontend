@@ -475,6 +475,8 @@ class RefuelCardView extends GetView<RefuelCardController> {
                           selectedRefuel = refuelings[int.parse(value!)];
                           var address = jsonDecode(
                               selectedRefuel['fuel_station_address']);
+
+                          // Update the controllers and state variables accordingly
                           controller.siteNameController.text =
                               address['site_name'] ?? '';
                           controller.countryController.text =
@@ -483,6 +485,7 @@ class RefuelCardView extends GetView<RefuelCardController> {
                               address['state'] ?? '';
                           controller.cityController.text =
                               address['city'] ?? '';
+
                           odometerController.text =
                               selectedRefuel['odometer_reading']?.toString() ??
                                   '';
@@ -500,15 +503,20 @@ class RefuelCardView extends GetView<RefuelCardController> {
                               selectedRefuel['price_per_liter']?.toString() ??
                                   '';
 
+                          // Update the units
                           odometerReadingUnit =
                               selectedRefuel['odometer_reading_unit'] ?? 'KM';
                           fuelQuantityUnit =
                               selectedRefuel['fuel_quantity_unit'] ?? 'liters';
 
+                          // Update the segmented tab selection
                           controller.selectedFuelType.value =
                               selectedRefuel['fuel_type'] ?? 'diesel';
                           controller.selectedFuelFilledTo.value =
                               selectedRefuel['fuel_filled_to'] ?? 'truck';
+
+                          // Refresh the stateful builders to reflect changes
+                          setState(() {});
                         });
                       },
                     ),
@@ -727,12 +735,10 @@ class RefuelCardView extends GetView<RefuelCardController> {
                                     controller: odometerController,
                                     showSegmentedTabs: true,
                                     segments: ['KM', 'Miles'],
-                                    selectedSegment:
-                                        odometerReadingUnit, // This should reflect the current unit
+                                    selectedSegment: odometerReadingUnit,
                                     onSegmentSelected: (value) {
                                       setOdometerState(() {
-                                        odometerReadingUnit =
-                                            value; // Update the state with the selected unit
+                                        odometerReadingUnit = value;
                                       });
                                     },
                                     keyboardType:
@@ -743,7 +749,6 @@ class RefuelCardView extends GetView<RefuelCardController> {
                                 },
                               ),
                               SizedBox(height: 10),
-
                               StatefulBuilder(
                                 builder: (BuildContext context,
                                     StateSetter setFuelState) {
@@ -768,7 +773,6 @@ class RefuelCardView extends GetView<RefuelCardController> {
                                   );
                                 },
                               ),
-
                               SizedBox(height: 10),
                               CommonTextInput(
                                 labelText: 'Receipt Number',
