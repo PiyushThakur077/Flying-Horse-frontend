@@ -556,16 +556,26 @@ class RefuelingView extends GetView<RefuelingController> {
             right: 16,
             bottom: 60,
             child: Obx(
-              () => controller.trips.isEmpty
-                  ? SizedBox.shrink()
-                  : AppButton(
-                      padding: const EdgeInsets.symmetric(vertical: 35),
-                      onPressed: () {
-                        Get.to(() => const RefuelView(),
-                            binding: RefuelBinding());
-                      },
-                      title: 'Add New Fuel Detail',
-                    ),
+              () {
+                // Check if there is any trip with the status 'inprogress'
+                final hasInProgressTrip = controller.trips.any(
+                  (trip) => trip['status_name']?.toLowerCase() == 'inprogress',
+                );
+
+                // Show the button if there is an in-progress trip
+                if (hasInProgressTrip) {
+                  return AppButton(
+                    padding: const EdgeInsets.symmetric(vertical: 35),
+                    onPressed: () {
+                      Get.to(() => const RefuelView(),
+                          binding: RefuelBinding());
+                    },
+                    title: 'Add New Fuel Detail',
+                  );
+                } else {
+                  return const SizedBox.shrink(); // Hide the button
+                }
+              },
             ),
           ),
         ],

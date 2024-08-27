@@ -262,6 +262,15 @@ class _SegmentedTabState extends State<SegmentedTab> {
   }
 
   @override
+  void didUpdateWidget(SegmentedTab oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    // Update the _selectedSegment if the selectedSegment prop changes
+    if (widget.selectedSegment != oldWidget.selectedSegment) {
+      _selectedSegment = widget.selectedSegment ?? widget.segments[0];
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Container(
       height: 30, // Smaller height

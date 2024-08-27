@@ -17,6 +17,9 @@ class RefuelCardController extends GetxController {
   var selectedCountry = ''.obs;
   var selectedFuelType = ''.obs;
   var selectedFuelFilledTo = ''.obs;
+  RxString odometerReadingUnit = 'KM'.obs;
+  RxString fuelQuantityUnit = 'liters'.obs;
+
 
   TextEditingController siteNameController = TextEditingController();
   TextEditingController countryController = TextEditingController();
@@ -295,4 +298,15 @@ class RefuelCardController extends GetxController {
     }
     return totalFuelInLiters;
   }
+  Future<void> refreshTrips() async {
+  isLoading.value = true; // Show a loading indicator
+  try {
+    await Get.find<RefuelingController>().fetchTrips(); // Fetch the trips data
+  } catch (e) {
+    print('Error refreshing trips: $e');
+  } finally {
+    isLoading.value = false; // Hide the loading indicator
+  }
+}
+
 }

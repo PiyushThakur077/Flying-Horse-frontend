@@ -1,5 +1,4 @@
 import 'dart:convert';
-
 import 'package:dotted_line/dotted_line.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -62,309 +61,323 @@ class RefuelCardView extends GetView<RefuelCardController> {
         } else {
           final tripDetails = controller.tripDetails;
           final refuelings = tripDetails['refuelings'] ?? [];
-          return Column(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Expanded(
-                child: SingleChildScrollView(
-                  child: Column(
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          return RefreshIndicator(
+              onRefresh: controller.refreshTrips,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Expanded(
+                    child: SingleChildScrollView(
+                      child: Column(
                         children: [
-                          Column(
-                            mainAxisAlignment: MainAxisAlignment.start,
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              Padding(
-                                padding: EdgeInsets.symmetric(horizontal: 15),
-                                child: Align(
-                                  alignment: Alignment.centerLeft,
-                                  child: Text(
-                                    'Trip Details',
-                                    style: AppTextStyle.mediumStyle(
-                                      fontSize: 24,
-                                      color: Color(0xff000000),
+                              Column(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                children: [
+                                  Padding(
+                                    padding:
+                                        EdgeInsets.symmetric(horizontal: 15),
+                                    child: Align(
+                                      alignment: Alignment.centerLeft,
+                                      child: Text(
+                                        'Trip Details',
+                                        style: AppTextStyle.mediumStyle(
+                                          fontSize: 24,
+                                          color: Color(0xff000000),
+                                        ),
+                                      ),
                                     ),
                                   ),
-                                ),
-                              ),
-                              Padding(
-                                padding: EdgeInsets.symmetric(horizontal: 15),
-                                child: Align(
-                                  alignment: Alignment.centerLeft,
-                                  child: Text(
-                                    tripDetails['truck_name'] ?? '',
-                                    style: AppTextStyle.mediumStyle(
-                                      fontSize: 18,
-                                      color: Color(0xff000000),
+                                  Padding(
+                                    padding:
+                                        EdgeInsets.symmetric(horizontal: 15),
+                                    child: Align(
+                                      alignment: Alignment.centerLeft,
+                                      child: Text(
+                                        tripDetails['truck_name'] ?? '',
+                                        style: AppTextStyle.mediumStyle(
+                                          fontSize: 18,
+                                          color: Color(0xff000000),
+                                        ),
+                                      ),
                                     ),
                                   ),
-                                ),
-                              ),
-                              // Padding(
-                              //   padding: EdgeInsets.symmetric(horizontal: 15),
-                              //   child: Text(
+                                  // Padding(
+                                  //   padding: EdgeInsets.symmetric(horizontal: 15),
+                                  //   child: Text(
 
-                              //     style: TextStyle(
-                              //         fontSize: 18,
-                              //         fontWeight: FontWeight.w600,
-                              //         color: Colors.black),
-                              //   ),
-                              // ),
+                                  //     style: TextStyle(
+                                  //         fontSize: 18,
+                                  //         fontWeight: FontWeight.w600,
+                                  //         color: Colors.black),
+                                  //   ),
+                                  // ),
+                                ],
+                              ),
+                              Padding(
+                                padding: EdgeInsets.symmetric(vertical: 10),
+                                child: const Image(
+                                  image: AssetImage(
+                                      'assets/images/horse_black.png'),
+                                  height: 100,
+                                ),
+                              ),
                             ],
                           ),
                           Padding(
-                            padding: EdgeInsets.symmetric(vertical: 10),
-                            child: const Image(
-                              image:
-                                  AssetImage('assets/images/horse_black.png'),
-                              height: 100,
+                            padding: EdgeInsets.symmetric(
+                                horizontal: 10, vertical: 5),
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                TripDetailRow(
+                                  leftText: "Trip Number",
+                                  rightText: tripDetails['trip_number'] ?? '',
+                                  spaceHeight: 15.0,
+                                ),
+                                TripDetailRow(
+                                  leftText: "Truck Number",
+                                  rightText: tripDetails['truck_number'] ?? '',
+                                  spaceHeight: 15.0,
+                                ),
+                                TripDetailRow(
+                                  leftText: "Card Detail",
+                                  rightText: tripDetails['card_number'] ?? '',
+                                  spaceHeight: 15.0,
+                                ),
+                                ...refuelings
+                                    .asMap()
+                                    .entries
+                                    .map<Widget>((entry) {
+                                  int index = entry.key;
+                                  var refuel = entry.value;
+
+                                  String fuelStationAddressString =
+                                      refuel['fuel_station_address'] ?? '';
+
+                                  Map<String, dynamic> fuelStationAddress = {};
+                                  if (fuelStationAddressString.isNotEmpty) {
+                                    try {
+                                      fuelStationAddress =
+                                          jsonDecode(fuelStationAddressString);
+                                    } catch (e) {
+                                      print(
+                                          'Error decoding fuel station address: $e');
+                                    }
+                                  }
+
+                                  String address = '';
+                                  if (fuelStationAddress.isNotEmpty) {
+                                    address =
+                                        '${fuelStationAddress['site_name']}, '
+                                        '${fuelStationAddress['city']}, '
+                                        '${fuelStationAddress['state']}, '
+                                        '${fuelStationAddress['country']}';
+                                  }
+
+                                  return Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          Padding(
+                                            padding: EdgeInsets.symmetric(
+                                                vertical: 2),
+                                            child: Text(
+                                              "${_getFillingStationLabel(index)} Filling Station",
+                                              style: AppTextStyle.semiBoldStyle(
+                                                  color: Colors.black,
+                                                  fontSize: 16),
+                                            ),
+                                          ),
+                                          Obx(() => IconButton(
+                                                icon: Icon(Icons.delete,
+                                                    color: Colors.red),
+                                                onPressed: controller
+                                                        .isEditable.value
+                                                    ? () {
+                                                        showDeleteConfirmationDialog(
+                                                            context,
+                                                            refuel['id']);
+                                                      }
+                                                    : null, // Disable the button if not editable
+                                              )),
+                                        ],
+                                      ),
+                                      // Padding(
+                                      //   padding: EdgeInsets.symmetric(vertical: 5),
+                                      //   child: Text(
+                                      //     "Fuel Pump Location",
+                                      //     style: AppTextStyle.regularStyle(
+                                      //         color: Color(0xff676767),
+                                      //         fontSize: 15),
+                                      //   ),
+                                      // ),
+                                      Row(
+                                        children: [
+                                          Icon(
+                                            Icons.location_on,
+                                            size: 24.0,
+                                            color: Colors.red,
+                                          ),
+                                          SizedBox(width: 10),
+                                          Expanded(
+                                            child: Text(
+                                              address,
+                                              style: TextStyle(
+                                                  color: Color(0xff333333),
+                                                  fontWeight: FontWeight.w700,
+                                                  fontSize: 15),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                      TripDetailRow(
+                                        leftText: "Date",
+                                        rightText: formatDateTime(
+                                            refuel['created_at']),
+                                        showDottedLine: false,
+                                        spaceHeight: 10.0,
+                                      ),
+                                      TripDetailRow(
+                                        leftText: "Quantity filled",
+                                        rightText:
+                                            "${refuel['fuel_quantity']} ${refuel['fuel_quantity_unit'].toString().substring(0, 1).toUpperCase()}${refuel['fuel_quantity_unit'].toString().substring(1)}",
+                                        showDottedLine: false,
+                                        spaceHeight: 10.0,
+                                      ),
+                                      TripDetailRow(
+                                        leftText: "Fuel Type",
+                                        rightText: (refuel['fuel_type'] ??
+                                                    'Diesel')
+                                                .toString()
+                                                .substring(0, 1)
+                                                .toUpperCase() +
+                                            (refuel['fuel_type'] ?? 'Diesel')
+                                                .toString()
+                                                .substring(1),
+                                        showDottedLine: false,
+                                        spaceHeight: 10.0,
+                                      ),
+                                      TripDetailRow(
+                                        leftText: "Filled In",
+                                        rightText: (refuel['fuel_filled_to'] ??
+                                                    'Truck')
+                                                .toString()
+                                                .substring(0, 1)
+                                                .toUpperCase() +
+                                            (refuel['fuel_filled_to'] ??
+                                                    'Truck')
+                                                .toString()
+                                                .substring(1),
+                                        showDottedLine: false,
+                                        spaceHeight: 10.0,
+                                      ),
+                                      TripDetailRow(
+                                        leftText: "Odometer Reading",
+                                        rightText:
+                                            "${refuel['odometer_reading']} ${refuel['odometer_reading_unit'].toString().substring(0, 1).toUpperCase()}${refuel['odometer_reading_unit'].toString().substring(1)}",
+                                        showDottedLine: false,
+                                        spaceHeight: 10.0,
+                                      ),
+
+                                      TripDetailRow(
+                                        leftText: "Driver Name",
+                                        rightText:
+                                            "${refuel['user_name'].toString().substring(0, 1).toUpperCase()}${refuel['user_name'].toString().substring(1)}",
+                                        showDottedLine: false,
+                                        spaceHeight: 10.0,
+                                      ),
+
+                                      TripDetailRow(
+                                        leftText: "Receipt Number",
+                                        rightText:
+                                            refuel['receipt_number'] != null
+                                                ? "${refuel['receipt_number']}"
+                                                : "N/A",
+                                        showDottedLine: false,
+                                        spaceHeight: 10.0,
+                                      ),
+                                      TripDetailRow(
+                                        leftText: refuel['fuel_type'] == "def"
+                                            ? "Price Per Litre"
+                                            : "Amount Paid",
+                                        rightText: refuel['fuel_type'] == "def"
+                                            ? (refuel['price_per_liter'] != null
+                                                ? "\$${refuel['price_per_liter']}"
+                                                : "N/A")
+                                            : (refuel['amount_paid'] != null
+                                                ? "\$${refuel['amount_paid']}"
+                                                : "N/A"),
+                                        showDottedLine: false,
+                                        spaceHeight: 10.0,
+                                      ),
+
+                                      const SizedBox(
+                                        height: 5.0,
+                                      ),
+                                      const DottedLine(),
+                                    ],
+                                  );
+                                }).toList(),
+                                TripDetailRow(
+                                  leftText: "Total Diesel Filled",
+                                  rightText:
+                                      '${tripDetails['total_fuel_in_liters_diesel'].toString()} Liters',
+                                  spaceHeight: 15.0,
+                                ),
+                                TripDetailRow(
+                                  leftText: "Total Def Filled",
+                                  rightText:
+                                      '${tripDetails['total_fuel_in_liters_def'].toString()} Liters',
+                                  spaceHeight: 15.0,
+                                ),
+                                TripDetailRow(
+                                  leftText: "Total Amount Paid",
+                                  rightText:
+                                      '\$${tripDetails['total_amount_paid'].toString()}',
+                                  spaceHeight: 15.0,
+                                ),
+                              ],
                             ),
                           ),
                         ],
                       ),
-                      Padding(
-                        padding:
-                            EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            TripDetailRow(
-                              leftText: "Trip Number",
-                              rightText: tripDetails['trip_number'] ?? '',
-                              spaceHeight: 15.0,
-                            ),
-                            TripDetailRow(
-                              leftText: "Truck Number",
-                              rightText: tripDetails['truck_number'] ?? '',
-                              spaceHeight: 15.0,
-                            ),
-                            TripDetailRow(
-                              leftText: "Card Detail",
-                              rightText: tripDetails['card_number'] ?? '',
-                              spaceHeight: 15.0,
-                            ),
-                            ...refuelings.asMap().entries.map<Widget>((entry) {
-                              int index = entry.key;
-                              var refuel = entry.value;
-
-                              String fuelStationAddressString =
-                                  refuel['fuel_station_address'] ?? '';
-
-                              Map<String, dynamic> fuelStationAddress = {};
-                              if (fuelStationAddressString.isNotEmpty) {
-                                try {
-                                  fuelStationAddress =
-                                      jsonDecode(fuelStationAddressString);
-                                } catch (e) {
-                                  print(
-                                      'Error decoding fuel station address: $e');
-                                }
-                              }
-
-                              String address = '';
-                              if (fuelStationAddress.isNotEmpty) {
-                                address = '${fuelStationAddress['site_name']}, '
-                                    '${fuelStationAddress['city']}, '
-                                    '${fuelStationAddress['state']}, '
-                                    '${fuelStationAddress['country']}';
-                              }
-
-                              return Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      Padding(
-                                        padding:
-                                            EdgeInsets.symmetric(vertical: 2),
-                                        child: Text(
-                                          "${_getFillingStationLabel(index)} Filling Station",
-                                          style: AppTextStyle.semiBoldStyle(
-                                              color: Colors.black,
-                                              fontSize: 16),
-                                        ),
-                                      ),
-                                      Obx(() => IconButton(
-                                            icon: Icon(Icons.delete,
-                                                color: Colors.red),
-                                            onPressed: controller
-                                                    .isEditable.value
-                                                ? () {
-                                                    showDeleteConfirmationDialog(
-                                                        context, refuel['id']);
-                                                  }
-                                                : null, // Disable the button if not editable
-                                          )),
-                                    ],
-                                  ),
-                                  // Padding(
-                                  //   padding: EdgeInsets.symmetric(vertical: 5),
-                                  //   child: Text(
-                                  //     "Fuel Pump Location",
-                                  //     style: AppTextStyle.regularStyle(
-                                  //         color: Color(0xff676767),
-                                  //         fontSize: 15),
-                                  //   ),
-                                  // ),
-                                  Row(
-                                    children: [
-                                      Icon(
-                                        Icons.location_on,
-                                        size: 24.0,
-                                        color: Colors.red,
-                                      ),
-                                      SizedBox(width: 10),
-                                      Expanded(
-                                        child: Text(
-                                          address,
-                                          style: TextStyle(
-                                              color: Color(0xff333333),
-                                              fontWeight: FontWeight.w700,
-                                              fontSize: 15),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                  TripDetailRow(
-                                    leftText: "Date",
-                                    rightText:
-                                        formatDateTime(refuel['created_at']),
-                                    showDottedLine: false,
-                                    spaceHeight: 10.0,
-                                  ),
-                                  TripDetailRow(
-                                    leftText: "Quantity filled",
-                                    rightText:
-                                        "${refuel['fuel_quantity']} ${refuel['fuel_quantity_unit'].toString().substring(0, 1).toUpperCase()}${refuel['fuel_quantity_unit'].toString().substring(1)}",
-                                    showDottedLine: false,
-                                    spaceHeight: 10.0,
-                                  ),
-                                  TripDetailRow(
-                                    leftText: "Fuel Type",
-                                    rightText: (refuel['fuel_type'] ?? 'Diesel')
-                                            .toString()
-                                            .substring(0, 1)
-                                            .toUpperCase() +
-                                        (refuel['fuel_type'] ?? 'Diesel')
-                                            .toString()
-                                            .substring(1),
-                                    showDottedLine: false,
-                                    spaceHeight: 10.0,
-                                  ),
-                                  TripDetailRow(
-                                    leftText: "Filled In",
-                                    rightText: (refuel['fuel_filled_to'] ??
-                                                'Truck')
-                                            .toString()
-                                            .substring(0, 1)
-                                            .toUpperCase() +
-                                        (refuel['fuel_filled_to'] ?? 'Truck')
-                                            .toString()
-                                            .substring(1),
-                                    showDottedLine: false,
-                                    spaceHeight: 10.0,
-                                  ),
-                                  TripDetailRow(
-                                    leftText: "Odometer Reading",
-                                    rightText:
-                                        "${refuel['odometer_reading']} ${refuel['odometer_reading_unit'].toString().substring(0, 1).toUpperCase()}${refuel['odometer_reading_unit'].toString().substring(1)}",
-                                    showDottedLine: false,
-                                    spaceHeight: 10.0,
-                                  ),
-
-                                  TripDetailRow(
-                                    leftText: "Driver Name",
-                                    rightText:
-                                        "${refuel['user_name'].toString().substring(0, 1).toUpperCase()}${refuel['user_name'].toString().substring(1)}",
-                                    showDottedLine: false,
-                                    spaceHeight: 10.0,
-                                  ),
-
-                                  TripDetailRow(
-                                    leftText: "Receipt Number",
-                                    rightText: refuel['receipt_number'] != null
-                                        ? "${refuel['receipt_number']}"
-                                        : "N/A",
-                                    showDottedLine: false,
-                                    spaceHeight: 10.0,
-                                  ),
-                                  TripDetailRow(
-                                    leftText: refuel['fuel_type'] == "def"
-                                        ? "Price Per Litre"
-                                        : "Amount Paid",
-                                    rightText: refuel['fuel_type'] == "def"
-                                        ? (refuel['price_per_liter'] != null
-                                            ? "\$${refuel['price_per_liter']}"
-                                            : "N/A")
-                                        : (refuel['amount_paid'] != null
-                                            ? "\$${refuel['amount_paid']}"
-                                            : "N/A"),
-                                    showDottedLine: false,
-                                    spaceHeight: 10.0,
-                                  ),
-
-                                  const SizedBox(
-                                    height: 5.0,
-                                  ),
-                                  const DottedLine(),
-                                ],
-                              );
-                            }).toList(),
-                            TripDetailRow(
-                              leftText: "Total Diesel Filled",
-                              rightText:
-                                  '${tripDetails['total_fuel_in_liters_diesel'].toString()} Liters',
-                              spaceHeight: 15.0,
-                            ),
-                            TripDetailRow(
-                              leftText: "Total Def Filled",
-                              rightText:
-                                  '${tripDetails['total_fuel_in_liters_def'].toString()} Liters',
-                              spaceHeight: 15.0,
-                            ),
-                            TripDetailRow(
-                              leftText: "Total Amount Paid",
-                              rightText:
-                                  '\$${tripDetails['total_amount_paid'].toString()}',
-                              spaceHeight: 15.0,
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
+                    ),
                   ),
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.symmetric(vertical: 25),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    Obx(() {
-                      final refuelCardController =
-                          Get.find<RefuelCardController>();
-                      return _buildIconButton(
-                        Icons.edit,
-                        onPressed: refuelCardController.isEditable.value
-                            ? () {
-                                showEditModal(context, refuelings, controller);
-                              }
-                            : null,
-                        enabled: refuelCardController.isEditable.value,
-                      );
-                    }),
-                    _buildCloseButton(onPressed: () {
-                      Get.back();
-                    }),
-                  ],
-                ),
-              ),
-            ],
-          );
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 25),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        Obx(() {
+                          final refuelCardController =
+                              Get.find<RefuelCardController>();
+                          return _buildIconButton(
+                            Icons.edit,
+                            onPressed: refuelCardController.isEditable.value
+                                ? () {
+                                    showEditModal(
+                                        context, refuelings, controller);
+                                  }
+                                : null,
+                            enabled: refuelCardController.isEditable.value,
+                          );
+                        }),
+                        _buildCloseButton(onPressed: () {
+                          Get.back();
+                        }),
+                      ],
+                    ),
+                  ),
+                ],
+              ));
         }
       }),
     );
@@ -380,9 +393,6 @@ class RefuelCardView extends GetView<RefuelCardController> {
     TextEditingController driverNameController = TextEditingController();
     TextEditingController receiptNumberController = TextEditingController();
     TextEditingController pricePerLitreController = TextEditingController();
-
-    String odometerReadingUnit = 'KM';
-    String fuelQuantityUnit = 'liters';
 
     if (selectedRefuel != null) {
       var address = jsonDecode(selectedRefuel['fuel_station_address']);
@@ -401,8 +411,10 @@ class RefuelCardView extends GetView<RefuelCardController> {
       driverNameController.text = selectedRefuel['user_name'] ?? '';
       receiptNumberController.text = selectedRefuel['receipt_number'] ?? '';
 
-      odometerReadingUnit = selectedRefuel['odometer_reading_unit'] ?? 'KM';
-      fuelQuantityUnit = selectedRefuel['fuel_quantity_unit'] ?? 'liters';
+      controller.odometerReadingUnit.value =
+          selectedRefuel['odometer_reading_unit'] ?? 'KM';
+      controller.fuelQuantityUnit.value =
+          selectedRefuel['fuel_quantity_unit'] ?? 'liters';
       pricePerLitreController.text =
           selectedRefuel['price_per_liter']?.toString() ?? '';
 
@@ -476,7 +488,6 @@ class RefuelCardView extends GetView<RefuelCardController> {
                           var address = jsonDecode(
                               selectedRefuel['fuel_station_address']);
 
-                          // Update the controllers and state variables accordingly
                           controller.siteNameController.text =
                               address['site_name'] ?? '';
                           controller.countryController.text =
@@ -503,19 +514,15 @@ class RefuelCardView extends GetView<RefuelCardController> {
                               selectedRefuel['price_per_liter']?.toString() ??
                                   '';
 
-                          // Update the units
-                          odometerReadingUnit =
+                          controller.odometerReadingUnit.value =
                               selectedRefuel['odometer_reading_unit'] ?? 'KM';
-                          fuelQuantityUnit =
+                          controller.fuelQuantityUnit.value =
                               selectedRefuel['fuel_quantity_unit'] ?? 'liters';
 
-                          // Update the segmented tab selection
                           controller.selectedFuelType.value =
                               selectedRefuel['fuel_type'] ?? 'diesel';
                           controller.selectedFuelFilledTo.value =
                               selectedRefuel['fuel_filled_to'] ?? 'truck';
-
-                          // Refresh the stateful builders to reflect changes
                           setState(() {});
                         });
                       },
@@ -726,53 +733,68 @@ class RefuelCardView extends GetView<RefuelCardController> {
                                     )
                                   : SizedBox.shrink()),
                               SizedBox(height: 10),
-                              StatefulBuilder(
-                                builder: (BuildContext context,
-                                    StateSetter setOdometerState) {
-                                  return CommonTextInput(
-                                    labelText: 'Odometer Reading',
-                                    hintText: 'Enter Odometer Reading',
-                                    controller: odometerController,
-                                    showSegmentedTabs: true,
-                                    segments: ['KM', 'Miles'],
-                                    selectedSegment: odometerReadingUnit,
-                                    onSegmentSelected: (value) {
-                                      setOdometerState(() {
-                                        odometerReadingUnit = value;
-                                      });
-                                    },
-                                    keyboardType:
-                                        const TextInputType.numberWithOptions(
-                                            decimal: true),
-                                    height: 60,
-                                  );
-                                },
+                              Obx(
+                                () => CommonTextInput(
+                                  labelText: 'Odometer Reading',
+                                  hintText: 'Enter Odometer Reading',
+                                  controller: odometerController,
+                                  showSegmentedTabs: true,
+                                  segments: ['KM', 'Miles'],
+                                  selectedSegment:
+                                      controller.odometerReadingUnit.value,
+                                  onSegmentSelected: (value) {
+                                    setState(() {
+                                      controller.odometerReadingUnit.value =
+                                          value;
+                                    });
+                                  },
+                                  keyboardType:
+                                      const TextInputType.numberWithOptions(
+                                          decimal: true),
+                                  height: 60,
+                                ),
                               ),
                               SizedBox(height: 10),
-                              StatefulBuilder(
-                                builder: (BuildContext context,
-                                    StateSetter setFuelState) {
-                                  return CommonTextInput(
-                                    labelText: 'Fuel Quantity',
-                                    hintText: 'Enter Fuel Quantity',
-                                    controller: fuelQuantityController,
-                                    showSegmentedTabs: true,
-                                    segments: ['liters', 'gallon'],
-                                    selectedSegment: fuelQuantityUnit,
-                                    onSegmentSelected: (value) {
-                                      setFuelState(() {
-                                        fuelQuantityUnit = value;
-                                        print(
-                                            "Fuel Quantity Unit Selected: $fuelQuantityUnit"); // Print here
-                                      });
-                                    },
-                                    keyboardType:
-                                        const TextInputType.numberWithOptions(
-                                            decimal: true),
-                                    height: 60,
-                                  );
-                                },
-                              ),
+                              Obx(() {
+                                // Get the current value and handle nullability
+                                String selectedValue =
+                                    controller.fuelQuantityUnit.value ?? '';
+
+                                // Capitalize the first letter manually if not empty
+                                String capitalizedValue =
+                                    selectedValue.isNotEmpty
+                                        ? selectedValue[0].toUpperCase() +
+                                            selectedValue.substring(1)
+                                        : '';
+
+                                return CommonTextInput(
+                                  labelText: 'Fuel Quantity',
+                                  hintText: 'Enter Fuel Quantity',
+                                  controller: fuelQuantityController,
+                                  showSegmentedTabs: true,
+                                  segments: [
+                                    'Liters',
+                                    'Gallon'
+                                  ], // Display names with correct capitalization
+                                  selectedSegment:
+                                      capitalizedValue, // Use the manually capitalized value
+                                  onSegmentSelected: (value) {
+                                    setState(() {
+                                      // Save the selected value in lowercase
+                                      controller.fuelQuantityUnit.value =
+                                          value.toLowerCase();
+
+                                      // Print the value being set
+                                      print(
+                                          "Selected segment: ${controller.fuelQuantityUnit.value}");
+                                    });
+                                  },
+                                  keyboardType:
+                                      const TextInputType.numberWithOptions(
+                                          decimal: true),
+                                  height: 60,
+                                );
+                              }),
                               SizedBox(height: 10),
                               CommonTextInput(
                                 labelText: 'Receipt Number',
@@ -815,13 +837,14 @@ class RefuelCardView extends GetView<RefuelCardController> {
                                         controller.selectedFuelFilledTo.value,
                                     "fuel_quantity":
                                         fuelQuantityController.text,
-                                    "fuel_quantity_unit": fuelQuantityUnit,
+                                    "fuel_quantity_unit":
+                                        controller.fuelQuantityUnit.value,
                                     "amount_paid": amountPaidController.text,
                                     "receipt_number":
                                         receiptNumberController.text,
                                     "odometer_reading": odometerController.text,
                                     "odometer_reading_unit":
-                                        odometerReadingUnit,
+                                        controller.odometerReadingUnit.value,
                                     "user_name": driverNameController.text,
                                     "created_at": createdAt,
                                     "price_per_liter":
