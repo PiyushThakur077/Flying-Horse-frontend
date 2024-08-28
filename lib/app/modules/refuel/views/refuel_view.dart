@@ -538,7 +538,6 @@ class RefuelView extends GetView<RefuelController> {
               title: 'Submit',
               onPressed: () {
                 if (controller.formKey.currentState!.validate()) {
-                  // If the form is valid, save the details
                   controller.saveFuelDetails(context);
                 } else {}
               },

@@ -358,7 +358,7 @@ class RefuelController extends GetxController {
         siteNameController.clear();
         yourPrice.value = 0.0;
 
-        Future.delayed(Duration(seconds: 1), () {
+        Future.delayed(Duration(milliseconds: 5), () {
           Navigator.pop(context, true);
         });
       } else {

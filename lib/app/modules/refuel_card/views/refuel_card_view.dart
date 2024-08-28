@@ -177,6 +177,7 @@ class RefuelCardView extends GetView<RefuelCardController> {
                                         '${fuelStationAddress['state']}, '
                                         '${fuelStationAddress['country']}';
                                   }
+                                  
 
                                   return Column(
                                     crossAxisAlignment:
