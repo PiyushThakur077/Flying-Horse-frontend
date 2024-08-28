@@ -239,6 +239,18 @@ class RefuelController extends GetxController {
     selectedFuelFilledTo.value = value;
   }
 
+  String? validateCountry(String text) {
+    return text.isNotEmpty ? null : "Please select a valid country";
+  }
+
+  String? validateState(String text) {
+    return text.isNotEmpty ? null : "Please select a valid state";
+  }
+
+  String? validateCity(String text) {
+    return text.isNotEmpty ? null : "Please select a valid city";
+  }
+
   String? validateTruckNumber(String text) {
     return text.isNotEmpty ? null : "Please enter a valid truck number";
   }
@@ -282,6 +294,9 @@ class RefuelController extends GetxController {
         validateTripNumber(tripNumber.value) != null ||
         validateCardDetail(cardDetail.value) != null ||
         validateSiteName(siteNameController.text) != null ||
+         validateCountry(selectedCountry.value) != null ||
+          validateState(selectedProvince.value.name ?? '') != null ||
+        validateCity(selectedCity.value.name ?? '') != null ||
         validateReceiptNumber(receiptNumber.value) != null) {
       return false;
     }

@@ -119,60 +119,83 @@ class RefuelView extends GetView<RefuelController> {
                         SizedBox(
                           height: 10,
                         ),
-                        Obx(() => Container(
-                              width: double.infinity,
-                              height: 65,
-                              child: DropdownButtonFormField<String>(
-                                value: controller.selectedCountry.value.isEmpty
-                                    ? null
-                                    : controller.selectedCountry.value,
-                                decoration: InputDecoration(
-                                  filled: true,
-                                  fillColor: const Color(0xFFEEEEEE),
-                                  border: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(30.0),
-                                    borderSide: BorderSide.none,
-                                  ),
-                                  enabledBorder: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(30.0),
-                                    borderSide: BorderSide.none,
-                                  ),
-                                  focusedBorder: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(30.0),
-                                    borderSide: BorderSide.none,
+                        Obx(
+                          () => Container(
+                            width: double.infinity,
+                            height: 85,
+                            child: DropdownButtonFormField<String>(
+                              value: controller.selectedCountry.value.isEmpty
+                                  ? null
+                                  : controller.selectedCountry.value,
+                              decoration: InputDecoration(
+                                filled: true,
+                                fillColor: const Color(0xFFEEEEEE),
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(30.0),
+                                  borderSide: BorderSide.none,
+                                ),
+                                enabledBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(30.0),
+                                  borderSide: BorderSide.none,
+                                ),
+                                focusedBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(30.0),
+                                  borderSide: BorderSide.none,
+                                ),
+                                errorBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(30.0),
+                                  borderSide: const BorderSide(
+                                    color: Colors
+                                        .red, // Red border for error state
                                   ),
                                 ),
-                                onChanged: (String? newValue) {
-                                  controller.onCountrySelected(newValue);
-                                },
-                                items: [
-                                  DropdownMenuItem<String>(
-                                    value: null,
-                                    child: Center(
-                                      child: Text(
-                                        'Select Country',
-                                        style: TextStyle(
-                                          color: Colors
-                                              .grey, // Optional: make the hint text lighter
-                                        ),
+                                focusedErrorBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(30.0),
+                                  borderSide: const BorderSide(
+                                    color: Colors
+                                        .red, // Red border for focused error state
+                                  ),
+                                ),
+                              ),
+                              onChanged: (String? newValue) {
+                                controller.onCountrySelected(newValue);
+                              },
+                              items: [
+                                DropdownMenuItem<String>(
+                                  value: null,
+                                  child: Center(
+                                    child: Text(
+                                      'Select Country',
+                                      style: TextStyle(
+                                        color: Colors
+                                            .grey, // Optional: make the hint text lighter
                                       ),
                                     ),
                                   ),
-                                  ...controller.countryIso2Map.keys
-                                      .map<DropdownMenuItem<String>>(
-                                          (String key) {
+                                ),
+                                ...controller.countryIso2Map.keys
+                                    .map<DropdownMenuItem<String>>(
+                                  (String key) {
                                     return DropdownMenuItem<String>(
                                       value: key,
                                       child: Text(key),
                                     );
-                                  }).toList(),
-                                ],
-                              ),
-                            )),
+                                  },
+                                ).toList(),
+                              ],
+                              validator: (value) {
+                                if (value == null || value.isEmpty) {
+                                  return 'Please select a country';
+                                }
+                                return null;
+                              },
+                            ),
+                          ),
+                        ),
                         SizedBox(height: 10),
                         Obx(() => Container(
                               width: double.infinity,
-                              height: 65,
+                              height: 85,
                               child: DropdownButtonFormField<Province>(
                                 value: controller.selectedProvince.value.name ==
                                         null
@@ -192,6 +215,20 @@ class RefuelView extends GetView<RefuelController> {
                                   focusedBorder: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(30.0),
                                     borderSide: BorderSide.none,
+                                  ),
+                                  errorBorder: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(30.0),
+                                    borderSide: const BorderSide(
+                                      color: Colors
+                                          .red, // Red border when there's an error
+                                    ),
+                                  ),
+                                  focusedErrorBorder: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(30.0),
+                                    borderSide: const BorderSide(
+                                      color: Colors
+                                          .red, // Red border when focused and there's an error
+                                    ),
                                   ),
                                 ),
                                 onChanged: controller.onProvinceSelected,
@@ -217,12 +254,21 @@ class RefuelView extends GetView<RefuelController> {
                                     );
                                   }).toList(),
                                 ],
+                                // Adding validation
+                                validator: (value) {
+                                  if (value == null ||
+                                      value.name == null ||
+                                      value.name!.isEmpty) {
+                                    return 'Please select a state';
+                                  }
+                                  return null;
+                                },
                               ),
                             )),
                         SizedBox(height: 10),
                         Obx(() => Container(
                               width: double.infinity,
-                              height: 65,
+                              height: 85,
                               child: DropdownButtonFormField<Cities>(
                                 value:
                                     controller.selectedCity.value.name == null
@@ -242,6 +288,20 @@ class RefuelView extends GetView<RefuelController> {
                                   focusedBorder: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(30.0),
                                     borderSide: BorderSide.none,
+                                  ),
+                                  errorBorder: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(30.0),
+                                    borderSide: const BorderSide(
+                                      color: Colors
+                                          .red, // Red border when there's an error
+                                    ),
+                                  ),
+                                  focusedErrorBorder: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(30.0),
+                                    borderSide: const BorderSide(
+                                      color: Colors
+                                          .red, // Red border when focused and there's an error
+                                    ),
                                   ),
                                 ),
                                 onChanged: controller.onCitySelected,
@@ -267,6 +327,15 @@ class RefuelView extends GetView<RefuelController> {
                                     );
                                   }).toList(),
                                 ],
+                                // Adding validation
+                                validator: (value) {
+                                  if (value == null ||
+                                      value.name == null ||
+                                      value.name!.isEmpty) {
+                                    return 'Please select a city';
+                                  }
+                                  return null;
+                                },
                               ),
                             )),
                       ],
