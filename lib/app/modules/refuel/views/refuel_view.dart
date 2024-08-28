@@ -354,99 +354,109 @@ class RefuelView extends GetView<RefuelController> {
                         ),
                       )),
                   const SizedBox(height: 10),
-                 Column(
-  crossAxisAlignment: CrossAxisAlignment.start,
-  children: [
-    Padding(
-      padding: EdgeInsets.symmetric(horizontal: 11),
-      child: Text(
-        'Fuel Type',
-        style: AppTextStyle.mediumStyle(
-          fontSize: 15,
-          color: Color(0xff000000),
-        ),
-      ),
-    ),
-    Obx(
-      () => Container(
-        height: 50,
-        width: double.infinity,
-        child: SegmentedButton<String>(
-          showSelectedIcon: false,
-          style: ButtonStyle(
-            backgroundColor: MaterialStateProperty.resolveWith<Color?>(
-              (Set<MaterialState> states) {
-                if (states.contains(MaterialState.selected)) {
-                  return AppColors.primary;
-                }
-                return Color(0xFFEEEEEE);
-              },
-            ),
-            foregroundColor: MaterialStateProperty.resolveWith<Color?>(
-              (Set<MaterialState> states) {
-                if (states.contains(MaterialState.selected)) {
-                  return Colors.white;
-                }
-                return AppColors.black;
-              },
-            ),
-          ),
-          segments: <ButtonSegment<String>>[
-            ButtonSegment<String>(
-              value: 'diesel',
-              label: Text(
-                'Diesel',
-                style: AppTextStyle.mediumStyle(fontSize: 16),
-                textAlign: TextAlign.center,
-              ),
-            ),
-            ButtonSegment<String>(
-              value: 'def',
-              label: Text(
-                'DEF',
-                style: AppTextStyle.mediumStyle(fontSize: 16),
-                textAlign: TextAlign.center,
-              ),
-            ),
-          ],
-          selected: <String>{controller.selectedFuelType.value},
-          onSelectionChanged: (Set<String> newSelection) {
-            if (newSelection.isNotEmpty) {
-              controller.setSelectedFuelType(newSelection.first);
-              if (newSelection.first == 'def') {
-                controller.amountPaid.value = 0.0; // Reset amount paid when DEF is selected
-              }
-            }
-          },
-        ),
-      ),
-    ),
-    Obx(
-      () => controller.selectedFuelType.value == 'def'
-          ? Padding(
-              padding: EdgeInsets.symmetric(vertical: 10),
-              child: Column(
-                children: [
-                  CommonTextInput(
-                    labelText: 'Price per Liter',
-                    hintText: 'Enter price per liter',
-                    onChanged: (value) => controller.pricePerLitre.value =
-                        double.tryParse(value) ?? 0.0,
-                    keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                    required: true,
-                    validator: (value) {
-                      double parsedValue =
-                          double.tryParse(value ?? '') ?? 0.0;
-                      return controller.validatePricePerLiter(parsedValue);
-                    },
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 11),
+                        child: Text(
+                          'Fuel Type',
+                          style: AppTextStyle.mediumStyle(
+                            fontSize: 15,
+                            color: Color(0xff000000),
+                          ),
+                        ),
+                      ),
+                      Obx(
+                        () => Container(
+                          height: 50,
+                          width: double.infinity,
+                          child: SegmentedButton<String>(
+                            showSelectedIcon: false,
+                            style: ButtonStyle(
+                              backgroundColor:
+                                  MaterialStateProperty.resolveWith<Color?>(
+                                (Set<MaterialState> states) {
+                                  if (states.contains(MaterialState.selected)) {
+                                    return AppColors.primary;
+                                  }
+                                  return Color(0xFFEEEEEE);
+                                },
+                              ),
+                              foregroundColor:
+                                  MaterialStateProperty.resolveWith<Color?>(
+                                (Set<MaterialState> states) {
+                                  if (states.contains(MaterialState.selected)) {
+                                    return Colors.white;
+                                  }
+                                  return AppColors.black;
+                                },
+                              ),
+                            ),
+                            segments: <ButtonSegment<String>>[
+                              ButtonSegment<String>(
+                                value: 'diesel',
+                                label: Text(
+                                  'Diesel',
+                                  style: AppTextStyle.mediumStyle(fontSize: 16),
+                                  textAlign: TextAlign.center,
+                                ),
+                              ),
+                              ButtonSegment<String>(
+                                value: 'def',
+                                label: Text(
+                                  'DEF',
+                                  style: AppTextStyle.mediumStyle(fontSize: 16),
+                                  textAlign: TextAlign.center,
+                                ),
+                              ),
+                            ],
+                            selected: <String>{
+                              controller.selectedFuelType.value
+                            },
+                            onSelectionChanged: (Set<String> newSelection) {
+                              if (newSelection.isNotEmpty) {
+                                controller
+                                    .setSelectedFuelType(newSelection.first);
+                                if (newSelection.first == 'def') {
+                                  controller.amountPaid.value =
+                                      0.0; // Reset amount paid when DEF is selected
+                                }
+                              }
+                            },
+                          ),
+                        ),
+                      ),
+                      Obx(
+                        () => controller.selectedFuelType.value == 'def'
+                            ? Padding(
+                                padding: EdgeInsets.symmetric(vertical: 10),
+                                child: Column(
+                                  children: [
+                                    CommonTextInput(
+                                      labelText: 'Price per Liter',
+                                      hintText: 'Enter price per liter',
+                                      onChanged: (value) =>
+                                          controller.pricePerLitre.value =
+                                              double.tryParse(value) ?? 0.0,
+                                      keyboardType:
+                                          const TextInputType.numberWithOptions(
+                                              decimal: true),
+                                      required: true,
+                                      validator: (value) {
+                                        double parsedValue =
+                                            double.tryParse(value ?? '') ?? 0.0;
+                                        return controller
+                                            .validatePricePerLiter(parsedValue);
+                                      },
+                                    ),
+                                  ],
+                                ),
+                              )
+                            : const SizedBox.shrink(),
+                      ),
+                    ],
                   ),
-                ],
-              ),
-            )
-          : const SizedBox.shrink(),
-    ),
-  ],
-),
 
                   const SizedBox(height: 5),
                   CommonTextInput(
@@ -459,7 +469,8 @@ class RefuelView extends GetView<RefuelController> {
                         double.tryParse(value) ?? 0.0,
                     onSegmentSelected: (value) =>
                         controller.odometerReadingUnit.value = value,
-                     keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                    keyboardType:
+                        const TextInputType.numberWithOptions(decimal: true),
                     required: true,
                     validator: (value) {
                       final parsedValue = double.tryParse(value ?? '');
@@ -487,7 +498,8 @@ class RefuelView extends GetView<RefuelController> {
                       controller.fuelQuantityUnit.value = value.toLowerCase();
                     },
                     required: true,
-                     keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                    keyboardType:
+                        const TextInputType.numberWithOptions(decimal: true),
                     validator: (value) {
                       final parsedValue = double.tryParse(value ?? '');
 
@@ -509,21 +521,22 @@ class RefuelView extends GetView<RefuelController> {
                         controller.validateReceiptNumber(value ?? ''),
                   ),
                   const SizedBox(height: 10),
-               Obx(() => controller.selectedFuelType.value != 'def'
-    ? Column(
-        children: [
-          CommonTextInput(
-            labelText: 'Amount Paid',
-            hintText: 'Enter amount here',
-            onChanged: (value) =>
-                controller.amountPaid.value = double.tryParse(value) ?? 0.0,
-            keyboardType:
-                const TextInputType.numberWithOptions(decimal: true),
-          ),
-          const SizedBox(height: 10),
-        ],
-      )
-    : const SizedBox.shrink()),
+                  Obx(() => controller.selectedFuelType.value != 'def'
+                      ? Column(
+                          children: [
+                            CommonTextInput(
+                              labelText: 'Amount Paid',
+                              hintText: 'Enter amount here',
+                              onChanged: (value) => controller.amountPaid
+                                  .value = double.tryParse(value) ?? 0.0,
+                              keyboardType:
+                                  const TextInputType.numberWithOptions(
+                                      decimal: true),
+                            ),
+                            const SizedBox(height: 10),
+                          ],
+                        )
+                      : const SizedBox.shrink()),
 
                   const SizedBox(height: 100),
                 ],
@@ -534,15 +547,19 @@ class RefuelView extends GetView<RefuelController> {
             bottom: 0,
             left: 0,
             right: 0,
-            child: AppButton(
-              title: 'Submit',
-              onPressed: () {
-                if (controller.formKey.currentState!.validate()) {
-                  controller.saveFuelDetails(context);
-                } else {}
-              },
-              buttonWidth: double.infinity,
-            ),
+            child: Obx(() => AppButton(
+                  title: 'Submit',
+                  onPressed: controller.isLoading.value
+                      ? null
+                      : () {
+                          if (controller.formKey.currentState!.validate()) {
+                            controller.saveFuelDetails(context);
+                          }
+                        },
+                  buttonWidth: double.infinity,
+                  isLoading:
+                      controller.isLoading.value, // Pass the loading state here
+                )),
           ),
         ],
       ),

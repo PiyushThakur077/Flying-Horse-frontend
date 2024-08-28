@@ -12,7 +12,7 @@ class RefuelController extends GetxController {
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
 
   var currentLocation = LatLng(0, 0).obs;
-  var isLoading = true.obs;
+  var isLoading = false.obs;
   var selectedFuelType = 'diesel'.obs;
   var selectedFuelFilledTo = 'truck'.obs;
   var siteSuggestions = <String>[].obs;

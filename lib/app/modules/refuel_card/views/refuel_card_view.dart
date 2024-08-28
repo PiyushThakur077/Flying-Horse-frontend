@@ -177,7 +177,6 @@ class RefuelCardView extends GetView<RefuelCardController> {
                                         '${fuelStationAddress['state']}, '
                                         '${fuelStationAddress['country']}';
                                   }
-                                  
 
                                   return Column(
                                     crossAxisAlignment:
@@ -305,20 +304,30 @@ class RefuelCardView extends GetView<RefuelCardController> {
                                         showDottedLine: false,
                                         spaceHeight: 10.0,
                                       ),
-                                      TripDetailRow(
-                                        leftText: refuel['fuel_type'] == "def"
-                                            ? "Price Per Litre"
-                                            : "Amount Paid",
-                                        rightText: refuel['fuel_type'] == "def"
-                                            ? (refuel['price_per_liter'] != null
-                                                ? "\$${refuel['price_per_liter']}"
-                                                : "N/A")
-                                            : (refuel['amount_paid'] != null
-                                                ? "\$${refuel['amount_paid']}"
-                                                : "N/A"),
-                                        showDottedLine: false,
-                                        spaceHeight: 10.0,
-                                      ),
+                                      if (refuel['fuel_type'] == "def" &&
+                                          refuel['price_per_liter'] != null &&
+                                          refuel['price_per_liter']
+                                              .toString()
+                                              .isNotEmpty)
+                                        TripDetailRow(
+                                          leftText: "Price Per Liter",
+                                          rightText:
+                                              "\$${refuel['price_per_liter']}",
+                                          showDottedLine: false,
+                                          spaceHeight: 10.0,
+                                        ),
+                                      if (refuel['fuel_type'] != "def" &&
+                                          refuel['amount_paid'] != null &&
+                                          refuel['amount_paid']
+                                              .toString()
+                                              .isNotEmpty)
+                                        TripDetailRow(
+                                          leftText: "Amount Paid",
+                                          rightText:
+                                              "\$${refuel['amount_paid']}",
+                                          showDottedLine: false,
+                                          spaceHeight: 10.0,
+                                        ),
 
                                       const SizedBox(
                                         height: 5.0,
@@ -712,6 +721,11 @@ class RefuelCardView extends GetView<RefuelCardController> {
                                         if (newSelection.isNotEmpty) {
                                           controller.setSelectedFuelType(
                                               newSelection.first);
+
+                                          // Clear the price per liter if DEF is selected
+                                          if (newSelection.first == 'def') {
+                                            pricePerLitreController.clear();
+                                          }
                                         }
                                       },
                                     ),
@@ -825,6 +839,24 @@ class RefuelCardView extends GetView<RefuelCardController> {
                               TextButton(
                                 child: Text('Save'),
                                 onPressed: () async {
+                                  // Validate the Price per Liter field
+                                  if (controller.selectedFuelType.value ==
+                                          'def' &&
+                                      (pricePerLitreController.text.isEmpty ||
+                                          double.tryParse(
+                                                  pricePerLitreController
+                                                      .text) ==
+                                              0.0)) {
+                                    // Show an error message
+                                    Get.snackbar(
+                                      'Error',
+                                      'Price per Liter is required and must be greater than 0',
+                                      backgroundColor: Colors.red,
+                                      colorText: Colors.white,
+                                    );
+                                    return;
+                                  }
+
                                   String createdAt =
                                       DateFormat("yyyy-MM-ddTHH:mm:ss'Z'")
                                           .format(DateTime.now().toUtc());
@@ -849,28 +881,21 @@ class RefuelCardView extends GetView<RefuelCardController> {
                                     "user_name": driverNameController.text,
                                     "created_at": createdAt,
                                     "price_per_liter":
-                                        controller.selectedFuelType.value ==
-                                                'def'
-                                            ? pricePerLitreController.text
-                                            : '0.0',
-                                    "fuel_station_address": jsonEncode(
-                                      {
-                                        "country":
-                                            controller.selectedCountry.value,
-                                        "state": controller
-                                            .selectedProvince.value.name,
-                                        "city":
-                                            controller.selectedCity.value.name,
-                                        "site_name":
-                                            controller.siteNameController.text,
-                                      },
-                                    ),
+                                        pricePerLitreController.text,
+                                    "fuel_station_address": jsonEncode({
+                                      "country":
+                                          controller.selectedCountry.value,
+                                      "state": controller
+                                          .selectedProvince.value.name,
+                                      "city":
+                                          controller.selectedCity.value.name,
+                                      "site_name":
+                                          controller.siteNameController.text,
+                                    }),
                                   };
 
                                   await controller.updateFuelDetail(
-                                    selectedRefuel['id'],
-                                    updatedData,
-                                  );
+                                      selectedRefuel['id'], updatedData);
                                   Get.back();
                                 },
                               ),

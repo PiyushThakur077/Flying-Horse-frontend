@@ -7,7 +7,7 @@ class AppButton extends StatelessWidget {
   final String title;
   final Widget? icon;
   final double? buttonWidth;
-  final bool enabled;
+  final bool isLoading;
   final Color? buttonColor;
   final Color? textColor;
   final EdgeInsets? padding;
@@ -17,29 +17,27 @@ class AppButton extends StatelessWidget {
   final double? elevation;
   final double? radiusb;
   final double? textSize;
-  
-
-
   final Color? borderclr;
   final FocusNode? focusNode;
 
-  AppButton(
-      {this.buttonWidth,
-      required this.title,
-      this.buttonColor,
-      this.radiusb,
-      this.borderclr,
-      this.minlength,
-      this.minwidthh,
-      this.textSize,
-      this.enabled = true,
-      required this.onPressed,
-      this.icon,
-      this.verticalPaddingg,
-      this.textColor,
-      this.elevation,
-      this.padding,
-      this.focusNode});
+  AppButton({
+    this.buttonWidth,
+    required this.title,
+    this.buttonColor,
+    this.radiusb,
+    this.borderclr,
+    this.minlength,
+    this.minwidthh,
+    this.textSize,
+    this.isLoading = false, // Default is false
+    required this.onPressed,
+    this.icon,
+    this.verticalPaddingg,
+    this.textColor,
+    this.elevation,
+    this.padding,
+    this.focusNode,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -49,15 +47,13 @@ class AppButton extends StatelessWidget {
         minWidth: buttonWidth == 0.0 ? 0.0 : 40,
         child: ElevatedButton(
           focusNode: focusNode,
-          onPressed: enabled ? onPressed : null,
+          onPressed: isLoading ? null : onPressed, // Disable button if loading
           style: ButtonStyle(
             backgroundColor: MaterialStateProperty.all(buttonColor == null
-                ? enabled
-                    ? AppColors.primary
-                    : Colors.grey
-                : enabled
-                    ? buttonColor
-                    : Colors.grey),
+                ? isLoading
+                    ? Colors.grey
+                    : AppColors.primary
+                : buttonColor),
             shape: MaterialStateProperty.all(RoundedRectangleBorder(
                 borderRadius: radiusb == null
                     ? BorderRadius.circular(14)
@@ -77,9 +73,11 @@ class AppButton extends StatelessWidget {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                icon == null ? SizedBox() : icon!,
+                if (isLoading) CircularProgressIndicator(color: textColor ?? Colors.white),
+                if (!isLoading && icon != null) icon!,
+                SizedBox(width: isLoading ? 10 : 0), // Adjust spacing for loader
                 Text(
-                  title,
+                  isLoading ? "Loading..." : title,
                   overflow: TextOverflow.clip,
                   textAlign: TextAlign.center,
                   maxLines: 1,
