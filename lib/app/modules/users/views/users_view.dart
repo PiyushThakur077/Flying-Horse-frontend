@@ -144,27 +144,37 @@ class UsersView extends GetView<UsersController> {
                                       TextSpan(
                                         children: [
                                           TextSpan(
-                                            text: '${toTitleCase(user.name)}, ',
+                                            text: '${toTitleCase(user.name)}',
                                             style: AppTextStyle.boldStyle(
                                               fontSize: 17,
                                               color: Colors.black,
                                             ),
                                           ),
-                                          TextSpan(
-                                            text: user.statusId == 1
-                                                ? 'Available'
-                                                : user.statusId == 2
-                                                    ? 'May Be Available'
-                                                    : user.statusId == 3
-                                                        ? 'Unavailable'
-                                                        : user.statusId == 4
-                                                            ? 'Do Not Disturb'
-                                                            : '',
-                                            style: AppTextStyle.regularStyle(
-                                              fontSize: 14,
-                                              color: Color(0xffBDBDBD),
+                                          if (user.statusId != null &&
+                                              user.statusId != 0) ...[
+                                            TextSpan(
+                                              text: ', ',
+                                              style: AppTextStyle.boldStyle(
+                                                fontSize: 17,
+                                                color: Colors.black,
+                                              ),
                                             ),
-                                          ),
+                                            TextSpan(
+                                              text: user.statusId == 1
+                                                  ? 'Available'
+                                                  : user.statusId == 2
+                                                      ? 'May Be Available'
+                                                      : user.statusId == 3
+                                                          ? 'Unavailable'
+                                                          : user.statusId == 4
+                                                              ? 'Do Not Disturb'
+                                                              : '',
+                                              style: AppTextStyle.regularStyle(
+                                                fontSize: 14,
+                                                color: Color(0xffBDBDBD),
+                                              ),
+                                            ),
+                                          ],
                                         ],
                                       ),
                                     ),

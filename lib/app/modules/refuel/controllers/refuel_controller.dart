@@ -13,6 +13,7 @@ class RefuelController extends GetxController {
 
   var currentLocation = LatLng(0, 0).obs;
   var isLoading = false.obs;
+  var isProvinceLoading = false.obs;
   var selectedFuelType = 'diesel'.obs;
   var selectedFuelFilledTo = 'truck'.obs;
   var siteSuggestions = <String>[].obs;
@@ -35,6 +36,8 @@ class RefuelController extends GetxController {
   var selectedCity = Cities().obs;
   var selectedCountry = ''.obs;
   var siteName = ''.obs;
+  var trailerNumber = ''.obs;
+  var trailerName = ''.obs;
 
   TextEditingController countryController = TextEditingController();
   TextEditingController stateController = TextEditingController();
@@ -61,11 +64,14 @@ class RefuelController extends GetxController {
     tripNumber.value = storage.read<String>('tripNumber') ?? '';
     cardDetail.value = storage.read<String>('cardNumber') ?? '';
     fuelQuantity.value = storage.read<double>('fuelQuantity') ?? 0.0;
+    trailerNumber.value = storage.read<String>('trailerNumber') ?? '';
+    trailerName.value = storage.read<String>('trailerName') ?? '';
   }
 
   Future<void> fetchProvinces(String iso2CountryCode) async {
     if (iso2CountryCode.isEmpty) return;
 
+    isProvinceLoading.value = true; // Start loading
     try {
       final response =
           await ApiProvider().getProvincesByCountry(iso2CountryCode);
@@ -82,17 +88,29 @@ class RefuelController extends GetxController {
     } catch (e) {
       print("Error fetching provinces: $e");
       Get.snackbar("Error", "Failed to fetch provinces: $e");
+    } finally {
+      isProvinceLoading.value = false; // Stop loading
     }
   }
 
-  void onCountrySelected(String? country) {
-    if (country != null) {
-      selectedProvince.value = Province();
-      selectedCity.value = Cities();
-      selectedCountry.value = country;
-      fetchProvinces(countryIso2Map[country]!);
+ void onCountrySelected(String? country) {
+  if (country != null) {
+    selectedProvince.value = Province();
+    selectedCity.value = Cities();
+    selectedCountry.value = country;
+
+    if (countryIso2Map[country] == 'US') {
+      fuelQuantityUnit.value = 'Gallon';
+      odometerReadingUnit.value = 'Miles';
+    } else {
+      fuelQuantityUnit.value = 'liters';
+      odometerReadingUnit.value = 'KM';
     }
+
+    fetchProvinces(countryIso2Map[country]!);
   }
+}
+
 
   void onProvinceSelected(Province? value) {
     if (value != null) {
@@ -294,8 +312,8 @@ class RefuelController extends GetxController {
         validateTripNumber(tripNumber.value) != null ||
         validateCardDetail(cardDetail.value) != null ||
         validateSiteName(siteNameController.text) != null ||
-         validateCountry(selectedCountry.value) != null ||
-          validateState(selectedProvince.value.name ?? '') != null ||
+        validateCountry(selectedCountry.value) != null ||
+        validateState(selectedProvince.value.name ?? '') != null ||
         validateCity(selectedCity.value.name ?? '') != null ||
         validateReceiptNumber(receiptNumber.value) != null) {
       return false;

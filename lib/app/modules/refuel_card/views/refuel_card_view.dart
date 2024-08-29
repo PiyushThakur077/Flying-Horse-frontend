@@ -144,6 +144,27 @@ class RefuelCardView extends GetView<RefuelCardController> {
                                   spaceHeight: 15.0,
                                 ),
                                 TripDetailRow(
+                                  leftText: "Trailer Name",
+                                  rightText: tripDetails['trailers'] != null &&
+                                          tripDetails['trailers'].isNotEmpty
+                                      ? tripDetails['trailers'][0]
+                                              ['trailer_name'] ??
+                                          ''
+                                      : 'N/A',
+                                  spaceHeight: 15.0,
+                                ),
+                                TripDetailRow(
+                                  leftText: "Trailer Number",
+                                  rightText: tripDetails['trailers'] != null &&
+                                          tripDetails['trailers'].isNotEmpty
+                                      ? tripDetails['trailers'][0]
+                                              ['trailer_number'] ??
+                                          ''
+                                      : 'N/A',
+                                  spaceHeight: 15.0,
+                                ),
+                                
+                                TripDetailRow(
                                   leftText: "Card Detail",
                                   rightText: tripDetails['card_number'] ?? '',
                                   spaceHeight: 15.0,
@@ -354,6 +375,13 @@ class RefuelCardView extends GetView<RefuelCardController> {
                                       '\$${tripDetails['total_amount_paid'].toString()}',
                                   spaceHeight: 15.0,
                                 ),
+                                if (tripDetails['notes'] != null &&
+                                    tripDetails['notes'].isNotEmpty)
+                                  TripDetailRow(
+                                    leftText: "Notes",
+                                    rightText: tripDetails['notes'] ?? '',
+                                    spaceHeight: 15.0,
+                                  ),
                               ],
                             ),
                           ),
@@ -835,11 +863,57 @@ class RefuelCardView extends GetView<RefuelCardController> {
                                       ],
                                     )
                                   : SizedBox.shrink()),
-                              SizedBox(height: 20),
+                              SizedBox(height: 10),
                               TextButton(
-                                child: Text('Save'),
+                                style: TextButton.styleFrom(
+                                  backgroundColor: AppColors
+                                      .primary, // Set the background color to red
+                                  padding: EdgeInsets.symmetric(
+                                      vertical: 12.0,
+                                      horizontal:
+                                          24.0), // Adjust padding if needed
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(
+                                        8.0), // Rounded corners
+                                  ),
+                                ),
+                                child: Text(
+                                  'Save',
+                                  style: TextStyle(
+                                      color: Colors.white,
+                                      fontWeight: FontWeight
+                                          .bold), // Set the text color to white
+                                ),
                                 onPressed: () async {
-                                  // Validate the Price per Liter field
+                                  // Validate fuel_quantity
+                                  if (fuelQuantityController.text.isEmpty ||
+                                      double.tryParse(
+                                              fuelQuantityController.text) ==
+                                          null ||
+                                      double.tryParse(
+                                              fuelQuantityController.text)! <=
+                                          0) {
+                                    Get.snackbar(
+                                      'Error',
+                                      'Fuel Quantity is required and must be a valid number greater than 0',
+                                      backgroundColor: Colors.red,
+                                      colorText: Colors.white,
+                                    );
+                                    return;
+                                  }
+
+                                  // Validate receipt_number
+                                  if (receiptNumberController.text.isEmpty) {
+                                    Get.snackbar(
+                                      'Error',
+                                      'Receipt Number is required',
+                                      backgroundColor: Colors.red,
+                                      colorText: Colors.white,
+                                    );
+                                    return;
+                                  }
+
+                                  // Validate price_per_liter
                                   if (controller.selectedFuelType.value ==
                                           'def' &&
                                       (pricePerLitreController.text.isEmpty ||
@@ -851,6 +925,23 @@ class RefuelCardView extends GetView<RefuelCardController> {
                                     Get.snackbar(
                                       'Error',
                                       'Price per Liter is required and must be greater than 0',
+                                      backgroundColor: Colors.red,
+                                      colorText: Colors.white,
+                                    );
+                                    return;
+                                  }
+
+                                  // Validate odometer_reading
+                                  if (odometerController.text.isEmpty ||
+                                      double.tryParse(
+                                              odometerController.text) ==
+                                          null ||
+                                      double.tryParse(
+                                              odometerController.text)! <=
+                                          0) {
+                                    Get.snackbar(
+                                      'Error',
+                                      'Odometer Reading is required and must be a valid number greater than 0',
                                       backgroundColor: Colors.red,
                                       colorText: Colors.white,
                                     );
@@ -899,6 +990,9 @@ class RefuelCardView extends GetView<RefuelCardController> {
                                   Get.back();
                                 },
                               ),
+                              SizedBox(
+                                height: 10,
+                              )
                             ],
                           ),
                         ),

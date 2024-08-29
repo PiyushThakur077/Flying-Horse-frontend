@@ -23,41 +23,47 @@ class RefuelingController extends GetxController {
     fuelQuantity.value = storage.read<double>('fuelQuantity') ?? 0.0;
   }
 
- Future <void> fetchTrips() async {
-    try {
-      isLoading(true);
-      var response = await apiProvider.getTrip();
-      if (response != null && response is List) {
-        var sortedTrips = response.map((e) => e as Map<String, dynamic>).toList()
-          ..sort((a, b) {
-            if (a['status_name'] == 'inprogress' &&
-                b['status_name'] != 'inprogress') {
-              return -1;
-            } else if (a['status_name'] != 'inprogress' &&
-                b['status_name'] == 'inprogress') {
-              return 1;
-            } else {
-              return 0;
-            }
-          });
-        trips.assignAll(sortedTrips);
-
-       
-        for (var trip in sortedTrips) {
-          if (trip['status_name'] == 'inprogress') {
-            GetStorage().write('cardNumber', trip['card_number']);
-            GetStorage().write('tripNumber', trip['trip_number']);
-            GetStorage().write('truckNumber', trip['truck_number']);
-            break;
+Future<void> fetchTrips() async {
+  try {
+    isLoading(true);
+    var response = await apiProvider.getTrip();
+    if (response != null && response is List) {
+      var sortedTrips = response.map((e) => e as Map<String, dynamic>).toList()
+        ..sort((a, b) {
+          if (a['status_name'] == 'inprogress' &&
+              b['status_name'] != 'inprogress') {
+            return -1;
+          } else if (a['status_name'] != 'inprogress' &&
+              b['status_name'] == 'inprogress') {
+            return 1;
+          } else {
+            return 0;
           }
+        });
+      trips.assignAll(sortedTrips);
+
+      for (var trip in sortedTrips) {
+        if (trip['status_name'] == 'inprogress') {
+          GetStorage().write('cardNumber', trip['card_number']);
+          GetStorage().write('tripNumber', trip['trip_number']);
+          GetStorage().write('truckNumber', trip['truck_number']);
+          
+          if (trip['trailers'] != null && trip['trailers'].isNotEmpty) {
+            var trailer = trip['trailers'][0]; // Assuming you want to save the first trailer
+            GetStorage().write('trailerName', trailer['trailer_name']);
+            GetStorage().write('trailerNumber', trailer['trailer_number']);
+          }
+          break;
         }
       }
-    } catch (e) {
-      Get.snackbar('Error', 'Failed to fetch trips');
-    } finally {
-      isLoading(false);
     }
+  } catch (e) {
+    Get.snackbar('Error', 'Failed to fetch trips');
+  } finally {
+    isLoading(false);
   }
+}
+
 
   void updateTotalAmountPaid(String tripId, double amount) {
     var index = trips.indexWhere((trip) => trip['id'] == tripId);

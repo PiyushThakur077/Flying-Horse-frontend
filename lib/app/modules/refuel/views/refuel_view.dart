@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flying_horse/app/data/colors.dart';
 import 'package:flying_horse/app/modules/refuel/models/country.dart';
@@ -88,17 +89,30 @@ class RefuelView extends GetView<RefuelController> {
                   //   },
                   // ),
                   TripDetailRow(
+                    leftText: "Trip Number",
+                    rightText: controller.tripNumber.value,
+                    showDottedLine: false,
+                    spaceHeight: 10.0,
+                  ),
+                  TripDetailRow(
                     leftText: "Truck number",
                     rightText: controller.truckNumber.value,
                     showDottedLine: false,
                     spaceHeight: 10.0,
                   ),
                   TripDetailRow(
-                    leftText: "Trip Number",
-                    rightText: controller.tripNumber.value,
+                    leftText: "Trailer name",
+                    rightText: controller.trailerName.value,
                     showDottedLine: false,
                     spaceHeight: 10.0,
                   ),
+                  TripDetailRow(
+                    leftText: "Trailer number",
+                    rightText: controller.trailerNumber.value,
+                    showDottedLine: false,
+                    spaceHeight: 10.0,
+                  ),
+                  
                   TripDetailRow(
                     leftText: "Card Detail",
                     rightText: controller.cardDetail.value,
@@ -193,78 +207,107 @@ class RefuelView extends GetView<RefuelController> {
                           ),
                         ),
                         SizedBox(height: 10),
-                        Obx(() => Container(
-                              width: double.infinity,
-                              height: 85,
-                              child: DropdownButtonFormField<Province>(
-                                value: controller.selectedProvince.value.name ==
-                                        null
-                                    ? null
-                                    : controller.selectedProvince.value,
-                                decoration: InputDecoration(
-                                  filled: true,
-                                  fillColor: const Color(0xFFEEEEEE),
-                                  border: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(30.0),
-                                    borderSide: BorderSide.none,
-                                  ),
-                                  enabledBorder: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(30.0),
-                                    borderSide: BorderSide.none,
-                                  ),
-                                  focusedBorder: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(30.0),
-                                    borderSide: BorderSide.none,
-                                  ),
-                                  errorBorder: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(30.0),
-                                    borderSide: const BorderSide(
-                                      color: Colors
-                                          .red, // Red border when there's an error
+                        Obx(
+                          () => Stack(
+                            children: [
+                              Container(
+                                width: double.infinity,
+                                height: 85,
+                                child: DropdownButtonFormField<Province>(
+                                  value:
+                                      controller.selectedProvince.value.name ==
+                                              null
+                                          ? null
+                                          : controller.selectedProvince.value,
+                                  decoration: InputDecoration(
+                                    filled: true,
+                                    fillColor: const Color(0xFFEEEEEE),
+                                    border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(30.0),
+                                      borderSide: BorderSide.none,
                                     ),
-                                  ),
-                                  focusedErrorBorder: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(30.0),
-                                    borderSide: const BorderSide(
-                                      color: Colors
-                                          .red, // Red border when focused and there's an error
+                                    enabledBorder: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(30.0),
+                                      borderSide: BorderSide.none,
                                     ),
-                                  ),
-                                ),
-                                onChanged: controller.onProvinceSelected,
-                                items: [
-                                  DropdownMenuItem<Province>(
-                                    value: null,
-                                    child: Center(
-                                      child: Text(
-                                        'Select State',
-                                        style: TextStyle(
-                                          color: Colors
-                                              .grey, // Optional: make the hint text lighter
-                                        ),
+                                    focusedBorder: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(30.0),
+                                      borderSide: BorderSide.none,
+                                    ),
+                                    errorBorder: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(30.0),
+                                      borderSide: const BorderSide(
+                                        color: Colors.red,
+                                      ),
+                                    ),
+                                    focusedErrorBorder: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(30.0),
+                                      borderSide: const BorderSide(
+                                        color: Colors.red,
                                       ),
                                     ),
                                   ),
-                                  ...controller.provinces
-                                      .map<DropdownMenuItem<Province>>(
-                                          (Province value) {
-                                    return DropdownMenuItem<Province>(
-                                      value: value,
-                                      child: Text(value.name ?? ""),
-                                    );
-                                  }).toList(),
-                                ],
-                                // Adding validation
-                                validator: (value) {
-                                  if (value == null ||
-                                      value.name == null ||
-                                      value.name!.isEmpty) {
-                                    return 'Please select a state';
-                                  }
-                                  return null;
-                                },
+                                  onChanged: (Province? selectedProvince) {
+                                    controller
+                                        .onProvinceSelected(selectedProvince);
+                                  },
+                                  items: [
+                                    DropdownMenuItem<Province>(
+                                      value: null,
+                                      child: Center(
+                                        child: Text(
+                                          'Select State',
+                                          style: TextStyle(
+                                            color: Colors.grey,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                    ...controller.provinces
+                                        .map<DropdownMenuItem<Province>>(
+                                      (Province province) {
+                                        return DropdownMenuItem<Province>(
+                                          value: province,
+                                          child: Text(province.name ?? ""),
+                                        );
+                                      },
+                                    ).toList(),
+                                  ],
+                                  validator: (Province? value) {
+                                    if (value == null ||
+                                        value.name == null ||
+                                        value.name!.isEmpty) {
+                                      return 'Please select a state';
+                                    }
+                                    return null;
+                                  },
+                                ),
                               ),
-                            )),
+                              if (controller.isProvinceLoading.value)
+                                Positioned.fill(
+                                  child: Center(
+                                    child: Column(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: [
+                                        CupertinoActivityIndicator(
+                                          color: AppColors.primary,
+                                        ),
+                                        SizedBox(height: 8),
+                                        Text(
+                                          'Loading...',
+                                          style: TextStyle(
+                                            color: AppColors.primary,
+                                            fontSize: 16,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                            ],
+                          ),
+                        ),
                         SizedBox(height: 10),
                         Obx(() => Container(
                               width: double.infinity,

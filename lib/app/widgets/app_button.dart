@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flying_horse/app/data/colors.dart';
 import 'package:flying_horse/app/utils/text_style.dart';
@@ -51,7 +52,7 @@ class AppButton extends StatelessWidget {
           style: ButtonStyle(
             backgroundColor: MaterialStateProperty.all(buttonColor == null
                 ? isLoading
-                    ? Colors.grey
+                    ? Colors.grey[700]
                     : AppColors.primary
                 : buttonColor),
             shape: MaterialStateProperty.all(RoundedRectangleBorder(
@@ -73,11 +74,13 @@ class AppButton extends StatelessWidget {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                if (isLoading) CircularProgressIndicator(color: textColor ?? Colors.white),
+                if (isLoading) CupertinoActivityIndicator(
+                                      color: Colors.white,
+                                    ),
                 if (!isLoading && icon != null) icon!,
                 SizedBox(width: isLoading ? 10 : 0), // Adjust spacing for loader
                 Text(
-                  isLoading ? "Loading..." : title,
+                  isLoading ? "" : title,
                   overflow: TextOverflow.clip,
                   textAlign: TextAlign.center,
                   maxLines: 1,
