@@ -170,6 +170,7 @@ class RefuelView extends GetView<RefuelController> {
                                         .red, // Red border for focused error state
                                   ),
                                 ),
+                                contentPadding: EdgeInsets.all(15)
                               ),
                               onChanged: (String? newValue) {
                                 controller.onCountrySelected(newValue);
