@@ -412,59 +412,75 @@ class RefuelView extends GetView<RefuelController> {
                     ),
                   ),
                   Obx(() => Container(
-                        height: 50, // Updated height
-                        width: double.infinity,
-                        child: SegmentedButton<String>(
-                          showSelectedIcon: false,
-                          style: ButtonStyle(
-                            backgroundColor:
-                                MaterialStateProperty.resolveWith<Color?>(
-                              (Set<MaterialState> states) {
-                                if (states.contains(MaterialState.selected)) {
-                                  return AppColors.primary;
-                                }
-                                return Color(0xFFEEEEEE);
-                              },
-                            ),
-                            foregroundColor:
-                                MaterialStateProperty.resolveWith<Color?>(
-                              (Set<MaterialState> states) {
-                                if (states.contains(MaterialState.selected)) {
-                                  return Colors.white;
-                                }
-                                return AppColors.black;
-                              },
-                            ),
-                          ),
-                          segments: <ButtonSegment<String>>[
-                            ButtonSegment<String>(
-                              value: 'truck',
-                              label: Text(
-                                'Truck',
-                                style: AppTextStyle.mediumStyle(fontSize: 16),
-                                textAlign: TextAlign.center,
-                              ),
-                            ),
-                            ButtonSegment<String>(
-                              value: 'reefer',
-                              label: Text(
-                                'Reefer',
-                                style: AppTextStyle.mediumStyle(fontSize: 16),
-                                textAlign: TextAlign.center,
-                              ),
-                            ),
-                          ],
-                          selected: <String>{
-                            controller.selectedFuelFilledTo.value
-                          },
-                          onSelectionChanged: (Set<String> newSelection) {
-                            if (newSelection.isNotEmpty) {
-                              controller
-                                  .selectedFuelFilledTo(newSelection.first);
-                            }
-                          },
-                        ),
-                      )),
+  height: 50, // Updated height
+  width: double.infinity,
+  child: SegmentedButton<String>(
+    showSelectedIcon: false,
+    style: ButtonStyle(
+      backgroundColor: MaterialStateProperty.resolveWith<Color?>(
+        (Set<MaterialState> states) {
+          if (states.contains(MaterialState.selected)) {
+            return AppColors.primary;
+          }
+          return Color(0xFFEEEEEE);
+        },
+      ),
+      foregroundColor: MaterialStateProperty.resolveWith<Color?>(
+        (Set<MaterialState> states) {
+          if (states.contains(MaterialState.selected)) {
+            return Colors.white;
+          }
+          return AppColors.black;
+        },
+      ),
+    ),
+    segments: <ButtonSegment<String>>[
+      ButtonSegment<String>(
+        value: 'truck',
+        label: Text(
+          'Truck',
+          style: AppTextStyle.mediumStyle(fontSize: 16),
+          textAlign: TextAlign.center,
+        ),
+      ),
+      ButtonSegment<String>(
+        value: 'reefer',
+        label: Text(
+          'Reefer',
+          style: AppTextStyle.mediumStyle(fontSize: 16),
+          textAlign: TextAlign.center,
+        ),
+      ),
+    ],
+    selected: <String>{controller.selectedFuelFilledTo.value},
+    onSelectionChanged: (Set<String> newSelection) {
+      if (newSelection.isNotEmpty) {
+        controller.selectedFuelFilledTo(newSelection.first);
+
+        if (newSelection.first == 'reefer') {
+          showDialog(
+            context: context,
+            builder: (BuildContext context) {
+              return AlertDialog(
+                title: Text('Reefer Selected'),
+                content: Text('You have selected Reefer.'),
+                actions: <Widget>[
+                  TextButton(
+                    child: Text('OK'),
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                  ),
+                ],
+              );
+            },
+          );
+        }
+      }
+    },
+  ),
+)),
+
                   const SizedBox(height: 10),
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
