@@ -36,8 +36,8 @@ class RefuelController extends GetxController {
   var selectedCity = Cities().obs;
   var selectedCountry = ''.obs;
   var siteName = ''.obs;
-  var trailerNumber = ''.obs;
-  var trailerName = ''.obs;
+  var trailerNumbers = <String>[].obs;  // Updated to store multiple trailer numbers
+  var trailerNames = <String>[].obs;   
 
   TextEditingController countryController = TextEditingController();
   TextEditingController stateController = TextEditingController();
@@ -64,9 +64,15 @@ class RefuelController extends GetxController {
     tripNumber.value = storage.read<String>('tripNumber') ?? '';
     cardDetail.value = storage.read<String>('cardNumber') ?? '';
     fuelQuantity.value = storage.read<double>('fuelQuantity') ?? 0.0;
-    trailerNumber.value = storage.read<String>('trailerNumber') ?? '';
-    trailerName.value = storage.read<String>('trailerName') ?? '';
+     List<dynamic>? storedTrailerNames = storage.read<List<dynamic>>('trailerNames');
+    List<dynamic>? storedTrailerNumbers = storage.read<List<dynamic>>('trailerNumbers');
+    
+    // Update the observable lists if the stored data is available
+    trailerNames.value = storedTrailerNames != null ? List<String>.from(storedTrailerNames) : [];
+    trailerNumbers.value = storedTrailerNumbers != null ? List<String>.from(storedTrailerNumbers) : [];
+  print( storedTrailerNumbers);
   }
+   
 
   Future<void> fetchProvinces(String iso2CountryCode) async {
     if (iso2CountryCode.isEmpty) return;
@@ -95,21 +101,27 @@ class RefuelController extends GetxController {
 
  void onCountrySelected(String? country) {
   if (country != null) {
+    // Reset selected province and city when the country is changed
     selectedProvince.value = Province();
     selectedCity.value = Cities();
     selectedCountry.value = country;
 
+    // Check if the selected country is the United States
     if (countryIso2Map[country] == 'US') {
+      // If the country is the United States, switch to Gallon and Miles
       fuelQuantityUnit.value = 'Gallon';
       odometerReadingUnit.value = 'Miles';
     } else {
+      // For other countries, use liters and KM
       fuelQuantityUnit.value = 'liters';
       odometerReadingUnit.value = 'KM';
     }
 
+    // Fetch provinces based on the selected country
     fetchProvinces(countryIso2Map[country]!);
   }
 }
+
 
 
   void onProvinceSelected(Province? value) {

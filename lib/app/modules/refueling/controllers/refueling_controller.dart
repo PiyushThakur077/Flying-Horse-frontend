@@ -47,11 +47,17 @@ Future<void> fetchTrips() async {
           GetStorage().write('cardNumber', trip['card_number']);
           GetStorage().write('tripNumber', trip['trip_number']);
           GetStorage().write('truckNumber', trip['truck_number']);
-          
+
+          // Save both trailers data
           if (trip['trailers'] != null && trip['trailers'].isNotEmpty) {
-            var trailer = trip['trailers'][0]; // Assuming you want to save the first trailer
-            GetStorage().write('trailerName', trailer['trailer_name']);
-            GetStorage().write('trailerNumber', trailer['trailer_number']);
+            List<Map<String, String>> trailers = trip['trailers'].map((trailer) {
+              return {
+                'trailerName': trailer['trailer_name'],
+                'trailerNumber': trailer['trailer_number'],
+              };
+            }).toList();
+
+            GetStorage().write('trailers', trailers);
           }
           break;
         }
@@ -63,6 +69,7 @@ Future<void> fetchTrips() async {
     isLoading(false);
   }
 }
+
 
 
   void updateTotalAmountPaid(String tripId, double amount) {

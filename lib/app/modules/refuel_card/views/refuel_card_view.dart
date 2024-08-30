@@ -143,27 +143,27 @@ class RefuelCardView extends GetView<RefuelCardController> {
                                   rightText: tripDetails['truck_number'] ?? '',
                                   spaceHeight: 15.0,
                                 ),
-                                TripDetailRow(
-                                  leftText: "Trailer Name",
-                                  rightText: tripDetails['trailers'] != null &&
-                                          tripDetails['trailers'].isNotEmpty
-                                      ? tripDetails['trailers'][0]
-                                              ['trailer_name'] ??
-                                          ''
-                                      : 'N/A',
-                                  spaceHeight: 15.0,
-                                ),
-                                TripDetailRow(
-                                  leftText: "Trailer Number",
-                                  rightText: tripDetails['trailers'] != null &&
-                                          tripDetails['trailers'].isNotEmpty
-                                      ? tripDetails['trailers'][0]
-                                              ['trailer_number'] ??
-                                          ''
-                                      : 'N/A',
-                                  spaceHeight: 15.0,
-                                ),
-                                
+                                  if (controller.trailers.length == 1)
+                                  TripDetailRow(
+                                    leftText: "Trailer",
+                                    rightText:
+                                        "${controller.trailers[0]['trailer_name']} (${controller.trailers[0]['trailer_number']})",
+                                    spaceHeight: 15.0,
+                                  ),
+                                if (controller.trailers.length >= 2) ...[
+                                  TripDetailRow(
+                                    leftText: "1st Trailer",
+                                    rightText:
+                                        "${controller.trailers[0]['trailer_name']} (${controller.trailers[0]['trailer_number']})",
+                                    spaceHeight: 15.0,
+                                  ),
+                                  TripDetailRow(
+                                    leftText: "2nd Trailer",
+                                    rightText:
+                                        "${controller.trailers[1]['trailer_name']} (${controller.trailers[1]['trailer_number']})",
+                                    spaceHeight: 15.0,
+                                  ),
+                                ],
                                 TripDetailRow(
                                   leftText: "Card Detail",
                                   rightText: tripDetails['card_number'] ?? '',
@@ -377,10 +377,32 @@ class RefuelCardView extends GetView<RefuelCardController> {
                                 ),
                                 if (tripDetails['notes'] != null &&
                                     tripDetails['notes'].isNotEmpty)
-                                  TripDetailRow(
-                                    leftText: "Notes",
-                                    rightText: tripDetails['notes'] ?? '',
-                                    spaceHeight: 15.0,
+                                  Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        "Notes",
+                                        style: TextStyle(
+                                          fontSize:
+                                              16.0, // Adjust the font size as needed
+                                          fontWeight: FontWeight
+                                              .bold, // Customize the font weight if needed
+                                        ),
+                                      ),
+                                      SizedBox(
+                                          height:
+                                              5.0), // Adjust the spacing as needed
+                                      Text(
+                                        tripDetails['notes'] ?? '',
+                                        style: TextStyle(
+                                          fontSize:
+                                              14.0, // Adjust the font size as needed
+                                          color: Colors
+                                              .black, // Customize the text color if needed
+                                        ),
+                                      ),
+                                    ],
                                   ),
                               ],
                             ),
@@ -570,43 +592,37 @@ class RefuelCardView extends GetView<RefuelCardController> {
                         child: SingleChildScrollView(
                           child: Column(
                             children: [
-                              CommonTextInput(
-                                labelText: 'Driver Name',
-                                hintText: 'Enter Driver Name',
-                                controller: driverNameController,
-                                readOnly: true,
-                                height: 60,
+                              TripDetailRow(
+                                leftText: 'Driver Name',
+                                rightText: driverNameController.text,
+                                spaceHeight: 5.0,
+                                showDottedLine: false,
                               ),
-                              SizedBox(height: 10),
-                              CommonTextInput(
-                                labelText: 'Country',
-                                hintText: 'Select Country',
-                                controller: controller.countryController,
-                                readOnly: true,
-                                height: 60,
+                              TripDetailRow(
+                                leftText: 'Country',
+                                rightText: controller.countryController.text,
+                                spaceHeight: 5.0,
+                                showDottedLine: false,
                               ),
-                              const SizedBox(height: 10),
-                              CommonTextInput(
-                                labelText: 'State',
-                                hintText: 'Select State',
-                                controller: controller.stateController,
-                                readOnly: true,
-                                height: 60,
+                              TripDetailRow(
+                                leftText: 'State',
+                                rightText: controller.stateController.text,
+                                spaceHeight: 5.0,
+                                showDottedLine: false,
                               ),
-                              const SizedBox(height: 10),
-                              CommonTextInput(
-                                labelText: 'City',
-                                hintText: 'Select City',
-                                controller: controller.cityController,
-                                readOnly: true,
-                                height: 60,
+                              TripDetailRow(
+                                leftText: 'City',
+                                rightText: controller.cityController.text,
+                                spaceHeight: 5.0,
+                                showDottedLine: false,
                               ),
-                              CommonTextInput(
-                                labelText: 'Site Name',
-                                hintText: '',
-                                controller: controller.siteNameController,
-                                readOnly: true,
-                                height: 60,
+                              TripDetailRow(
+                                leftText: 'Site Name',
+                                rightText: controller.siteNameController.text,
+                                spaceHeight: 5.0,
+                              ),
+                              SizedBox(
+                                height: 10,
                               ),
                               Padding(
                                 padding: EdgeInsets.symmetric(horizontal: 11),

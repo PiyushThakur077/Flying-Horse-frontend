@@ -10,7 +10,7 @@ class RefuelCardController extends GetxController {
   var isLoading = true.obs;
   var isEditable = true.obs;
   var apiProvider = ApiProvider();
-
+ var trailers = <Map<String, dynamic>>[].obs; 
   var provinces = <Province>[].obs;
   var selectedProvince = Province().obs;
   var selectedCity = Cities().obs;
@@ -69,8 +69,17 @@ class RefuelCardController extends GetxController {
       print('Received trip details: $details');
       tripDetails.value = details;
 
+      // Fetch trailer details if available
+      if (details['trailers'] != null) {
+        trailers.value = List<Map<String, dynamic>>.from(details['trailers']);
+      } else {
+        trailers.clear();
+      }
+
       // Update the editability based on status_name
       isEditable.value = tripDetails['status_name'] != 'cancelled';
+    } catch (e) {
+      print('Error fetching trip details: $e');
     } finally {
       isLoading.value = false;
     }

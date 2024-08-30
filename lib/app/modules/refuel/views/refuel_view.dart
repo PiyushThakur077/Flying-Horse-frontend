@@ -100,17 +100,38 @@ class RefuelView extends GetView<RefuelController> {
                     showDottedLine: false,
                     spaceHeight: 10.0,
                   ),
-                  TripDetailRow(
-                    leftText: "Trailer name",
-                    rightText: controller.trailerName.value,
-                    showDottedLine: false,
-                    spaceHeight: 10.0,
-                  ),
-                  TripDetailRow(
-                    leftText: "Trailer number",
-                    rightText: controller.trailerNumber.value,
-                    showDottedLine: false,
-                    spaceHeight: 10.0,
+                Obx(
+                    () {
+                      // Check if trailer lists are not empty
+                      if (controller.trailerNames.isEmpty ||
+                          controller.trailerNumbers.isEmpty) {
+                        return Center(
+                          child: Text('No trailer details available'),
+                        );
+                      }
+                      return Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: List.generate(controller.trailerNames.length,
+                            (index) {
+                          return Column(
+                            children: [
+                              TripDetailRow(
+                                leftText: "Trailer name",
+                                rightText: controller.trailerNames[index],
+                                showDottedLine: false,
+                                spaceHeight: 10.0,
+                              ),
+                              TripDetailRow(
+                                leftText: "Trailer number",
+                                rightText: controller.trailerNumbers[index],
+                                showDottedLine: false,
+                                spaceHeight: 10.0,
+                              ),
+                            ],
+                          );
+                        }),
+                      );
+                    },
                   ),
                   
                   TripDetailRow(
