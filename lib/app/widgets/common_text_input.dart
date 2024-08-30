@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flying_horse/app/data/colors.dart';
 import 'package:flying_horse/app/utils/text_style.dart';
-import 'package:csc_picker/csc_picker.dart';
 
 class CommonTextInput extends StatefulWidget {
   final String labelText;
@@ -15,15 +14,10 @@ class CommonTextInput extends StatefulWidget {
   final String? selectedSegment;
   final Function(String)? onSegmentSelected;
   final bool readOnly;
-  final bool isCountryPicker;
   final VoidCallback? onTap;
-  final TextEditingController? countryController;
-  final TextEditingController? stateController;
-  final TextEditingController? cityController;
-  final Function(String countryCode, String stateCode, String city)?
-      onAddressSelected;
   final bool required;
   final bool isValid;
+  final bool isDisabled;
   final FormFieldValidator<String>? validator;
   final double? height;
 
@@ -41,12 +35,8 @@ class CommonTextInput extends StatefulWidget {
     this.selectedSegment,
     this.onSegmentSelected,
     this.readOnly = false,
-    this.isCountryPicker = false,
-    this.countryController,
-    this.stateController,
-    this.cityController,
-    this.onAddressSelected,
     this.required = false,
+      this.isDisabled = false, 
     this.isValid = true,
     this.validator,
     this.height,
@@ -101,136 +91,77 @@ class _CommonTextInputState extends State<CommonTextInput> {
           ),
         ),
         const SizedBox(height: 6),
-        if (widget.isCountryPicker)
-          CSCPicker(
-            flagState: CountryFlag.DISABLE,
-            onCountryChanged: (country) {
-              widget.countryController?.text = country;
-              _validateField(); // Validate on change
+        Container(
+          width: double.infinity,
+          height: widget.height ?? 75,
+          child: TextFormField(
+            controller: _controller,
+            keyboardType: widget.keyboardType,
+            obscureText: widget.obscureText,
+            validator: widget.validator,
+            onChanged: (value) {
+              if (widget.onChanged != null) widget.onChanged!(value);
+              _validateField();
             },
-            onStateChanged: (state) {
-              widget.stateController?.text = state ?? '';
-              _validateField(); // Validate on change
-              // Handle state selection logic
-              String iso2StateCode = ''; // Assuming stateIsoMap logic
-              if (widget.countryController?.text != null) {
-                String countryCode = widget.countryController!.text;
-                widget.onAddressSelected?.call(
-                  countryCode,
-                  iso2StateCode.isNotEmpty ? iso2StateCode : 'Unknown',
-                  widget.cityController?.text ?? '',
-                );
-              }
-            },
-            onCityChanged: (city) {
-              widget.cityController?.text = city ?? '';
-              _validateField(); // Validate on change
-              // Handle city selection logic
-              if (widget.countryController?.text != null &&
-                  widget.stateController?.text != null) {
-                String countryCode = widget.countryController!.text;
-                String stateCode = ''; // Assuming stateIsoMap logic
-                widget.onAddressSelected?.call(
-                  countryCode,
-                  stateCode,
-                  widget.cityController?.text ?? '',
-                );
-              }
-            },
-            showStates: true,
-            showCities: true,
-            layout: Layout.vertical,
-            dropdownDecoration: BoxDecoration(
-              borderRadius: BorderRadius.all(Radius.circular(25.0)),
-              color: const Color(0xFFEEEEEE),
-              border: Border.all(
-                  color: _showErrorBorder ? Colors.red : Colors.grey.shade300),
+            onTap: widget.onTap,
+            readOnly: widget.readOnly,
+            style: TextStyle(
+              color: widget.readOnly ? Colors.grey : Colors.black,
             ),
-            disabledDropdownDecoration: BoxDecoration(
-              borderRadius: BorderRadius.all(Radius.circular(25.0)),
-              border: Border.all(color: Colors.grey.shade300),
-              color: const Color(0xFFEEEEEE),
-            ),
-            countrySearchPlaceholder: "Search Country",
-            stateSearchPlaceholder: "Search State",
-            citySearchPlaceholder: "Search City",
-            countryFilter: const [
-              CscCountry.Canada,
-              CscCountry.United_States,
-              CscCountry.Mexico,
-            ],
-          )
-        else
-          Container(
-            width: double.infinity,
-            height: widget.height ?? 75,
-            child: TextFormField(
-              controller: _controller,
-              keyboardType: widget.keyboardType,
-              obscureText: widget.obscureText,
-              validator: widget.validator,
-              onChanged: (value) {
-                if (widget.onChanged != null) widget.onChanged!(value);
-                _validateField();
-              },
-              onTap: widget.onTap,
-              readOnly: widget.readOnly,
-              style: TextStyle(
-                color: widget.readOnly ? Colors.grey : Colors.black,
+            decoration: InputDecoration(
+              filled: true,
+              fillColor: const Color(0xFFEEEEEE),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(25.0),
+                borderSide: BorderSide.none,
               ),
-              decoration: InputDecoration(
-                filled: true,
-                fillColor: const Color(0xFFEEEEEE),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(25.0),
-                  borderSide: BorderSide.none,
+              enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(25.0),
+                borderSide: BorderSide(
+                  color: _showErrorBorder ? Colors.red : Colors.grey.shade300,
                 ),
-                enabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(25.0),
-                  borderSide: BorderSide(
-                    color: _showErrorBorder ? Colors.red : Colors.grey.shade300,
-                  ),
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(25.0),
+                borderSide: BorderSide(
+                  color: _showErrorBorder ? Colors.red : Colors.grey.shade300,
                 ),
-                focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(25.0),
-                  borderSide: BorderSide(
-                    color: _showErrorBorder ? Colors.red : Colors.grey.shade300,
-                  ),
+              ),
+              errorBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(25.0),
+                borderSide: BorderSide(
+                  color: Colors.red, // Red border for error state
                 ),
-                errorBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(25.0),
-                  borderSide: BorderSide(
-                    color: Colors.red, // Red border for error state
-                  ),
+              ),
+              focusedErrorBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(25.0),
+                borderSide: BorderSide(
+                  color: Colors.red, // Red border for focused error state
                 ),
-                focusedErrorBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(25.0),
-                  borderSide: BorderSide(
-                    color: Colors.red, // Red border for focused error state
-                  ),
-                ),
-                hintText: widget.hintText,
-                hintStyle: const TextStyle(color: Color(0xFFB8B8B8)),
-                contentPadding: const EdgeInsets.symmetric(
-                  vertical: 15.0,
-                  horizontal: 20.0,
-                ),
-                suffixIcon: widget.showSegmentedTabs && widget.segments != null
-                    ? Padding(
-                        padding: const EdgeInsets.only(right: 8),
-                        child: Container(
-                          height: 30, // Smaller height
-                          child: SegmentedTab(
-                            segments: widget.segments!,
-                            selectedSegment: widget.selectedSegment,
-                            onSegmentSelected: widget.onSegmentSelected,
-                          ),
+              ),
+              hintText: widget.hintText,
+              hintStyle: const TextStyle(color: Color(0xFFB8B8B8)),
+              contentPadding: const EdgeInsets.symmetric(
+                vertical: 15.0,
+                horizontal: 20.0,
+              ),
+              suffixIcon: widget.showSegmentedTabs && widget.segments != null
+                  ? Padding(
+                      padding: const EdgeInsets.only(right: 8),
+                      child: Container(
+                        height: 30, // Smaller height
+                        child: SegmentedTab(
+                          segments: widget.segments!,
+                          selectedSegment: widget.selectedSegment,
+                          onSegmentSelected: widget.onSegmentSelected,
+                          
                         ),
-                      )
-                    : null,
-              ),
+                      ),
+                    )
+                  : null,
             ),
           ),
+        ),
       ],
     );
   }
@@ -240,12 +171,14 @@ class SegmentedTab extends StatefulWidget {
   final List<String> segments;
   final String? selectedSegment;
   final Function(String)? onSegmentSelected;
+  final bool readOnly; // New property
 
   const SegmentedTab({
     Key? key,
     required this.segments,
     this.selectedSegment,
     this.onSegmentSelected,
+    this.readOnly = false, // Default is false
   }) : super(key: key);
 
   @override
@@ -278,7 +211,7 @@ class _SegmentedTabState extends State<SegmentedTab> {
         isSelected: widget.segments
             .map((segment) => segment == _selectedSegment)
             .toList(),
-        onPressed: (index) {
+        onPressed: widget.readOnly ? null : (index) {
           setState(() {
             _selectedSegment = widget.segments[index];
           });
@@ -302,3 +235,5 @@ class _SegmentedTabState extends State<SegmentedTab> {
     );
   }
 }
+
+

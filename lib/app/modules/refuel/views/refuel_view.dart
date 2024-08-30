@@ -44,50 +44,6 @@ class RefuelView extends GetView<RefuelController> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Autocomplete<String>(
-                  //   optionsBuilder: (TextEditingValue textEditingValue) async {
-                  //     if (textEditingValue.text.isEmpty) {
-                  //       return const Iterable<String>.empty();
-                  //     }
-                  //     return await controller
-                  //         .fetchSiteSuggestions(textEditingValue.text);
-                  //   },
-                  //   onSelected: (String selection) {
-                  //     controller.siteNameController.text = selection;
-                  //   },
-                  //   fieldViewBuilder: (BuildContext context,
-                  //       TextEditingController textEditingController,
-                  //       FocusNode focusNode,
-                  //       VoidCallback onFieldSubmitted) {
-                  //     return TextField(
-                  //       controller: controller.siteNameController,
-                  //       focusNode: focusNode,
-                  //       decoration: InputDecoration(
-                  //         filled: true,
-                  //         fillColor: const Color(0xFFEEEEEE),
-                  //         border: OutlineInputBorder(
-                  //   borderRadius: BorderRadius.circular(25.0),
-                  //   borderSide: BorderSide.none,
-                  // ),
-                  // enabledBorder: OutlineInputBorder(
-                  //   borderRadius: BorderRadius.circular(25.0),
-                  //   borderSide: BorderSide.none,
-                  // ),
-                  // focusedBorder: OutlineInputBorder(
-                  //   borderRadius: BorderRadius.circular(25.0),
-                  //   borderSide: BorderSide.none,
-                  // ),
-                  //         labelText: 'Site Name',
-                  //         hintText: 'ONTARIO 8AHM 202',
-
-                  //       ),
-                  //       onChanged: (value) {
-                  //         textEditingController.text = value;
-                  //         controller.siteNameController.text = value;
-                  //       },
-                  //     );
-                  //   },
-                  // ),
                   TripDetailRow(
                     leftText: "Trip Number",
                     rightText: controller.tripNumber.value,
@@ -100,40 +56,6 @@ class RefuelView extends GetView<RefuelController> {
                     showDottedLine: false,
                     spaceHeight: 10.0,
                   ),
-                Obx(
-                    () {
-                      // Check if trailer lists are not empty
-                      if (controller.trailerNames.isEmpty ||
-                          controller.trailerNumbers.isEmpty) {
-                        return Center(
-                          child: Text('No trailer details available'),
-                        );
-                      }
-                      return Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: List.generate(controller.trailerNames.length,
-                            (index) {
-                          return Column(
-                            children: [
-                              TripDetailRow(
-                                leftText: "Trailer name",
-                                rightText: controller.trailerNames[index],
-                                showDottedLine: false,
-                                spaceHeight: 10.0,
-                              ),
-                              TripDetailRow(
-                                leftText: "Trailer number",
-                                rightText: controller.trailerNumbers[index],
-                                showDottedLine: false,
-                                spaceHeight: 10.0,
-                              ),
-                            ],
-                          );
-                        }),
-                      );
-                    },
-                  ),
-                  
                   TripDetailRow(
                     leftText: "Card Detail",
                     rightText: controller.cardDetail.value,
@@ -143,7 +65,6 @@ class RefuelView extends GetView<RefuelController> {
                   SizedBox(
                     height: 10,
                   ),
-
                   Container(
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.start,
@@ -191,7 +112,7 @@ class RefuelView extends GetView<RefuelController> {
                                         .red, // Red border for focused error state
                                   ),
                                 ),
-                                contentPadding: EdgeInsets.all(15)
+                                contentPadding: EdgeInsets.all(15),
                               ),
                               onChanged: (String? newValue) {
                                 controller.onCountrySelected(newValue);
@@ -406,16 +327,6 @@ class RefuelView extends GetView<RefuelController> {
                       ],
                     ),
                   ),
-
-                  // CommonTextInput(
-                  //   labelText: 'Select Location',
-                  //   hintText: 'Select Country',
-                  //   isCountryPicker: true,
-                  //   countryController: controller.countryController,
-                  //   stateController: controller.stateController,
-                  //   cityController: controller.cityController,
-                  //   readOnly: true,
-                  // ),
                   const SizedBox(height: 10),
                   CommonTextInput(
                     labelText: 'Site Name',
@@ -591,58 +502,57 @@ class RefuelView extends GetView<RefuelController> {
                       ),
                     ],
                   ),
-
                   const SizedBox(height: 5),
-                  CommonTextInput(
-                    labelText: 'Odometer Reading',
-                    hintText: 'Enter odometer reading',
-                    showSegmentedTabs: true,
-                    segments: ['KM', 'Miles'],
-                    selectedSegment: controller.odometerReadingUnit.value,
-                    onChanged: (value) => controller.odometerReading.value =
-                        double.tryParse(value) ?? 0.0,
-                    onSegmentSelected: (value) =>
-                        controller.odometerReadingUnit.value = value,
-                    keyboardType:
-                        const TextInputType.numberWithOptions(decimal: true),
-                    required: true,
-                    validator: (value) {
-                      final parsedValue = double.tryParse(value ?? '');
-
-                      if (parsedValue == null) {
-                        return "Please enter a valid odometerReading";
-                      }
-
-                      return controller.validateOdometerReading(parsedValue);
-                    },
+                  Obx(
+                    () => CommonTextInput(
+                      labelText: 'Odometer Reading',
+                      hintText: 'Enter odometer reading',
+                      showSegmentedTabs: true,
+                      segments: ['KM', 'Miles'],
+                      selectedSegment: controller.odometerReadingUnit.value,
+                      onChanged: (value) => controller.odometerReading.value =
+                          double.tryParse(value) ?? 0.0,
+                      onSegmentSelected: (value) =>
+                          controller.odometerReadingUnit.value = value,
+                      keyboardType:
+                          const TextInputType.numberWithOptions(decimal: true),
+                      required: true,
+                      validator: (value) {
+                        final parsedValue = double.tryParse(value ?? '');
+                        if (parsedValue == null) {
+                          return "Please enter a valid odometer reading";
+                        }
+                        return controller.validateOdometerReading(parsedValue);
+                      },
+                    ),
                   ),
                   const SizedBox(height: 10),
-                  CommonTextInput(
-                    labelText: 'Fuel Quantity',
-                    hintText: 'Enter fuel quantity',
-                    showSegmentedTabs: true,
-                    segments: ['Liters', 'Gallon'],
-                    selectedSegment:
-                        controller.fuelQuantityUnit.value == 'liters'
-                            ? 'Liters'
-                            : 'Gallon',
-                    onChanged: (value) => controller.fuelQuantity.value =
-                        double.tryParse(value) ?? 0.0,
-                    onSegmentSelected: (value) {
-                      controller.fuelQuantityUnit.value = value.toLowerCase();
-                    },
-                    required: true,
-                    keyboardType:
-                        const TextInputType.numberWithOptions(decimal: true),
-                    validator: (value) {
-                      final parsedValue = double.tryParse(value ?? '');
-
-                      if (parsedValue == null) {
-                        return "Please enter a valid fuel quantity";
-                      }
-
-                      return controller.validateFuelQuantity(parsedValue);
-                    },
+                  Obx(
+                    () => CommonTextInput(
+                      labelText: 'Fuel Quantity',
+                      hintText: 'Enter fuel quantity',
+                      showSegmentedTabs: true,
+                      segments: ['Liters', 'Gallon'],
+                      selectedSegment:
+                          controller.fuelQuantityUnit.value == 'liters'
+                              ? 'Liters'
+                              : 'Gallon',
+                      onChanged: (value) => controller.fuelQuantity.value =
+                          double.tryParse(value) ?? 0.0,
+                      onSegmentSelected: (value) {
+                        controller.fuelQuantityUnit.value = value.toLowerCase();
+                      },
+                      required: true,
+                      keyboardType:
+                          const TextInputType.numberWithOptions(decimal: true),
+                      validator: (value) {
+                        final parsedValue = double.tryParse(value ?? '');
+                        if (parsedValue == null) {
+                          return "Please enter a valid fuel quantity";
+                        }
+                        return controller.validateFuelQuantity(parsedValue);
+                      },
+                    ),
                   ),
                   const SizedBox(height: 10),
                   CommonTextInput(
@@ -671,7 +581,6 @@ class RefuelView extends GetView<RefuelController> {
                           ],
                         )
                       : const SizedBox.shrink()),
-
                   const SizedBox(height: 100),
                 ],
               ),
@@ -691,8 +600,7 @@ class RefuelView extends GetView<RefuelController> {
                           }
                         },
                   buttonWidth: double.infinity,
-                  isLoading:
-                      controller.isLoading.value, // Pass the loading state here
+                  isLoading: controller.isLoading.value,
                 )),
           ),
         ],

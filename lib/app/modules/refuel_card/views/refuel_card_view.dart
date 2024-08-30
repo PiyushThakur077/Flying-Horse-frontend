@@ -143,7 +143,7 @@ class RefuelCardView extends GetView<RefuelCardController> {
                                   rightText: tripDetails['truck_number'] ?? '',
                                   spaceHeight: 15.0,
                                 ),
-                                  if (controller.trailers.length == 1)
+                                if (controller.trailers.length == 1)
                                   TripDetailRow(
                                     leftText: "Trailer",
                                     rightText:
@@ -358,15 +358,31 @@ class RefuelCardView extends GetView<RefuelCardController> {
                                   );
                                 }).toList(),
                                 TripDetailRow(
-                                  leftText: "Total Diesel Filled",
+                                  leftText:
+                                      "Total quantity of diesel fuel in liters",
                                   rightText:
-                                      '${tripDetails['total_fuel_in_liters_diesel'].toString()} Liters',
+                                      '${tripDetails['total_fuel_quantity_liters_diesel'].toString()}',
                                   spaceHeight: 15.0,
                                 ),
                                 TripDetailRow(
-                                  leftText: "Total Def Filled",
+                                  leftText:
+                                      "Total quantity of diesel fuel in Gallons",
                                   rightText:
-                                      '${tripDetails['total_fuel_in_liters_def'].toString()} Liters',
+                                      '${tripDetails['total_fuel_quantity_gallons_diesel'].toString()}',
+                                  spaceHeight: 15.0,
+                                ),
+                                TripDetailRow(
+                                  leftText:
+                                      "Total quantity of DEF fuel in liters",
+                                  rightText:
+                                      '${tripDetails['total_fuel_quantity_liters_def'].toString()}',
+                                  spaceHeight: 15.0,
+                                ),
+                                TripDetailRow(
+                                  leftText:
+                                      "Total quantity of DEF fuel in Gallons",
+                                  rightText:
+                                      '${tripDetails['total_fuel_quantity_gallons_def'].toString()}',
                                   spaceHeight: 15.0,
                                 ),
                                 TripDetailRow(
@@ -375,6 +391,7 @@ class RefuelCardView extends GetView<RefuelCardController> {
                                       '\$${tripDetails['total_amount_paid'].toString()}',
                                   spaceHeight: 15.0,
                                 ),
+                                SizedBox(height: 10,),
                                 if (tripDetails['notes'] != null &&
                                     tripDetails['notes'].isNotEmpty)
                                   Column(

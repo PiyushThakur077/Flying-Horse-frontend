@@ -47,23 +47,17 @@ Future<void> fetchTrips() async {
           GetStorage().write('cardNumber', trip['card_number']);
           GetStorage().write('tripNumber', trip['trip_number']);
           GetStorage().write('truckNumber', trip['truck_number']);
-
-          // Save both trailers data
-          if (trip['trailers'] != null && trip['trailers'].isNotEmpty) {
-            List<Map<String, String>> trailers = trip['trailers'].map((trailer) {
-              return {
-                'trailerName': trailer['trailer_name'],
-                'trailerNumber': trailer['trailer_number'],
-              };
-            }).toList();
-
-            GetStorage().write('trailers', trailers);
-          }
-          break;
         }
       }
+    } else if (response == null) {
+      print('No response from API');
+      Get.snackbar('Error', 'No response from API');
+    } else {
+      print('Unexpected response format: $response');
+      Get.snackbar('Error', 'Unexpected response format');
     }
   } catch (e) {
+    print('Error fetching trips: $e'); // This will help you debug
     Get.snackbar('Error', 'Failed to fetch trips');
   } finally {
     isLoading(false);
