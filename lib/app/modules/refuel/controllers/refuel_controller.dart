@@ -17,7 +17,6 @@ class RefuelController extends GetxController {
   var selectedFuelType = 'diesel'.obs;
   var selectedFuelFilledTo = 'truck'.obs;
   var siteSuggestions = <String>[].obs;
-
   var truckNumber = ''.obs;
   var odometerReadingUnit = 'KM'.obs;
   var odometerReading = 0.0.obs;
@@ -31,13 +30,18 @@ class RefuelController extends GetxController {
   var yourPrice = 0.0.obs;
   var effectiveDate = ''.obs;
   var pricePerLitre = 0.0.obs;
+  var pricePerGallon = 0.0.obs;
   var provinces = <Province>[].obs;
   var selectedProvince = Province().obs;
   var selectedCity = Cities().obs;
   var selectedCountry = ''.obs;
   var siteName = ''.obs;
-  var trailerNumber = ''.obs;
-  var trailerName = ''.obs;
+
+  // Update these to store two trailer names and numbers
+  var trailerNumber1 = ''.obs;
+  var trailerNumber2 = ''.obs;
+  var trailerName1 = ''.obs;
+  var trailerName2 = ''.obs;
 
   TextEditingController countryController = TextEditingController();
   TextEditingController stateController = TextEditingController();
@@ -64,8 +68,12 @@ class RefuelController extends GetxController {
     tripNumber.value = storage.read<String>('tripNumber') ?? '';
     cardDetail.value = storage.read<String>('cardNumber') ?? '';
     fuelQuantity.value = storage.read<double>('fuelQuantity') ?? 0.0;
-    trailerNumber.value = storage.read<String>('trailerNumber') ?? '';
-    trailerName.value = storage.read<String>('trailerName') ?? '';
+
+    // Read both trailer names and trailer numbers
+    trailerNumber1.value = storage.read<String>('trailerNumber1') ?? '';
+    trailerNumber2.value = storage.read<String>('trailerNumber2') ?? '';
+    trailerName1.value = storage.read<String>('trailerName1') ?? '';
+    trailerName2.value = storage.read<String>('trailerName2') ?? '';
   }
 
   Future<void> fetchProvinces(String iso2CountryCode) async {
@@ -99,12 +107,16 @@ class RefuelController extends GetxController {
       selectedCity.value = Cities();
       selectedCountry.value = country;
 
+      siteNameController.clear();
+
       if (countryIso2Map[country] == 'US') {
         fuelQuantityUnit.value = 'gallon';
         odometerReadingUnit.value = 'Miles';
+        pricePerGallon.value = pricePerGallon.value;
       } else {
         fuelQuantityUnit.value = 'liters';
         odometerReadingUnit.value = 'KM';
+        pricePerLitre.value = pricePerLitre.value;
       }
 
       fetchProvinces(countryIso2Map[country]!);
@@ -304,6 +316,10 @@ class RefuelController extends GetxController {
     return value > 0 ? null : "Please enter a valid price per liter";
   }
 
+  String? validatePricePerGallon(double value) {
+    return value > 0 ? null : "Please enter a valid price per liter";
+  }
+
   bool validateFields() {
     if (validateTruckNumber(truckNumber.value) != null ||
         validateOdometerReading(odometerReading.value) != null ||
@@ -348,6 +364,7 @@ class RefuelController extends GetxController {
       }),
       "your_price": yourPrice.value,
       "price_per_liter": pricePerLitre.value,
+      "price_per_gallon": pricePerGallon.value,
       "timezone": DateTime.now().timeZoneName,
       "local_time": localTime,
       "effective_date": effectiveDate.value,
@@ -387,6 +404,7 @@ class RefuelController extends GetxController {
         countryController.clear();
         stateController.clear();
         cityController.clear();
+        pricePerGallon.value = 0.0;
         siteNameController.clear();
         yourPrice.value = 0.0;
 

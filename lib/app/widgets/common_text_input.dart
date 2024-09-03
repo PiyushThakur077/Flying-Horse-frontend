@@ -36,7 +36,7 @@ class CommonTextInput extends StatefulWidget {
     this.onSegmentSelected,
     this.readOnly = false,
     this.required = false,
-      this.isDisabled = false, 
+    this.isDisabled = false,
     this.isValid = true,
     this.validator,
     this.height,
@@ -104,9 +104,10 @@ class _CommonTextInputState extends State<CommonTextInput> {
               _validateField();
             },
             onTap: widget.onTap,
-            readOnly: widget.readOnly,
+            readOnly: widget.readOnly &&
+                !widget.showSegmentedTabs, // Conditional readOnly
             style: TextStyle(
-              color: widget.readOnly ? Colors.grey : Colors.black,
+              color: Colors.black,
             ),
             decoration: InputDecoration(
               filled: true,
@@ -154,7 +155,8 @@ class _CommonTextInputState extends State<CommonTextInput> {
                           segments: widget.segments!,
                           selectedSegment: widget.selectedSegment,
                           onSegmentSelected: widget.onSegmentSelected,
-                          
+                          isReadOnly: widget
+                              .readOnly, // Disable segmented tabs if readOnly is true
                         ),
                       ),
                     )
@@ -171,14 +173,14 @@ class SegmentedTab extends StatefulWidget {
   final List<String> segments;
   final String? selectedSegment;
   final Function(String)? onSegmentSelected;
-  final bool readOnly; // New property
+  final bool isReadOnly;
 
   const SegmentedTab({
     Key? key,
     required this.segments,
     this.selectedSegment,
     this.onSegmentSelected,
-    this.readOnly = false, // Default is false
+    this.isReadOnly = false,
   }) : super(key: key);
 
   @override
@@ -197,7 +199,6 @@ class _SegmentedTabState extends State<SegmentedTab> {
   @override
   void didUpdateWidget(SegmentedTab oldWidget) {
     super.didUpdateWidget(oldWidget);
-    // Update the _selectedSegment if the selectedSegment prop changes
     if (widget.selectedSegment != oldWidget.selectedSegment) {
       _selectedSegment = widget.selectedSegment ?? widget.segments[0];
     }
@@ -211,29 +212,44 @@ class _SegmentedTabState extends State<SegmentedTab> {
         isSelected: widget.segments
             .map((segment) => segment == _selectedSegment)
             .toList(),
-        onPressed: widget.readOnly ? null : (index) {
-          setState(() {
-            _selectedSegment = widget.segments[index];
-          });
-          if (widget.onSegmentSelected != null) {
-            widget.onSegmentSelected!(_selectedSegment);
-          }
-        },
+        onPressed: widget.isReadOnly
+            ? null // Disable interaction when isReadOnly is true
+            : (index) {
+                setState(() {
+                  _selectedSegment = widget.segments[index];
+                });
+                if (widget.onSegmentSelected != null) {
+                  widget.onSegmentSelected!(_selectedSegment);
+                }
+              },
         borderRadius: BorderRadius.circular(15.0),
-        fillColor: AppColors.primary,
-        selectedColor: Colors.white,
-        color: Colors.black,
+        fillColor: 
+             AppColors.primary ,// Conditional fill color
+        selectedColor: widget.isReadOnly
+            ? Colors.white
+            : AppColors.primary, // Conditional text color
+        color: widget.isReadOnly
+            ? Colors.white.withOpacity(0.7) // Disabled state color
+            : Colors.black, // Enabled state color
         constraints: BoxConstraints(minHeight: 30, minWidth: 50),
         children: widget.segments
             .map((segment) => Padding(
                   padding: const EdgeInsets.symmetric(
                       horizontal: 7.0, vertical: 5.0),
-                  child: Text(segment, style: TextStyle(fontSize: 14)),
+                  child: Text(
+                    segment,
+                    style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600,
+                      color: segment == _selectedSegment
+                          ? (widget.isReadOnly ? Colors.red : Colors.white)
+                          : (widget.isReadOnly ? Colors.grey : Colors.grey),
+                    ),
+                  ),
                 ))
             .toList(),
       ),
     );
   }
 }
-
 

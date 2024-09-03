@@ -3,9 +3,7 @@ import 'package:dotted_line/dotted_line.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flying_horse/app/data/colors.dart';
-import 'package:flying_horse/app/modules/refuel/models/country.dart';
 import 'package:flying_horse/app/utils/text_style.dart';
-import 'package:flying_horse/app/widgets/app_button.dart';
 import 'package:flying_horse/app/widgets/common_text_input.dart';
 import 'package:flying_horse/app/widgets/trip_detail_row.dart';
 import 'package:get/get.dart';
@@ -16,10 +14,10 @@ class RefuelCardView extends GetView<RefuelCardController> {
   const RefuelCardView({Key? key}) : super(key: key);
 
   String convertUtcToLocal(String utcDate) {
-    DateTime utcDateTime = DateTime.parse(utcDate).toUtc(); // Parse as UTC
-    DateTime localDateTime = utcDateTime.toLocal(); // Convert to local time
-    String formattedDate = DateFormat('dd MMM yyyy, hh:mm a')
-        .format(localDateTime); // Format to desired output
+    DateTime utcDateTime = DateTime.parse(utcDate).toUtc();
+    DateTime localDateTime = utcDateTime.toLocal();
+    String formattedDate =
+        DateFormat('dd MMM yyyy, hh:mm a').format(localDateTime);
     return formattedDate;
   }
 
@@ -104,16 +102,6 @@ class RefuelCardView extends GetView<RefuelCardController> {
                                       ),
                                     ),
                                   ),
-                                  // Padding(
-                                  //   padding: EdgeInsets.symmetric(horizontal: 15),
-                                  //   child: Text(
-
-                                  //     style: TextStyle(
-                                  //         fontSize: 18,
-                                  //         fontWeight: FontWeight.w600,
-                                  //         color: Colors.black),
-                                  //   ),
-                                  // ),
                                 ],
                               ),
                               Padding(
@@ -189,7 +177,9 @@ class RefuelCardView extends GetView<RefuelCardController> {
                                           'Error decoding fuel station address: $e');
                                     }
                                   }
-
+                                  String country = fuelStationAddress['country']
+                                          ?.toLowerCase() ??
+                                      '';
                                   String address = '';
                                   if (fuelStationAddress.isNotEmpty) {
                                     address =
@@ -220,26 +210,17 @@ class RefuelCardView extends GetView<RefuelCardController> {
                                           Obx(() => IconButton(
                                                 icon: Icon(Icons.delete,
                                                     color: Colors.red),
-                                                onPressed: controller
-                                                        .isEditable.value
-                                                    ? () {
-                                                        showDeleteConfirmationDialog(
-                                                            context,
-                                                            refuel['id']);
-                                                      }
-                                                    : null, // Disable the button if not editable
+                                                onPressed:
+                                                    controller.isEditable.value
+                                                        ? () {
+                                                            showDeleteConfirmationDialog(
+                                                                context,
+                                                                refuel['id']);
+                                                          }
+                                                        : null,
                                               )),
                                         ],
                                       ),
-                                      // Padding(
-                                      //   padding: EdgeInsets.symmetric(vertical: 5),
-                                      //   child: Text(
-                                      //     "Fuel Pump Location",
-                                      //     style: AppTextStyle.regularStyle(
-                                      //         color: Color(0xff676767),
-                                      //         fontSize: 15),
-                                      //   ),
-                                      // ),
                                       Row(
                                         children: [
                                           Icon(
@@ -307,7 +288,6 @@ class RefuelCardView extends GetView<RefuelCardController> {
                                         showDottedLine: false,
                                         spaceHeight: 10.0,
                                       ),
-
                                       TripDetailRow(
                                         leftText: "Driver Name",
                                         rightText:
@@ -315,7 +295,6 @@ class RefuelCardView extends GetView<RefuelCardController> {
                                         showDottedLine: false,
                                         spaceHeight: 10.0,
                                       ),
-
                                       TripDetailRow(
                                         leftText: "Receipt Number",
                                         rightText:
@@ -325,17 +304,38 @@ class RefuelCardView extends GetView<RefuelCardController> {
                                         showDottedLine: false,
                                         spaceHeight: 10.0,
                                       ),
-                                      if (refuel['fuel_type'] == "def" &&
-                                          refuel['price_per_liter'] != null &&
-                                          refuel['price_per_liter']
-                                              .toString()
-                                              .isNotEmpty)
-                                        TripDetailRow(
-                                          leftText: "Price Per Liter",
-                                          rightText:
-                                              "\$${refuel['price_per_liter']}",
-                                          showDottedLine: false,
-                                          spaceHeight: 10.0,
+                                      if (refuel['fuel_type'] == "def")
+                                        Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            if (country == 'united states' &&
+                                                refuel['price_per_gallon'] !=
+                                                    null &&
+                                                refuel['price_per_gallon']
+                                                    .toString()
+                                                    .isNotEmpty)
+                                              TripDetailRow(
+                                                leftText: "Price Per Gallon",
+                                                rightText:
+                                                    "\$${refuel['price_per_gallon']}",
+                                                showDottedLine: false,
+                                                spaceHeight: 10.0,
+                                              )
+                                            else if (refuel[
+                                                        'price_per_liter'] !=
+                                                    null &&
+                                                refuel['price_per_liter']
+                                                    .toString()
+                                                    .isNotEmpty)
+                                              TripDetailRow(
+                                                leftText: "Price Per Liter",
+                                                rightText:
+                                                    "\$${refuel['price_per_liter']}",
+                                                showDottedLine: false,
+                                                spaceHeight: 10.0,
+                                              ),
+                                          ],
                                         ),
                                       if (refuel['fuel_type'] != "def" &&
                                           refuel['amount_paid'] != null &&
@@ -349,7 +349,6 @@ class RefuelCardView extends GetView<RefuelCardController> {
                                           showDottedLine: false,
                                           spaceHeight: 10.0,
                                         ),
-
                                       const SizedBox(
                                         height: 5.0,
                                       ),
@@ -359,28 +358,26 @@ class RefuelCardView extends GetView<RefuelCardController> {
                                 }).toList(),
                                 TripDetailRow(
                                   leftText:
-                                      "Total quantity of diesel fuel in liters",
+                                      "Total Fuel Quantity Diesel (Liters)",
                                   rightText:
                                       '${tripDetails['total_fuel_quantity_liters_diesel'].toString()}',
                                   spaceHeight: 15.0,
                                 ),
                                 TripDetailRow(
-                                  leftText:
-                                      "Total quantity of diesel fuel in Gallons",
-                                  rightText:
-                                      '${tripDetails['total_fuel_quantity_gallons_diesel'].toString()}',
-                                  spaceHeight: 15.0,
-                                ),
-                                TripDetailRow(
-                                  leftText:
-                                      "Total quantity of DEF fuel in liters",
+                                  leftText: "Total Fuel Quantity DEF (Liters)",
                                   rightText:
                                       '${tripDetails['total_fuel_quantity_liters_def'].toString()}',
                                   spaceHeight: 15.0,
                                 ),
                                 TripDetailRow(
                                   leftText:
-                                      "Total quantity of DEF fuel in Gallons",
+                                      "Total Fuel Quantity Diesel (Gallons)",
+                                  rightText:
+                                      '${tripDetails['total_fuel_quantity_gallons_diesel'].toString()}',
+                                  spaceHeight: 15.0,
+                                ),
+                                TripDetailRow(
+                                  leftText: "Total Fuel Quantity DEF (Gallons)",
                                   rightText:
                                       '${tripDetails['total_fuel_quantity_gallons_def'].toString()}',
                                   spaceHeight: 15.0,
@@ -391,7 +388,9 @@ class RefuelCardView extends GetView<RefuelCardController> {
                                       '\$${tripDetails['total_amount_paid'].toString()}',
                                   spaceHeight: 15.0,
                                 ),
-                                SizedBox(height: 10,),
+                                SizedBox(
+                                  height: 10,
+                                ),
                                 if (tripDetails['notes'] != null &&
                                     tripDetails['notes'].isNotEmpty)
                                   Column(
@@ -399,26 +398,161 @@ class RefuelCardView extends GetView<RefuelCardController> {
                                         CrossAxisAlignment.start,
                                     children: [
                                       Text(
-                                        "Notes",
+                                        "Notes:",
                                         style: TextStyle(
-                                          fontSize:
-                                              16.0, // Adjust the font size as needed
-                                          fontWeight: FontWeight
-                                              .bold, // Customize the font weight if needed
+                                          fontSize: 16.0,
+                                          fontWeight: FontWeight.bold,
                                         ),
                                       ),
-                                      SizedBox(
-                                          height:
-                                              5.0), // Adjust the spacing as needed
+                                      SizedBox(height: 5.0),
                                       Text(
                                         tripDetails['notes'] ?? '',
                                         style: TextStyle(
-                                          fontSize:
-                                              14.0, // Adjust the font size as needed
-                                          color: Colors
-                                              .black, // Customize the text color if needed
+                                          fontSize: 14.0,
+                                          color: Colors.black,
                                         ),
                                       ),
+                                      SizedBox(
+                                        height: 5,
+                                      ),
+                                      DottedLine(),
+                                    ],
+                                  ),
+                                SizedBox(
+                                  height: 10,
+                                ),
+                                if (tripDetails['truck_notes'] != null &&
+                                    tripDetails['truck_notes'].isNotEmpty)
+                                  Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        "Truck Notes:",
+                                        style: TextStyle(
+                                          fontSize: 16.0,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                      SizedBox(height: 5.0),
+                                      Text(
+                                        tripDetails['truck_notes'] ?? '',
+                                        style: TextStyle(
+                                          fontSize: 14.0,
+                                          color: Colors.black,
+                                        ),
+                                      ),
+                                      SizedBox(
+                                        height: 5,
+                                      ),
+                                      DottedLine(),
+                                    ],
+                                  ),
+                                SizedBox(
+                                  height: 10,
+                                ),
+                                if (tripDetails['trailers'] != null &&
+                                    tripDetails['trailers'].isNotEmpty)
+                                  Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      if (tripDetails['trailers'].length == 1)
+                                        if (tripDetails['trailers'][0]
+                                                    ['trailer_notes'] !=
+                                                null &&
+                                            tripDetails['trailers'][0]
+                                                    ['trailer_notes']
+                                                .isNotEmpty)
+                                          Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              Text(
+                                                "Trailer Notes:",
+                                                style: TextStyle(
+                                                  fontSize: 16.0,
+                                                  fontWeight: FontWeight.bold,
+                                                ),
+                                              ),
+                                              SizedBox(height: 5.0),
+                                              Text(
+                                                tripDetails['trailers'][0]
+                                                        ['trailer_notes'] ??
+                                                    '',
+                                                style: TextStyle(
+                                                  fontSize: 14.0,
+                                                  color: Colors.black,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                      if (tripDetails['trailers'].length >
+                                          1) ...[
+                                        if (tripDetails['trailers'][0]
+                                                    ['trailer_notes'] !=
+                                                null &&
+                                            tripDetails['trailers'][0]
+                                                    ['trailer_notes']
+                                                .isNotEmpty)
+                                          Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              Text(
+                                                "1st Trailer Notes:",
+                                                style: TextStyle(
+                                                  fontSize: 16.0,
+                                                  fontWeight: FontWeight.bold,
+                                                ),
+                                              ),
+                                              SizedBox(height: 5.0),
+                                              Text(
+                                                tripDetails['trailers'][0]
+                                                        ['trailer_notes'] ??
+                                                    '',
+                                                style: TextStyle(
+                                                  fontSize: 14.0,
+                                                  color: Colors.black,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        SizedBox(
+                                          height: 10,
+                                        ),
+                                        
+                                        if (tripDetails['trailers'].length > 1)
+                                          if (tripDetails['trailers'][1]
+                                                      ['trailer_notes'] !=
+                                                  null &&
+                                              tripDetails['trailers'][1]
+                                                      ['trailer_notes']
+                                                  .isNotEmpty)
+                                            Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: [
+                                                Text(
+                                                  "2nd Trailer Notes:",
+                                                  style: TextStyle(
+                                                    fontSize: 16.0,
+                                                    fontWeight: FontWeight.bold,
+                                                  ),
+                                                ),
+                                                SizedBox(height: 5.0),
+                                                Text(
+                                                  tripDetails['trailers'][1]
+                                                          ['trailer_notes'] ??
+                                                      '',
+                                                  style: TextStyle(
+                                                    fontSize: 14.0,
+                                                    color: Colors.black,
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                      ],
                                     ],
                                   ),
                               ],
@@ -469,7 +603,7 @@ class RefuelCardView extends GetView<RefuelCardController> {
     TextEditingController amountPaidController = TextEditingController();
     TextEditingController driverNameController = TextEditingController();
     TextEditingController receiptNumberController = TextEditingController();
-    TextEditingController pricePerLitreController = TextEditingController();
+    TextEditingController pricePerUnitController = TextEditingController();
 
     if (selectedRefuel != null) {
       var address = jsonDecode(selectedRefuel['fuel_station_address']);
@@ -492,13 +626,20 @@ class RefuelCardView extends GetView<RefuelCardController> {
           selectedRefuel['odometer_reading_unit'] ?? 'KM';
       controller.fuelQuantityUnit.value =
           selectedRefuel['fuel_quantity_unit'] ?? 'liters';
-      pricePerLitreController.text =
-          selectedRefuel['price_per_liter']?.toString() ?? '';
 
       controller.selectedFuelType.value =
           selectedRefuel['fuel_type'] ?? 'diesel';
       controller.selectedFuelFilledTo.value =
           selectedRefuel['fuel_filled_to'] ?? 'truck';
+
+      // Conditionally set the price per unit
+      if (address['country']?.toLowerCase() == 'united states') {
+        pricePerUnitController.text =
+            selectedRefuel['price_per_gallon']?.toString() ?? '';
+      } else {
+        pricePerUnitController.text =
+            selectedRefuel['price_per_liter']?.toString() ?? '';
+      }
     }
 
     showDialog(
@@ -587,9 +728,6 @@ class RefuelCardView extends GetView<RefuelCardController> {
                               selectedRefuel['user_name'] ?? '';
                           receiptNumberController.text =
                               selectedRefuel['receipt_number'] ?? '';
-                          pricePerLitreController.text =
-                              selectedRefuel['price_per_liter']?.toString() ??
-                                  '';
 
                           controller.odometerReadingUnit.value =
                               selectedRefuel['odometer_reading_unit'] ?? 'KM';
@@ -600,6 +738,19 @@ class RefuelCardView extends GetView<RefuelCardController> {
                               selectedRefuel['fuel_type'] ?? 'diesel';
                           controller.selectedFuelFilledTo.value =
                               selectedRefuel['fuel_filled_to'] ?? 'truck';
+
+                          // Conditionally set the price per unit
+                          if (address['country']?.toLowerCase() ==
+                              'united states') {
+                            pricePerUnitController.text =
+                                selectedRefuel['price_per_gallon']
+                                        ?.toString() ??
+                                    '';
+                          } else {
+                            pricePerUnitController.text =
+                                selectedRefuel['price_per_liter']?.toString() ??
+                                    '';
+                          }
                           setState(() {});
                         });
                       },
@@ -639,7 +790,7 @@ class RefuelCardView extends GetView<RefuelCardController> {
                                 spaceHeight: 5.0,
                               ),
                               SizedBox(
-                                height: 10,
+                                height: 15,
                               ),
                               Padding(
                                 padding: EdgeInsets.symmetric(horizontal: 11),
@@ -783,9 +934,9 @@ class RefuelCardView extends GetView<RefuelCardController> {
                                           controller.setSelectedFuelType(
                                               newSelection.first);
 
-                                          // Clear the price per liter if DEF is selected
+                                          // Clear the price per unit if DEF is selected
                                           if (newSelection.first == 'def') {
-                                            pricePerLitreController.clear();
+                                            pricePerUnitController.clear();
                                           }
                                         }
                                       },
@@ -797,9 +948,11 @@ class RefuelCardView extends GetView<RefuelCardController> {
                                   ? Column(
                                       children: [
                                         CommonTextInput(
-                                          labelText: 'Price per Liter',
-                                          hintText: 'Enter price per liter',
-                                          controller: pricePerLitreController,
+                                          labelText:
+                                              'Price per ${controller.countryController.text.toLowerCase() == 'united states' ? "Gallon" : "Liter"}',
+                                          hintText:
+                                              'Enter price per ${controller.countryController.text.toLowerCase() == 'united states' ? "gallon" : "liter"}',
+                                          controller: pricePerUnitController,
                                           keyboardType: const TextInputType
                                               .numberWithOptions(decimal: true),
                                           height: 60,
@@ -828,6 +981,7 @@ class RefuelCardView extends GetView<RefuelCardController> {
                                       const TextInputType.numberWithOptions(
                                           decimal: true),
                                   height: 60,
+                                  // readOnly: true,
                                 ),
                               ),
                               SizedBox(height: 10),
@@ -869,6 +1023,7 @@ class RefuelCardView extends GetView<RefuelCardController> {
                                       const TextInputType.numberWithOptions(
                                           decimal: true),
                                   height: 60,
+                                  readOnly: true,
                                 );
                               }),
                               SizedBox(height: 10),
@@ -946,18 +1101,17 @@ class RefuelCardView extends GetView<RefuelCardController> {
                                     return;
                                   }
 
-                                  // Validate price_per_liter
+                                  // Validate price_per_unit
                                   if (controller.selectedFuelType.value ==
                                           'def' &&
-                                      (pricePerLitreController.text.isEmpty ||
-                                          double.tryParse(
-                                                  pricePerLitreController
-                                                      .text) ==
+                                      (pricePerUnitController.text.isEmpty ||
+                                          double.tryParse(pricePerUnitController
+                                                  .text) ==
                                               0.0)) {
                                     // Show an error message
                                     Get.snackbar(
                                       'Error',
-                                      'Price per Liter is required and must be greater than 0',
+                                      'Price per ${controller.countryController.text.toLowerCase() == 'united states' ? "Gallon" : "Liter"} is required and must be greater than 0',
                                       backgroundColor: Colors.red,
                                       colorText: Colors.white,
                                     );
@@ -1004,8 +1158,18 @@ class RefuelCardView extends GetView<RefuelCardController> {
                                         controller.odometerReadingUnit.value,
                                     "user_name": driverNameController.text,
                                     "created_at": createdAt,
-                                    "price_per_liter":
-                                        pricePerLitreController.text,
+                                    "price_per_liter": controller
+                                                .countryController.text
+                                                .toLowerCase() ==
+                                            'united states'
+                                        ? null
+                                        : pricePerUnitController.text,
+                                    "price_per_gallon": controller
+                                                .countryController.text
+                                                .toLowerCase() ==
+                                            'united states'
+                                        ? pricePerUnitController.text
+                                        : null,
                                     "fuel_station_address": jsonEncode({
                                       "country":
                                           controller.selectedCountry.value,

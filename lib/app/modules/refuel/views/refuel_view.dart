@@ -56,6 +56,41 @@ class RefuelView extends GetView<RefuelController> {
                     showDottedLine: false,
                     spaceHeight: 10.0,
                   ),
+                  if (controller.trailerName1.value.isEmpty &&
+                      controller.trailerName2.value.isEmpty)
+                    TripDetailRow(
+                      leftText: "Trailer",
+                      rightText: "No Trailer Assigned",
+                      spaceHeight: 10.0,
+                      showDottedLine: false,
+                    )
+                  else if (controller.trailerName2.value.isEmpty)
+                    TripDetailRow(
+                      leftText: "Trailer",
+                      rightText:
+                          "${controller.trailerName1.value} (${controller.trailerNumber1.value})",
+                      spaceHeight: 10.0,
+                      showDottedLine: false,
+                    )
+                  else
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        TripDetailRow(
+                          leftText: "1st Trailer",
+                          rightText:
+                              "${controller.trailerName1.value} (${controller.trailerNumber1.value})",
+                          spaceHeight: 10.0,
+                          showDottedLine: false,
+                        ),
+                        TripDetailRow(
+                            leftText: "2nd Trailer",
+                            rightText:
+                                "${controller.trailerName2.value} (${controller.trailerNumber2.value})",
+                            spaceHeight: 10.0,
+                            showDottedLine: false),
+                      ],
+                    ),
                   TripDetailRow(
                     leftText: "Card Detail",
                     rightText: controller.cardDetail.value,
@@ -156,74 +191,83 @@ class RefuelView extends GetView<RefuelController> {
                               Container(
                                 width: double.infinity,
                                 height: 85,
-                                child: DropdownButtonFormField<Province>(
-                                  value:
-                                      controller.selectedProvince.value.name ==
-                                              null
-                                          ? null
-                                          : controller.selectedProvince.value,
-                                  decoration: InputDecoration(
-                                    filled: true,
-                                    fillColor: const Color(0xFFEEEEEE),
-                                    border: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(30.0),
-                                      borderSide: BorderSide.none,
-                                    ),
-                                    enabledBorder: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(30.0),
-                                      borderSide: BorderSide.none,
-                                    ),
-                                    focusedBorder: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(30.0),
-                                      borderSide: BorderSide.none,
-                                    ),
-                                    errorBorder: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(30.0),
-                                      borderSide: const BorderSide(
-                                        color: Colors.red,
+                                child: AbsorbPointer(
+                                  absorbing: controller.isProvinceLoading
+                                      .value, // Disables interaction when loading
+                                  child: DropdownButtonFormField<Province>(
+                                    value: controller
+                                                .selectedProvince.value.name ==
+                                            null
+                                        ? null
+                                        : controller.selectedProvince.value,
+                                    decoration: InputDecoration(
+                                      filled: true,
+                                      fillColor: const Color(0xFFEEEEEE),
+                                      border: OutlineInputBorder(
+                                        borderRadius:
+                                            BorderRadius.circular(30.0),
+                                        borderSide: BorderSide.none,
                                       ),
-                                    ),
-                                    focusedErrorBorder: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(30.0),
-                                      borderSide: const BorderSide(
-                                        color: Colors.red,
+                                      enabledBorder: OutlineInputBorder(
+                                        borderRadius:
+                                            BorderRadius.circular(30.0),
+                                        borderSide: BorderSide.none,
                                       ),
-                                    ),
-                                  ),
-                                  onChanged: (Province? selectedProvince) {
-                                    controller
-                                        .onProvinceSelected(selectedProvince);
-                                  },
-                                  items: [
-                                    DropdownMenuItem<Province>(
-                                      value: null,
-                                      child: Center(
-                                        child: Text(
-                                          'Select State',
-                                          style: TextStyle(
-                                            color: Colors.grey,
-                                          ),
+                                      focusedBorder: OutlineInputBorder(
+                                        borderRadius:
+                                            BorderRadius.circular(30.0),
+                                        borderSide: BorderSide.none,
+                                      ),
+                                      errorBorder: OutlineInputBorder(
+                                        borderRadius:
+                                            BorderRadius.circular(30.0),
+                                        borderSide: const BorderSide(
+                                          color: Colors.red,
+                                        ),
+                                      ),
+                                      focusedErrorBorder: OutlineInputBorder(
+                                        borderRadius:
+                                            BorderRadius.circular(30.0),
+                                        borderSide: const BorderSide(
+                                          color: Colors.red,
                                         ),
                                       ),
                                     ),
-                                    ...controller.provinces
-                                        .map<DropdownMenuItem<Province>>(
-                                      (Province province) {
-                                        return DropdownMenuItem<Province>(
-                                          value: province,
-                                          child: Text(province.name ?? ""),
-                                        );
-                                      },
-                                    ).toList(),
-                                  ],
-                                  validator: (Province? value) {
-                                    if (value == null ||
-                                        value.name == null ||
-                                        value.name!.isEmpty) {
-                                      return 'Please select a state';
-                                    }
-                                    return null;
-                                  },
+                                    onChanged: (Province? selectedProvince) {
+                                      controller
+                                          .onProvinceSelected(selectedProvince);
+                                    },
+                                    items: [
+                                      DropdownMenuItem<Province>(
+                                        value: null,
+                                        child: Center(
+                                          child: Text(
+                                            'Select State',
+                                            style: TextStyle(
+                                              color: Colors.grey,
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                      ...controller.provinces
+                                          .map<DropdownMenuItem<Province>>(
+                                        (Province province) {
+                                          return DropdownMenuItem<Province>(
+                                            value: province,
+                                            child: Text(province.name ?? ""),
+                                          );
+                                        },
+                                      ).toList(),
+                                    ],
+                                    validator: (Province? value) {
+                                      if (value == null ||
+                                          value.name == null ||
+                                          value.name!.isEmpty) {
+                                        return 'Please select a state';
+                                      }
+                                      return null;
+                                    },
+                                  ),
                                 ),
                               ),
                               if (controller.isProvinceLoading.value)
@@ -479,11 +523,30 @@ class RefuelView extends GetView<RefuelController> {
                                 child: Column(
                                   children: [
                                     CommonTextInput(
-                                      labelText: 'Price per Liter',
-                                      hintText: 'Enter price per liter',
-                                      onChanged: (value) =>
+                                      labelText:
+                                          controller.selectedCountry.value ==
+                                                  'United States'
+                                              ? 'Price per Gallon'
+                                              : 'Price per Liter',
+                                      hintText:
+                                          controller.selectedCountry.value ==
+                                                  'United States'
+                                              ? 'Enter price per gallon'
+                                              : 'Enter price per liter',
+                                      onChanged: (value) {
+                                        if (controller.selectedCountry.value ==
+                                            'United States') {
+                                          controller.pricePerGallon.value =
+                                              double.tryParse(value) ?? 0.0;
+                                          // Clear the other value
+                                          controller.pricePerLitre.value = 0.0;
+                                        } else {
                                           controller.pricePerLitre.value =
-                                              double.tryParse(value) ?? 0.0,
+                                              double.tryParse(value) ?? 0.0;
+                                          // Clear the other value
+                                          controller.pricePerGallon.value = 0.0;
+                                        }
+                                      },
                                       keyboardType:
                                           const TextInputType.numberWithOptions(
                                               decimal: true),
@@ -491,8 +554,16 @@ class RefuelView extends GetView<RefuelController> {
                                       validator: (value) {
                                         double parsedValue =
                                             double.tryParse(value ?? '') ?? 0.0;
-                                        return controller
-                                            .validatePricePerLiter(parsedValue);
+                                        if (controller.selectedCountry.value ==
+                                            'United States') {
+                                          return controller
+                                              .validatePricePerGallon(
+                                                  parsedValue);
+                                        } else {
+                                          return controller
+                                              .validatePricePerLiter(
+                                                  parsedValue);
+                                        }
                                       },
                                     ),
                                   ],
@@ -500,88 +571,92 @@ class RefuelView extends GetView<RefuelController> {
                               )
                             : const SizedBox.shrink(),
                       ),
+                      const SizedBox(height: 5),
+                      Obx(
+                        () => CommonTextInput(
+                          labelText: 'Odometer Reading',
+                          hintText: 'Enter odometer reading',
+                          showSegmentedTabs: true,
+                          segments: ['KM', 'Miles'],
+                          selectedSegment: controller.odometerReadingUnit.value,
+                          onChanged: (value) => controller.odometerReading
+                              .value = double.tryParse(value) ?? 0.0,
+                          onSegmentSelected: (value) =>
+                              controller.odometerReadingUnit.value = value,
+                          keyboardType: const TextInputType.numberWithOptions(
+                              decimal: true),
+                          required: true,
+                          validator: (value) {
+                            final parsedValue = double.tryParse(value ?? '');
+                            if (parsedValue == null) {
+                              return "Please enter a valid odometer reading";
+                            }
+                            return controller
+                                .validateOdometerReading(parsedValue);
+                          },
+                          // readOnly: true,
+                        ),
+                      ),
+                      const SizedBox(height: 10),
+                      Obx(
+                        () => CommonTextInput(
+                          labelText: 'Fuel Quantity',
+                          hintText: 'Enter fuel quantity',
+                          showSegmentedTabs: true,
+                          segments: ['Liters', 'Gallon'],
+                          selectedSegment:
+                              controller.fuelQuantityUnit.value == 'liters'
+                                  ? 'Liters'
+                                  : 'Gallon',
+                          onChanged: (value) => controller.fuelQuantity.value =
+                              double.tryParse(value) ?? 0.0,
+                          onSegmentSelected: (value) {
+                            controller.fuelQuantityUnit.value =
+                                value.toLowerCase();
+                          },
+                          required: true,
+                          keyboardType: const TextInputType.numberWithOptions(
+                              decimal: true),
+                          validator: (value) {
+                            final parsedValue = double.tryParse(value ?? '');
+                            if (parsedValue == null) {
+                              return "Please enter a valid fuel quantity";
+                            }
+                            return controller.validateFuelQuantity(parsedValue);
+                          },
+                          readOnly: true,
+                        ),
+                      ),
+                      const SizedBox(height: 10),
+                      CommonTextInput(
+                        labelText: 'Receipt Number',
+                        hintText: 'Enter receipt number here',
+                        onChanged: (value) =>
+                            controller.receiptNumber.value = value,
+                        required: true,
+                        validator: (value) =>
+                            controller.validateReceiptNumber(value ?? ''),
+                      ),
+                      const SizedBox(height: 10),
+                      Obx(() => controller.selectedFuelType.value != 'def'
+                          ? Column(
+                              children: [
+                                CommonTextInput(
+                                  labelText: 'Amount Paid',
+                                  hintText: 'Enter amount here',
+                                  onChanged: (value) => controller.amountPaid
+                                      .value = double.tryParse(value) ?? 0.0,
+                                  keyboardType:
+                                      const TextInputType.numberWithOptions(
+                                          decimal: true),
+                                ),
+                                const SizedBox(height: 10),
+                              ],
+                            )
+                          : const SizedBox.shrink()),
+                      const SizedBox(height: 100),
                     ],
                   ),
-                  const SizedBox(height: 5),
-                  Obx(
-                    () => CommonTextInput(
-                      labelText: 'Odometer Reading',
-                      hintText: 'Enter odometer reading',
-                      showSegmentedTabs: true,
-                      segments: ['KM', 'Miles'],
-                      selectedSegment: controller.odometerReadingUnit.value,
-                      onChanged: (value) => controller.odometerReading.value =
-                          double.tryParse(value) ?? 0.0,
-                      onSegmentSelected: (value) =>
-                          controller.odometerReadingUnit.value = value,
-                      keyboardType:
-                          const TextInputType.numberWithOptions(decimal: true),
-                      required: true,
-                      validator: (value) {
-                        final parsedValue = double.tryParse(value ?? '');
-                        if (parsedValue == null) {
-                          return "Please enter a valid odometer reading";
-                        }
-                        return controller.validateOdometerReading(parsedValue);
-                      },
-                    ),
-                  ),
-                  const SizedBox(height: 10),
-                  Obx(
-                    () => CommonTextInput(
-                      labelText: 'Fuel Quantity',
-                      hintText: 'Enter fuel quantity',
-                      showSegmentedTabs: true,
-                      segments: ['Liters', 'Gallon'],
-                      selectedSegment:
-                          controller.fuelQuantityUnit.value == 'liters'
-                              ? 'Liters'
-                              : 'Gallon',
-                      onChanged: (value) => controller.fuelQuantity.value =
-                          double.tryParse(value) ?? 0.0,
-                      onSegmentSelected: (value) {
-                        controller.fuelQuantityUnit.value = value.toLowerCase();
-                      },
-                      required: true,
-                      keyboardType:
-                          const TextInputType.numberWithOptions(decimal: true),
-                      validator: (value) {
-                        final parsedValue = double.tryParse(value ?? '');
-                        if (parsedValue == null) {
-                          return "Please enter a valid fuel quantity";
-                        }
-                        return controller.validateFuelQuantity(parsedValue);
-                      },
-                    ),
-                  ),
-                  const SizedBox(height: 10),
-                  CommonTextInput(
-                    labelText: 'Receipt Number',
-                    hintText: 'Enter receipt number here',
-                    onChanged: (value) =>
-                        controller.receiptNumber.value = value,
-                    required: true,
-                    validator: (value) =>
-                        controller.validateReceiptNumber(value ?? ''),
-                  ),
-                  const SizedBox(height: 10),
-                  Obx(() => controller.selectedFuelType.value != 'def'
-                      ? Column(
-                          children: [
-                            CommonTextInput(
-                              labelText: 'Amount Paid',
-                              hintText: 'Enter amount here',
-                              onChanged: (value) => controller.amountPaid
-                                  .value = double.tryParse(value) ?? 0.0,
-                              keyboardType:
-                                  const TextInputType.numberWithOptions(
-                                      decimal: true),
-                            ),
-                            const SizedBox(height: 10),
-                          ],
-                        )
-                      : const SizedBox.shrink()),
-                  const SizedBox(height: 100),
                 ],
               ),
             ),

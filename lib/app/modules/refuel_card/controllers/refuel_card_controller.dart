@@ -308,14 +308,15 @@ class RefuelCardController extends GetxController {
     return totalFuelInLiters;
   }
   Future<void> refreshTrips() async {
-  isLoading.value = true; // Show a loading indicator
-  try {
-    await Get.find<RefuelingController>().fetchTrips(); // Fetch the trips data
-  } catch (e) {
-    print('Error refreshing trips: $e');
-  } finally {
-    isLoading.value = false; // Hide the loading indicator
+    try {
+      isLoading.value = true;
+      final id = Get.arguments['id'];
+      await fetchTripDetails(int.parse(id));
+      // Get.snackbar('Success', 'Trip details refreshed successfully.');
+    } catch (e) {
+      Get.snackbar('Error', 'Failed to refresh trip details: $e');
+    } finally {
+      isLoading.value = false;
+    }
   }
-}
-
 }
