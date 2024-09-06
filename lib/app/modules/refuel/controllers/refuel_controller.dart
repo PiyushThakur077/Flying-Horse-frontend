@@ -64,6 +64,7 @@ class RefuelController extends GetxController {
   }
 
   void _prefillDetailsFromStorage() {
+      isLoading.value = true; 
     final storage = GetStorage();
     tripId.value = GetStorage().read<int>('tripId') ?? 0;
     truckNumber.value = storage.read<String>('truckNumber') ?? '';
@@ -76,6 +77,8 @@ class RefuelController extends GetxController {
     trailerNumber2.value = storage.read<String>('trailerNumber2') ?? '';
     trailerName1.value = storage.read<String>('trailerName1') ?? '';
     trailerName2.value = storage.read<String>('trailerName2') ?? '';
+    
+    isLoading.value = false;
   }
 
   Future<void> fetchProvinces(String iso2CountryCode) async {
