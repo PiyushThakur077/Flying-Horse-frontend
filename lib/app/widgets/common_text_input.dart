@@ -78,7 +78,7 @@ class _CommonTextInputState extends State<CommonTextInput> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Padding(
-          padding: EdgeInsets.symmetric(horizontal: 10),
+          padding: EdgeInsets.symmetric(horizontal: 8),
           child: RichText(
             text: TextSpan(
               text: widget.labelText,
@@ -113,29 +113,33 @@ class _CommonTextInputState extends State<CommonTextInput> {
               filled: true,
               fillColor: const Color(0xFFEEEEEE),
               border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(25.0),
+                borderRadius: BorderRadius.circular(10.0),
                 borderSide: BorderSide.none,
               ),
               enabledBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(25.0),
+                               borderRadius: BorderRadius.circular(10.0),
+
                 borderSide: BorderSide(
                   color: _showErrorBorder ? Colors.red : Colors.grey.shade300,
                 ),
               ),
               focusedBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(25.0),
+                               borderRadius: BorderRadius.circular(10.0),
+
                 borderSide: BorderSide(
                   color: _showErrorBorder ? Colors.red : Colors.grey.shade300,
                 ),
               ),
               errorBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(25.0),
+                                borderRadius: BorderRadius.circular(10.0),
+
                 borderSide: BorderSide(
                   color: Colors.red, // Red border for error state
                 ),
               ),
               focusedErrorBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(25.0),
+                                borderRadius: BorderRadius.circular(10.0),
+
                 borderSide: BorderSide(
                   color: Colors.red, // Red border for focused error state
                 ),
@@ -144,7 +148,7 @@ class _CommonTextInputState extends State<CommonTextInput> {
               hintStyle: const TextStyle(color: Color(0xFFB8B8B8)),
               contentPadding: const EdgeInsets.symmetric(
                 vertical: 15.0,
-                horizontal: 20.0,
+                horizontal: 15.0,
               ),
               suffixIcon: widget.showSegmentedTabs && widget.segments != null
                   ? Padding(
