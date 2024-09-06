@@ -607,6 +607,7 @@ class RefuelCardView extends GetView<RefuelCardController> {
 
     if (selectedRefuel != null) {
       var address = jsonDecode(selectedRefuel['fuel_station_address']);
+
       controller.siteNameController.text = address['site_name'] ?? '';
       controller.countryController.text = address['country'] ?? '';
       controller.stateController.text = address['state'] ?? '';
@@ -942,7 +943,6 @@ class RefuelCardView extends GetView<RefuelCardController> {
                                       },
                                     ),
                                   )),
-                              const SizedBox(height: 10),
                               Obx(() => controller.selectedFuelType.value ==
                                       'def'
                                   ? Column(
@@ -961,7 +961,6 @@ class RefuelCardView extends GetView<RefuelCardController> {
                                       ],
                                     )
                                   : SizedBox.shrink()),
-                              SizedBox(height: 10),
                               Obx(
                                 () => CommonTextInput(
                                   labelText: 'Odometer Reading',

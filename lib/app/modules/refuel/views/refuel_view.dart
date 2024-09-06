@@ -122,26 +122,26 @@ class RefuelView extends GetView<RefuelController> {
                                 filled: true,
                                 fillColor: const Color(0xFFEEEEEE),
                                 border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(10.0),
+                                  borderRadius: BorderRadius.circular(25.0),
                                   borderSide: BorderSide.none,
                                 ),
                                 enabledBorder: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(10.0),
+                                  borderRadius: BorderRadius.circular(25.0),
                                   borderSide: BorderSide.none,
                                 ),
                                 focusedBorder: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(10.0),
+                                  borderRadius: BorderRadius.circular(25.0),
                                   borderSide: BorderSide.none,
                                 ),
                                 errorBorder: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(10.0),
+                                  borderRadius: BorderRadius.circular(25.0),
                                   borderSide: const BorderSide(
                                     color: Colors
                                         .red, // Red border for error state
                                   ),
                                 ),
                                 focusedErrorBorder: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(10.0),
+                                 borderRadius: BorderRadius.circular(25.0),
                                   borderSide: const BorderSide(
                                     color: Colors
                                         .red, // Red border for focused error state
@@ -204,30 +204,25 @@ class RefuelView extends GetView<RefuelController> {
                                       filled: true,
                                       fillColor: const Color(0xFFEEEEEE),
                                       border: OutlineInputBorder(
-                                        borderRadius:
-                                            BorderRadius.circular(10.0),
+                                       borderRadius: BorderRadius.circular(25.0),
                                         borderSide: BorderSide.none,
                                       ),
                                       enabledBorder: OutlineInputBorder(
-                                        borderRadius:
-                                            BorderRadius.circular(10.0),
+                                        borderRadius: BorderRadius.circular(25.0),
                                         borderSide: BorderSide.none,
                                       ),
                                       focusedBorder: OutlineInputBorder(
-                                        borderRadius:
-                                            BorderRadius.circular(10.0),
+                                        borderRadius: BorderRadius.circular(25.0),
                                         borderSide: BorderSide.none,
                                       ),
                                       errorBorder: OutlineInputBorder(
-                                        borderRadius:
-                                            BorderRadius.circular(10.0),
+                                        borderRadius: BorderRadius.circular(25.0),
                                         borderSide: const BorderSide(
                                           color: Colors.red,
                                         ),
                                       ),
                                       focusedErrorBorder: OutlineInputBorder(
-                                        borderRadius:
-                                            BorderRadius.circular(10.0),
+                                        borderRadius: BorderRadius.circular(25.0),
                                         borderSide: const BorderSide(
                                           color: Colors.red,
                                         ),
@@ -295,7 +290,6 @@ class RefuelView extends GetView<RefuelController> {
                             ],
                           ),
                         ),
-                        // SizedBox(height: 10),
                         Obx(() => Container(
                               width: double.infinity,
                               height: 85,
@@ -308,19 +302,19 @@ class RefuelView extends GetView<RefuelController> {
                                   filled: true,
                                   fillColor: const Color(0xFFEEEEEE),
                                   border: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(10.0),
+                                    borderRadius: BorderRadius.circular(25.0),
                                     borderSide: BorderSide.none,
                                   ),
                                   enabledBorder: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(10.0),
+                                    borderRadius: BorderRadius.circular(25.0),
                                     borderSide: BorderSide.none,
                                   ),
                                   focusedBorder: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(10.0),
+                                    borderRadius: BorderRadius.circular(25.0),
                                     borderSide: BorderSide.none,
                                   ),
                                   errorBorder: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(10.0),
+                                    borderRadius: BorderRadius.circular(25.0),
                                     borderSide: const BorderSide(
                                       color: Colors
                                           .red, // Red border when there's an error
@@ -391,6 +385,11 @@ class RefuelView extends GetView<RefuelController> {
                   Obx(() => Container(
                         height: 50, // Updated height
                         width: double.infinity,
+                        decoration: BoxDecoration(
+                          color: Colors
+                              .transparent, // Background color of the container if needed
+                          borderRadius: BorderRadius.circular(150.0),
+                        ),
                         child: SegmentedButton<String>(
                           showSelectedIcon: false,
                           style: ButtonStyle(
@@ -442,6 +441,7 @@ class RefuelView extends GetView<RefuelController> {
                           },
                         ),
                       )),
+
                   // const SizedBox(height: 10),
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -519,7 +519,7 @@ class RefuelView extends GetView<RefuelController> {
                       Obx(
                         () => controller.selectedFuelType.value == 'def'
                             ? Padding(
-                                padding: EdgeInsets.symmetric(vertical: 10),
+                                padding: EdgeInsets.only(top: 10),
                                 child: Column(
                                   children: [
                                     CommonTextInput(
@@ -571,7 +571,7 @@ class RefuelView extends GetView<RefuelController> {
                               )
                             : const SizedBox.shrink(),
                       ),
-                      const SizedBox(height: 5),
+                     
                       Obx(
                         () => CommonTextInput(
                           labelText: 'Odometer Reading',

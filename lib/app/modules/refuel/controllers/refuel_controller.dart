@@ -36,6 +36,7 @@ class RefuelController extends GetxController {
   var selectedCity = Cities().obs;
   var selectedCountry = ''.obs;
   var siteName = ''.obs;
+  var tripId = 0.obs;
 
   // Update these to store two trailer names and numbers
   var trailerNumber1 = ''.obs;
@@ -64,6 +65,7 @@ class RefuelController extends GetxController {
 
   void _prefillDetailsFromStorage() {
     final storage = GetStorage();
+    tripId.value = GetStorage().read<int>('tripId') ?? 0;
     truckNumber.value = storage.read<String>('truckNumber') ?? '';
     tripNumber.value = storage.read<String>('tripNumber') ?? '';
     cardDetail.value = storage.read<String>('cardNumber') ?? '';
@@ -349,6 +351,7 @@ class RefuelController extends GetxController {
     final localTime = DateFormat('yyyy-MM-dd HH:mm:ss').format(DateTime.now());
 
     final map = {
+       "trip_id": tripId.value,
       "trip_number": tripNumber.value,
       "fuel_type": selectedFuelType.value.toLowerCase(),
       "odometer_reading_unit": odometerReadingUnit.value,

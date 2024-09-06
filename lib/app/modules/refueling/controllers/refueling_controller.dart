@@ -45,6 +45,7 @@ class RefuelingController extends GetxController {
         for (var trip in sortedTrips) {
           if (trip['status_name'] == 'inprogress') {
             // Save trip details to GetStorage
+            GetStorage().write('tripId', trip['id'] as int);
             GetStorage().write('cardNumber', trip['card_number']);
             GetStorage().write('tripNumber', trip['trip_number']);
             GetStorage().write('truckNumber', trip['truck_number']);
