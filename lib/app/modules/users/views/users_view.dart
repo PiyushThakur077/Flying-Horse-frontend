@@ -4,7 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:flying_horse/app/data/colors.dart';
 import 'package:flying_horse/app/utils/text_style.dart';
 import 'package:get/get.dart';
-
+import 'package:url_launcher/url_launcher.dart';
 import '../controllers/users_controller.dart';
 
 class UsersView extends GetView<UsersController> {
@@ -56,7 +56,7 @@ class UsersView extends GetView<UsersController> {
                   )
                 : RefreshIndicator(
                     onRefresh: () async {
-                      await controller.getUsers(50);
+                      await controller.getUsers(1); // Refresh from page 1
                     },
                     child: ListView(
                       controller: controller.scrollController,
@@ -121,6 +121,7 @@ class UsersView extends GetView<UsersController> {
                                     )
                                   : SizedBox.shrink();
                             }
+
                             final user = controller.users[index];
                             return Container(
                               height: 64,
@@ -178,6 +179,34 @@ class UsersView extends GetView<UsersController> {
                                         ],
                                       ),
                                     ),
+                                  ),
+                                  PopupMenuButton<int>(
+                                    icon: Icon(Icons.more_vert),
+                                    onSelected: (value) async {
+                                      if (value == 1) {
+                                        final phoneNumber = user.phone ?? '';
+                                        final Uri url = Uri(
+                                            scheme: 'tel', path: phoneNumber);
+                                        if (await canLaunchUrl(url)) {
+                                          await launchUrl(url);
+                                        } else {
+                                          print('Could not launch $url');
+                                        }
+                                      }
+                                    },
+                                    itemBuilder: (context) => [
+                                      PopupMenuItem(
+                                        value: 1,
+                                        child: Row(
+                                          children: [
+                                            Icon(Icons.call,
+                                                color: AppColors.primary),
+                                            SizedBox(width: 8),
+                                            Text('Call'),
+                                          ],
+                                        ),
+                                      ),
+                                    ],
                                   ),
                                   Container(
                                     height: 64,

@@ -2,7 +2,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flying_horse/app/data/api_provider.dart';
 import 'package:flying_horse/app/data/colors.dart';
-import 'package:flying_horse/app/modules/login/user.dart';
 import 'package:flying_horse/app/modules/users/users_response.dart';
 import 'package:get/get.dart';
 
@@ -47,12 +46,21 @@ class UsersController extends GetxController {
 
     try {
       var resp = await ApiProvider().getUsers(page, perPage: 50);
-      UsersResponse usersResponse = UsersResponse.fromJson(resp);
+
+      // Map response to the new UsersListResponse model
+      UserResponse usersListResponse = UserResponse.fromJson(resp);
+
       if (page == 1) {
         users.clear();
       }
-      users.addAll(usersResponse.data!);
-      lastPage.value = usersResponse.lastPage ?? 1;
+
+      // Loop through teams and add users to the list
+      for (var team in usersListResponse.data.teams) {
+        users.addAll(team.users);
+      }
+
+      lastPage.value = (usersListResponse.data.total / usersListResponse.data.perPage).ceil();
+
     } catch (e) {
       print(e);
     } finally {
@@ -63,3 +71,4 @@ class UsersController extends GetxController {
     }
   }
 }
+

@@ -53,7 +53,7 @@ class User {
   String? name;
   String? email;
   // Null? emailVerifiedAt;
-  // Null? phone;
+  String? phone;
   // Null? image;
   int? active;
   String? createdAt;
@@ -69,7 +69,7 @@ class User {
       this.name,
       this.email,
       // this.emailVerifiedAt,
-      // this.phone,
+      this.phone,
       // this.image,
       this.active,
       this.createdAt,
@@ -85,7 +85,7 @@ class User {
     name = json['name'];
     email = json['email'];
     // emailVerifiedAt = json['email_verified_at'];
-    // phone = json['phone'];
+    phone = json['phone'];
     // image = json['image'];
     active = json['active'];
     createdAt = json['created_at'];
@@ -103,7 +103,7 @@ class User {
     data['name'] = this.name;
     data['email'] = this.email;
     // data['email_verified_at'] = this.emailVerifiedAt;
-    // data['phone'] = this.phone;
+    data['phone'] = this.phone;
     // data['image'] = this.image;
     data['active'] = this.active;
     data['created_at'] = this.createdAt;

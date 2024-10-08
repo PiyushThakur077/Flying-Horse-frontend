@@ -37,6 +37,24 @@ class RefuelController extends GetxController {
   var selectedCountry = ''.obs;
   var siteName = ''.obs;
   var tripId = 0.obs;
+  var prod = ''.obs;
+  var fedralTax = ''.obs;
+  var stateTax = ''.obs;
+  var cost = 0.0.obs;
+  var freight = 0.0.obs;
+  var other = 0.0.obs;
+  var basePrice = 0.0.obs;
+  var fet = ''.obs;
+  var pft = ''.obs;
+  var pct = ''.obs;
+  var local = ''.obs;
+  var fuelPrice = 0.0.obs;
+  var salesTax = 0.0.obs;
+  var inTaxPrice = 0.0.obs;
+  var qst = 0.0.obs;
+  var totalCost = 0.0.obs;
+  var retailPrice = 0.0.obs;
+  var savings = 0.0.obs;
 
   // Update these to store two trailer names and numbers
   var trailerNumber1 = ''.obs;
@@ -64,7 +82,7 @@ class RefuelController extends GetxController {
   }
 
   void _prefillDetailsFromStorage() {
-      isLoading.value = true; 
+    isLoading.value = true;
     final storage = GetStorage();
     tripId.value = GetStorage().read<int>('tripId') ?? 0;
     truckNumber.value = storage.read<String>('truckNumber') ?? '';
@@ -77,7 +95,7 @@ class RefuelController extends GetxController {
     trailerNumber2.value = storage.read<String>('trailerNumber2') ?? '';
     trailerName1.value = storage.read<String>('trailerName1') ?? '';
     trailerName2.value = storage.read<String>('trailerName2') ?? '';
-    
+
     isLoading.value = false;
   }
 
@@ -162,6 +180,32 @@ class RefuelController extends GetxController {
           yourPrice.value =
               double.tryParse(selectedSite.yourPrice ?? '0.0') ?? 0.0;
           effectiveDate.value = selectedSite.effectiveDate ?? '';
+          prod.value = selectedSite.prod ?? '';
+          fedralTax.value = selectedSite.fedralTax ?? '';
+          stateTax.value = selectedSite.stateTax ?? '';
+          cost.value = double.tryParse(selectedSite.cost ?? '0.0') ?? 0.0;
+          ;
+          freight.value =
+              double.tryParse(selectedSite.yourPrice ?? '0.0') ?? 0.0;
+          other.value = double.tryParse(selectedSite.other ?? '0.0') ?? 0.0;
+          basePrice.value =
+              double.tryParse(selectedSite.basePrice ?? '0.0') ?? 0.0;
+          fet.value = selectedSite.fet ?? '';
+          pft.value = selectedSite.pft ?? '';
+          pct.value = selectedSite.pct ?? '';
+          local.value = selectedSite.local ?? '';
+          fuelPrice.value =
+              double.tryParse(selectedSite.fuelPrice ?? '0.0') ?? 0.0;
+          salesTax.value =
+              double.tryParse(selectedSite.salesTax ?? '0.0') ?? 0.0;
+          inTaxPrice.value =
+              double.tryParse(selectedSite.intaxPrice ?? '0.0') ?? 0.0;
+          qst.value = double.tryParse(selectedSite.qst ?? '0.0') ?? 0.0;
+          totalCost.value =
+              double.tryParse(selectedSite.totalCost ?? '0.0') ?? 0.0;
+          retailPrice.value =
+              double.tryParse(selectedSite.retailPrice ?? '0.0') ?? 0.0;
+          savings.value = double.tryParse(selectedSite.savings ?? '0.0') ?? 0.0;
 
           print('Your Price: ${yourPrice.value}');
           print('Effective Date: ${effectiveDate.value}');
@@ -354,7 +398,7 @@ class RefuelController extends GetxController {
     final localTime = DateFormat('yyyy-MM-dd HH:mm:ss').format(DateTime.now());
 
     final map = {
-       "trip_id": tripId.value,
+      "trip_id": tripId.value,
       "trip_number": tripNumber.value,
       "fuel_type": selectedFuelType.value.toLowerCase(),
       "odometer_reading_unit": odometerReadingUnit.value,
@@ -376,6 +420,24 @@ class RefuelController extends GetxController {
       "effective_date": effectiveDate.value,
       "amount_paid": amountPaid.value > 0 ? amountPaid.value : null,
       "fuel_filled_to": selectedFuelFilledTo.value,
+      "prod": prod.value,
+      "fedral_tax": fedralTax.value,
+      "state_tax": stateTax.value,
+      "cost": cost.value,
+      "freight": freight.value,
+      "other": other.value,
+      "base_price": basePrice.value,
+      "fet": fet.value,
+      "pft": pft.value,
+      "pct": pct.value,
+      "local": local.value,
+      "fuel_price": fuelPrice.value,
+      "sales_tax": salesTax.value,
+      "intax_price": inTaxPrice.value,
+      "qst": qst.value,
+      "total_cost": totalCost.value,
+      "retail_price": retailPrice.value,
+      "savings": savings.value,
     };
 
     print("Submitted Data: $map"); // Debug output
@@ -413,6 +475,8 @@ class RefuelController extends GetxController {
         pricePerGallon.value = 0.0;
         siteNameController.clear();
         yourPrice.value = 0.0;
+        prod.value = '';
+       
 
         Future.delayed(Duration(milliseconds: 5), () {
           Navigator.pop(context, true);

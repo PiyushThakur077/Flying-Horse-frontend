@@ -1,3 +1,3 @@
 class Constants {
-  static const String baseUrl = "https://fh.zinreet.com/";
+  static const String baseUrl = "http://192.168.1.3:8000/";
 }
