@@ -2,21 +2,23 @@ class UserResponse {
   final bool success;
   final String message;
   final int statusCode;
-  final UserData data;
+  final UserData? data;
 
   UserResponse({
     required this.success,
     required this.message,
     required this.statusCode,
-    required this.data,
+    this.data,
   });
 
   factory UserResponse.fromJson(Map<String, dynamic> json) {
     return UserResponse(
-      success: json['success'],
-      message: json['message'],
-      statusCode: json['status_code'],
-      data: UserData.fromJson(json['data']),
+      success: json['success'] as bool,
+      message: json['message'] as String,
+      statusCode: json['status_code'] != null
+          ? int.tryParse(json['status_code'].toString()) ?? 0 // Provide default value
+          : 0, // Default if null
+      data: json['data'] != null ? UserData.fromJson(json['data']) : null,
     );
   }
 }
@@ -36,33 +38,44 @@ class UserData {
 
   factory UserData.fromJson(Map<String, dynamic> json) {
     return UserData(
-      page: json['page'],
-      perPage: json['per_page'],
-      total: json['total'],
-      teams: (json['data'] as List).map((teamJson) => Team.fromJson(teamJson)).toList(),
+      page: json['page'] != null
+          ? int.tryParse(json['page'].toString()) ?? 1 // Default to page 1 if null
+          : 1,
+      perPage: json['per_page'] != null
+          ? int.tryParse(json['per_page'].toString()) ?? 50 // Default to 50 if null
+          : 50,
+      total: json['total'] != null
+          ? int.tryParse(json['total'].toString()) ?? 0 // Default to 0 if null
+          : 0,
+      teams: (json['data'] as List? ?? []).map((teamJson) => Team.fromJson(teamJson)).toList(),
     );
   }
 }
 
 class Team {
-  final int teamId;
+  final int? teamId; // Allow null values for teamId
   final String teamName;
   final List<User> users;
 
   Team({
-    required this.teamId,
+    this.teamId, // No need for required since it can be null
     required this.teamName,
     required this.users,
   });
 
   factory Team.fromJson(Map<String, dynamic> json) {
     return Team(
-      teamId: json['team_id'],
-      teamName: json['team_name'],
-      users: (json['users'] as List).map((userJson) => User.fromJson(userJson)).toList(),
+      teamId: json['team_id'] != null
+          ? int.tryParse(json['team_id'].toString())
+          : null, // Handle null values for team_id
+      teamName: json['team_name'] as String? ?? 'Unknown', // Default if null
+      users: (json['users'] as List? ?? [])
+          .map((userJson) => User.fromJson(userJson))
+          .toList(),
     );
   }
 }
+
 
 class User {
   final int id;
@@ -111,26 +124,36 @@ class User {
 
   factory User.fromJson(Map<String, dynamic> json) {
     return User(
-      id: json['id'],
-      role: json['role'],
-      statusId: json['status_id'],
-      deviceId: json['device_id'],
-      provider: json['provider'],
-      providerId: json['provider_id'],
-      name: json['name'],
-      email: json['email'],
-      emailVerifiedAt: json['email_verified_at'],
-      phone: json['phone'],
-      image: json['image'],
-      active: json['active'],
-      createdAt: json['created_at'],
-      updatedAt: json['updated_at'],
-      superAdmin: json['super_admin'],
-      superUser: json['super_user'],
-      status: json['status'],
-      startedAt: json['started_at'],
-      teamId: json['team_id'],
-      teamName: json['team_name'],
+      id: json['id'] != null ? int.tryParse(json['id'].toString()) ?? 0 : 0, // Default if null
+      role: json['role'] as String? ?? 'Unknown', // Default if null
+      statusId: json['status_id'] != null
+          ? int.tryParse(json['status_id'].toString())
+          : null,
+      deviceId: json['device_id'] as String?,
+      provider: json['provider'] as String?,
+      providerId: json['provider_id'] as String?,
+      name: json['name'] as String? ?? 'Unknown', // Default if null
+      email: json['email'] as String? ?? 'Unknown', // Default if null
+      emailVerifiedAt: json['email_verified_at'] as String?,
+      phone: json['phone'] as String?,
+      image: json['image'] as String?,
+      active: json['active'] != null
+          ? int.tryParse(json['active'].toString()) ?? 0 // Default if null
+          : 0,
+      createdAt: json['created_at'] as String? ?? 'Unknown', // Default if null
+      updatedAt: json['updated_at'] as String? ?? 'Unknown', // Default if null
+      superAdmin: json['super_admin'] != null
+          ? int.tryParse(json['super_admin'].toString()) ?? 0 // Default if null
+          : 0,
+      superUser: json['super_user'] != null
+          ? int.tryParse(json['super_user'].toString()) ?? 0 // Default if null
+          : 0,
+      status: json['status'] as String?,
+      startedAt: json['started_at'] as String?,
+      teamId: json['team_id'] != null
+          ? int.tryParse(json['team_id'].toString())
+          : null,
+      teamName: json['team_name'] as String?,
     );
   }
 }

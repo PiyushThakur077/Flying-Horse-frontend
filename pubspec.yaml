@@ -1,5 +1,5 @@
 name: flying_horse
-version: 1.0.0+1
+version: 1.0.1+1
 publish_to: none
 description: A new Flutter project.
 environment: 
@@ -7,6 +7,7 @@ environment:
 
 dependencies: 
   get: ^4.6.6
+  dotted_border: ^2.0.0
   cupertino_icons: ^1.0.2
   get_storage: 2.1.1
   google_fonts: ^6.2.1
