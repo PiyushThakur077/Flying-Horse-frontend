@@ -22,7 +22,7 @@ class ProfileView extends GetView<ProfileController> {
             systemNavigationBarDividerColor: AppColors.primary),
         child: Scaffold(
       appBar: AppBar(
-        title: const Text('ProfileView'),
+        title: const Text('Profiless'),
         titleTextStyle: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.w600),
         centerTitle: true,
         backgroundColor: AppColors.primary,

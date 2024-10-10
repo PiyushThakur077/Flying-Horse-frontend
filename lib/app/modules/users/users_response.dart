@@ -28,15 +28,31 @@ class UserData {
   final int perPage;
   final int total;
   final List<Team> teams;
+  final List<User> unassignedUsers;
 
   UserData({
     required this.page,
     required this.perPage,
     required this.total,
     required this.teams,
+    required this.unassignedUsers,
   });
 
   factory UserData.fromJson(Map<String, dynamic> json) {
+    List<User> unassignedUsers = [];
+
+    List<Team> teams = (json['data'] as List<dynamic>? ?? []).map((teamJson) {
+      // Check if the team has a team_id; otherwise consider as unassigned users
+      if (teamJson['team_id'] != null) {
+        return Team.fromJson(teamJson);
+      } else {
+        unassignedUsers.addAll(
+          (teamJson['users'] as List<dynamic>? ?? []).map((userJson) => User.fromJson(userJson)).toList()
+        );
+      }
+      return null; // Return null for non-team entries to filter later
+    }).whereType<Team>().toList(); // Collect only valid teams
+
     return UserData(
       page: json['page'] != null
           ? int.tryParse(json['page'].toString()) ?? 1 // Default to page 1 if null
@@ -47,18 +63,19 @@ class UserData {
       total: json['total'] != null
           ? int.tryParse(json['total'].toString()) ?? 0 // Default to 0 if null
           : 0,
-      teams: (json['data'] as List? ?? []).map((teamJson) => Team.fromJson(teamJson)).toList(),
+      teams: teams, // Valid teams
+      unassignedUsers: unassignedUsers, // Unassigned users
     );
   }
 }
 
 class Team {
-  final int? teamId; // Allow null values for teamId
+  final int? teamId;
   final String teamName;
   final List<User> users;
 
   Team({
-    this.teamId, // No need for required since it can be null
+    this.teamId,
     required this.teamName,
     required this.users,
   });
@@ -67,15 +84,14 @@ class Team {
     return Team(
       teamId: json['team_id'] != null
           ? int.tryParse(json['team_id'].toString())
-          : null, // Handle null values for team_id
-      teamName: json['team_name'] as String? ?? 'Unknown', // Default if null
-      users: (json['users'] as List? ?? [])
+          : null,
+      teamName: json['team_name'] as String? ?? 'Unknown', // Default team name if null
+      users: (json['users'] as List<dynamic>? ?? [])
           .map((userJson) => User.fromJson(userJson))
-          .toList(),
+          .toList(), // Always treat users as a list, even if it's null
     );
   }
 }
-
 
 class User {
   final int id;

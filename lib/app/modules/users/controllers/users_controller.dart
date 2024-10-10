@@ -30,70 +30,72 @@ class UsersController extends GetxController {
     });
   }
 
- Future<void> getUsers(int page) async {
-  print("getUsers started for page: $page");
-
-  if (page == 1) {
-    isLoading.value = true;
-  } else {
-    Get.dialog(
-      Center(
-        child: CupertinoActivityIndicator(
-          color: AppColors.primary,
-        ),
-      ),
-      barrierDismissible: false,
-    );
-  }
-
-  try {
-    var resp = await ApiProvider().getUsers(page, perPage: 50);
-
-    // Log the raw response from the API
-    print("API Response: $resp");
-
-    // Parse the response into the UserResponse object
-    UserResponse? userResponse;
-    try {
-      userResponse = UserResponse.fromJson(resp);
-      print(
-          "Parsed UserResponse: ${userResponse.data?.teams.length ?? 0} teams found");
-    } catch (e) {
-      print("Error while parsing response: $e");
-      return;
-    }
+  Future<void> getUsers(int page) async {
+    print("getUsers started for page: $page");
 
     if (page == 1) {
-      users.clear(); // Clear previous data when fetching page 1
+      isLoading.value = true;
+    } else {
+      Get.dialog(
+        Center(
+          child: CupertinoActivityIndicator(
+            color: AppColors.primary,
+          ),
+        ),
+        barrierDismissible: false,
+      );
     }
 
-    // Proceed only if userResponse and its data are valid
-    if (userResponse != null && userResponse.data?.teams.isNotEmpty == true) {
-      for (var team in userResponse.data!.teams) {
-        // Log the users under the current team
-        print("Processing team: ${team.teamName} with ${team.users.length} users");
+    try {
+      var resp = await ApiProvider().getUsers(page, perPage: 50);
 
-        if (team.users.isNotEmpty) {
-          users.addAll(team.users); // Add users to the list
-          print("Added ${team.users.length} users from team: ${team.teamName}");
-        }
+      // Log the raw response from the API
+      print("API Response: $resp");
+
+      // Parse the response into the UserResponse object
+      UserResponse? userResponse;
+      try {
+        userResponse = UserResponse.fromJson(resp);
+        print(
+            "Parsed UserResponse: ${userResponse.data?.teams.length ?? 0} teams found, ${userResponse.data?.unassignedUsers.length ?? 0} unassigned users found");
+      } catch (e) {
+        print("Error while parsing response: $e");
+        return;
       }
 
-      // Calculate lastPage using total and perPage if present
-      lastPage.value =
-          (userResponse.data!.total / userResponse.data!.perPage).ceil();
-    } else {
-      print("User response or teams data is null or empty");
-    }
+      if (page == 1) {
+        users.clear(); // Clear previous data when fetching page 1
+      }
 
-    print("Total Users in List: ${users.length}");
-  } catch (e) {
-    print("Error during API call or data processing: $e");
-  } finally {
-    isLoading.value = false;
-    if (page > 1) {
-      Get.back(); // Close loading dialog after fetching paginated data
+      // Proceed only if userResponse and its data are valid
+      if (userResponse != null && userResponse.data != null) {
+        // Collect users from teams
+        for (var team in userResponse.data!.teams) {
+          users.addAll(team.users); // Add users to the list
+          print(
+              "Added ${team.users.length} users from team: ${team.teamName}");
+        }
+
+        // Collect unassigned users (users with team_id == null)
+        users.addAll(userResponse.data!.unassignedUsers);
+        print(
+            "Added ${userResponse.data!.unassignedUsers.length} unassigned users");
+
+        // Calculate lastPage using total and perPage if present
+        lastPage.value =
+            (userResponse.data!.total / userResponse.data!.perPage).ceil();
+      } else {
+        print("User response or teams/unassigned users data is null or empty");
+      }
+
+      print("Total Users in List: ${users.length}");
+    } catch (e) {
+      print("Error during API call or data processing: $e");
+    } finally {
+      isLoading.value = false;
+      if (page > 1) {
+        Get.back(); // Close loading dialog after fetching paginated data
+      }
     }
   }
-}
 }
