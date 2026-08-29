@@ -51,7 +51,7 @@ class AppTheme {
             borderRadius: BorderRadius.circular(12),
             borderSide: BorderSide(color: Colors.red)),
       ),
-      cardTheme: CardTheme(
+      cardTheme: CardThemeData(
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(12),
         ),

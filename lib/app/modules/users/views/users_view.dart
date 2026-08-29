@@ -207,13 +207,18 @@ class UsersView extends GetView<UsersController> {
             children: [
               // The dotted border box with dynamic color
               DottedBorder(
-                color: borderColor, // Dynamic color for the border
-                strokeWidth: 1,
-                dashPattern: [3, 3], // Length of dashes and space between them
-                borderType: BorderType.RRect, // Rounded border
-                radius: Radius.circular(10), // Corner radius
-                padding: EdgeInsets.symmetric(
-                    vertical: 15, horizontal: 15), // Increased top padding to fit the team name
+                options: RectDottedBorderOptions(
+                  color: borderColor,
+                  strokeWidth: 1,
+                  dashPattern: [3, 3],
+                  // borderType: BorderType.RRect,
+                  // radius: Radius.circular(10),
+                  padding: EdgeInsets.symmetric(
+                    vertical: 15, horizontal: 15),
+                ),
+                // borderType: BorderType.RRect, // Rounded border
+                // radius: Radius.circular(10), // Corner radius
+             // Increased top padding to fit the team name
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
